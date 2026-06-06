@@ -58,7 +58,7 @@ export function Header() {
               </button>
             </DropdownMenuTrigger>
             
-            <DropdownMenuContent align="end" className="w-56 rounded-xl border-neutral-200 dark:border-neutral-800">
+            <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">{user?.name || 'Guest'}</p>
@@ -70,19 +70,19 @@ export function Header() {
               <DropdownMenuSeparator className="bg-neutral-200 dark:bg-neutral-800" />
               
               {/* Profile Link */}
-              <DropdownMenuItem asChild className="cursor-pointer font-medium rounded-lg">
+              <DropdownMenuItem asChild className="cursor-pointer font-medium">
                 <Link to="/super-admin/profile" className="flex items-center w-full">
                   <User className="mr-2 h-4 w-4" />
                   <span>My Profile</span>
                 </Link>
               </DropdownMenuItem>
               
-              <DropdownMenuSeparator className="bg-neutral-200 dark:bg-neutral-800" />
+              <DropdownMenuSeparator />
               
               {/* Logout Button */}
               <DropdownMenuItem 
                 onClick={handleLogout}
-                className="cursor-pointer text-red-600 focus:text-red-600 dark:text-red-500 dark:focus:text-red-500 font-medium rounded-lg"
+                className="cursor-pointer text-red-600 focus:text-red-600 dark:text-red-500 dark:focus:text-red-500 font-medium"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>

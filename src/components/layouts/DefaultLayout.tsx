@@ -8,7 +8,7 @@ export function DefaultLayout({ children }: { children?: React.ReactNode }) {
   const isSidebarOpen = useLayoutStore((state) => state.isSidebarOpen)
 
   return (
-    <div className="flex min-h-screen w-full bg-neutral-50 dark:bg-neutral-900">
+    <div className="flex min-h-screen w-full">
       <Sidebar />
       
       <div 

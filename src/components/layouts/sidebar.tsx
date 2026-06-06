@@ -32,11 +32,11 @@ export function Sidebar() {
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 ease-in-out",
-          "bg-white text-neutral-600 border-r border-neutral-200 dark:bg-neutral-950 dark:text-neutral-400 dark:border-none",
+          "bg-white border-r border-border dark:bg-neutral-950",
           isSidebarOpen ? "w-64 translate-x-0" : "-translate-x-full lg:w-20 lg:translate-x-0"
         )}
       >
-        <div className="flex h-16 shrink-0 items-center justify-between px-4 border-b border-neutral-200 dark:border-neutral-800">
+        <div className="flex h-16 shrink-0 items-center justify-between px-6T border-b border-neutral-200 dark:border-neutral-800">
           <Link to="/" className="flex items-center gap-2 text-neutral-900 dark:text-white">
             <PanelsTopLeft className="h-6 w-6 text-neutral-700 dark:text-neutral-100" />
             {isSidebarOpen && <span className="font-semibold text-lg tracking-tight">System</span>}

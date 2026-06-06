@@ -90,7 +90,7 @@ const response = await fetch('http://localhost:3000/api/auth/profile', {
   return (
     <div className="p-6 max-w-2xl mx-auto w-full">
       <div className="mb-8">
-        <h1 className="text-3xl font-black tracking-tight text-neutral-900 dark:text-white">
+        <h1 className="text-3xl font-bold">
           Account Settings
         </h1>
         <p className="text-neutral-500 dark:text-neutral-400 mt-2 font-medium">

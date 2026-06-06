@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { Button } from '@/components/ui/button'
-import { ArrowRight, Trophy, BrainCircuit, Gamepad2, Swords } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Map, Swords, Coins, Check, Gamepad2, ChevronRight, ShieldCheck, BarChart3, Sun, Moon } from 'lucide-react'
 
 // Define the root route
 export const Route = createFileRoute('/')({
@@ -8,100 +8,256 @@ export const Route = createFileRoute('/')({
 })
 
 function LandingPage() {
-  return (
-    <div className="min-h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 transition-colors">
+  const [isDark, setIsDark] = useState(false);
+
+  // Initialize theme and setup 'd' keyboard shortcut
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      document.documentElement.classList.add('dark');
+      setIsDark(true);
+    } else {
+      document.documentElement.classList.remove('dark');
+      setIsDark(false);
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input or textarea
+      if (e.target instanceof HTMLElement && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
       
-      {/* Top Navigation - Flat, no bottom border */}
-      <header className="flex items-center justify-between px-6 py-6">
-        <div className="flex items-center gap-2">
-          <BrainCircuit className="h-7 w-7 text-primary" />
-          <span className="text-2xl font-extrabold tracking-tight">Damra</span>
-        </div>
-        <nav className="flex items-center gap-6">
-          <Link to="/auth/login" className="text-sm font-bold text-neutral-500 hover:text-primary dark:text-neutral-400 transition-colors">
-            Sign in
-          </Link>
-          <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-6 font-bold shadow-none">
-            <Link to="/auth/login">
-              Start Playing
-            </Link>
-          </Button>
-        </nav>
-      </header>
+      if (e.key === 'd' || e.key === 'D') {
+        toggleTheme();
+      }
+    };
 
-      {/* Hero Section */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 text-center py-16">
-        <div className="max-w-3xl space-y-8">
-          
-          {/* Flat Pill Indicator */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-bold">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
-            </span>
-            New Quizzes Added Daily
-          </div>
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
-          {/* Solid, flat typography */}
-          <h1 className="text-5xl md:text-7xl font-black tracking-tight text-neutral-900 dark:text-white">
-            Learn Faster. <br className="hidden md:block" /> Compete Harder.
-          </h1>
+  const toggleTheme = () => {
+    setIsDark((prev) => {
+      const nextTheme = !prev;
+      if (nextTheme) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+      return nextTheme;
+    });
+  };
 
-          <p className="text-lg md:text-xl text-neutral-500 dark:text-neutral-400 max-w-2xl mx-auto font-medium leading-relaxed">
-            Master new subjects through bite-sized lessons, challenge friends in real-time trivia battles, and climb the global leaderboard. Education meets intense competition.
-          </p>
+  return (
+    <div className="relative bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors duration-300 font-sans min-h-screen flex flex-col selection:bg-amber-500/30">
+      
+      {/* Subtle Grid Background (Spans full screen) */}
+      <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
-            {/* Flat Primary Button */}
-            <Button asChild size="lg" className="w-full sm:w-auto gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl h-14 px-8 text-base font-bold shadow-none">
-              <Link to="/auth/login">
-                Jump into the Arena <ArrowRight className="h-5 w-5" />
+      {/* FULL WIDTH NAVIGATION */}
+      <nav className="sticky top-0 z-50 w-full bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <div className="flex items-center gap-2 text-xl font-bold tracking-tight text-amber-600 dark:text-amber-600">
+              Damra App
+            </div>
+            <div className="hidden md:flex space-x-8 text-sm font-medium text-slate-600 dark:text-slate-300">
+              <a href="#paths" className="hover:text-amber-600 dark:hover:text-amber-400 transition">Learning Paths</a>
+              <a href="#battles" className="hover:text-amber-600 dark:hover:text-amber-400 transition">Arena</a>
+              <a href="#schools" className="hover:text-amber-600 dark:hover:text-amber-400 transition">For Schools</a>
+            </div>
+            <div className="flex items-center space-x-2 sm:space-x-4 text-sm font-medium">
+              
+              {/* Dark/Light Mode Toggle */}
+              <button 
+                onClick={toggleTheme}
+                className="p-2 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                aria-label="Toggle theme (Press D)"
+                title="Toggle theme (Press 'd')"
+              >
+                {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
+
+              <Link to="/auth/login" className="hidden hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg md:block px-4 py-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition">
+                Log In
               </Link>
-            </Button>
-            {/* Flat Secondary Button */}
-            <Button asChild variant="secondary" size="lg" className="w-full sm:w-auto gap-2 rounded-2xl h-14 px-8 text-base font-bold border-0 shadow-none bg-neutral-200 text-neutral-900 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700">
-              <Link to="/super-admin/check-health">
-                Admin Portal
+              <Link to="/auth/register" className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 py-2 px-4 rounded-lg shadow-sm transition-all duration-200">
+                Sign Up
               </Link>
-            </Button>
+            </div>
           </div>
         </div>
+      </nav>
 
-        {/* Feature Highlights - Flat background cards, no borders, no shadows */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full mt-24 text-left">
+      {/* BORDERED BODY WRAPPER */}
+      {/* flex-1 ensures the body grows to push the footer down if content is short */}
+      <main className="flex-1 relative z-10 max-w-7xl mx-auto w-full border-x border-slate-200/80 dark:border-slate-800/80 shadow-[0_0_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_0_40px_-15px_rgba(0,0,0,0.2)]">
+        
+        {/* HERO SECTION */}
+        <section className="relative pt-24 pb-20 sm:pt-32 sm:pb-24 overflow-hidden px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            
+            {/* Announcement Badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 mb-8 text-sm font-medium rounded-full bg-amber-100/50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-400 border border-amber-200/50 dark:border-amber-500/20 backdrop-blur-sm">
+              <span className="flex h-2 w-2 rounded-full bg-amber-500"></span>
+              Damra App 1.0 is on development mode
+            </div>
+
+            <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight mb-6 text-slate-900 dark:text-white">
+              Learn like a <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-500 dark:from-amber-400 dark:to-amber-600">Genius.</span><br />
+              Compete like a <span className="text-slate-400 dark:text-slate-500">Champion.</span>
+            </h1>
+            
+            <p className="mt-6 text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
+              Conquer structured learning paths, unlock epic achievements, and wager your knowledge in real-time multiplayer arenas.
+            </p>
+            
+            <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+              <button className="flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white text-base font-semibold py-3 px-6 rounded-lg shadow-sm transition-all">
+                Start Your Journey <ChevronRight className="w-4 h-4" />
+              </button>
+              <button className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-base font-semibold py-3 px-6 rounded-lg transition-all">
+                Enter the Arena
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* TAILWIND STYLE HORIZONTAL DIVIDER */}
+        <div className="relative flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
+          <div className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent"></div>
+          {/* Glowing accent in the center */}
+          <div className="absolute h-[1px] w-1/4 bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-50 blur-[1px]"></div>
+        </div>
+
+        {/* FEATURES GRID */}
+        <section id="paths" className="py-16 px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">Engineered for Mastery</h2>
+            <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">Powered by a robust assessment engine, Damra combines structured curriculum with high-stakes gamification.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Feature 1 */}
+            <div className="bg-white/80 dark:bg-slate-950 backdrop-blur-sm border border-slate-200 dark:border-slate-900 p-8 rounded-2xl transition-all group">
+              <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl flex items-center justify-center mb-6">
+                <Map className="w-6 h-6 text-slate-700 dark:text-slate-300 group-hover:text-amber-500 transition-colors" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">Interactive Paths</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                Follow curated maps designed by educators. Complete nodes, earn XP, and master complex subjects step-by-step.
+              </p>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="bg-white/80 dark:bg-slate-950 backdrop-blur-sm border border-slate-200 dark:border-slate-900 p-8 rounded-2xl transition-all group">
+              <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl flex items-center justify-center mb-6">
+                <Swords className="w-6 h-6 text-slate-700 dark:text-slate-300 group-hover:text-amber-500 transition-colors" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">Multiplayer Battles</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                Host or join live battle rooms. Pay the entry fee, race against the clock, and take the prize pool if you rank first.
+              </p>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="bg-white/80 dark:bg-slate-950 backdrop-blur-sm border border-slate-200 dark:border-slate-900 p-8 rounded-2xl transition-all group">
+              <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl flex items-center justify-center mb-6">
+                <Coins className="w-6 h-6 text-slate-700 dark:text-slate-300 group-hover:text-amber-500 transition-colors" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">Rich Economy</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                Every answer matters. Grind for XP to unlock exclusive badges and accumulate coins to enter global admin contests.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECOND TAILWIND STYLE HORIZONTAL DIVIDER */}
+        <div className="relative flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+          <div className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent"></div>
+        </div>
+
+        {/* B2B / SCHOOLS SECTION */}
+        <section id="schools" className="py-16 pb-24 px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row items-center gap-16">
+            <div className="w-full lg:w-1/2">
+              <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-6">
+                Built for Institutions.<br/>
+                <span className="text-slate-500">Secured for Students.</span>
+              </h2>
+              <ul className="space-y-6 mt-8">
+                <li className="flex items-start">
+                  <div className="mt-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md p-1.5 mr-4 shrink-0">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-1">Verified Grade Locking</h4>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Keep exams secure. Students must be authenticated and verified to enter specific grade-level content.</p>
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <div className="mt-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md p-1.5 mr-4 shrink-0">
+                    <Check className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-1">Blind Grading & Feedback</h4>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Review individual exam attempts, award marks for open-ended questions, and leave personalized insights.</p>
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <div className="mt-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md p-1.5 mr-4 shrink-0">
+                    <BarChart3 className="w-4 h-4 " />
+                  </div>
+                  <div>
+                    <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-1">Isolated Tenant Environments</h4>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Custom dashboards, role-based access control (RBAC), and leaderboards segmented perfectly by school.</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
           
-          <div className="space-y-4 p-8 rounded-3xl bg-neutral-200/50 dark:bg-neutral-900/50">
-            <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-              <Gamepad2 className="h-7 w-7 text-primary" />
-            </div>
-            <h3 className="text-xl font-extrabold text-neutral-900 dark:text-white">Bite-Sized Mastery</h3>
-            <p className="text-neutral-600 dark:text-neutral-400 font-medium">
-              Progress through structured, gamified learning paths designed to keep you hooked and retain knowledge effortlessly.
-            </p>
+            {/* Professional UI Mockup Right Column */}
+            {/* <div className="w-full lg:w-1/2">
+              <div className="relative rounded-xl bg-slate-900 p-2 shadow-2xl border border-slate-800 ring-1 ring-white/10 overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-8 bg-slate-900/50 border-b border-slate-800 flex items-center px-4 gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-slate-700"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-slate-700"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-slate-700"></div>
+                </div>
+                <div className="mt-8 bg-black/50 rounded-lg border border-slate-800 p-4 font-mono text-xs text-slate-400 overflow-x-auto">
+                  <div className="flex gap-4 mb-2"><span className="text-amber-500">POST</span> <span>/api/v1/schools/tenant/verify</span></div>
+                  <div className="text-slate-500">{"{"}</div>
+                  <div className="pl-4"><span className="text-sky-400">"school_id"</span>: <span className="text-orange-300">1042</span>,</div>
+                  <div className="pl-4"><span className="text-sky-400">"grade_level"</span>: <span className="text-green-400">"Grade 10"</span>,</div>
+                  <div className="pl-4"><span className="text-sky-400">"student_token"</span>: <span className="text-green-400">"ey..."</span></div>
+                  <div className="text-slate-500">{"}"}</div>
+                  <div className="mt-4 flex gap-4 mb-2"><span className="text-green-500">200 OK</span> <span>12ms</span></div>
+                  <div className="text-slate-500">{"{"}</div>
+                  <div className="pl-4"><span className="text-sky-400">"status"</span>: <span className="text-green-400">"verified"</span>,</div>
+                  <div className="pl-4"><span className="text-sky-400">"permissions"</span>: [<span className="text-green-400">"READ_EXAM"</span>, <span className="text-green-400">"JOIN_ROOM"</span>]</div>
+                  <div className="text-slate-500">{"}"}</div>
+                </div>
+              </div>
+            </div> */}
           </div>
-
-          <div className="space-y-4 p-8 rounded-3xl bg-neutral-200/50 dark:bg-neutral-900/50">
-            <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-              <Swords className="h-7 w-7 text-primary" />
-            </div>
-            <h3 className="text-xl font-extrabold text-neutral-900 dark:text-white">Elite Quiz Battles</h3>
-            <p className="text-neutral-600 dark:text-neutral-400 font-medium">
-              Test your skills against other learners in high-stakes, real-time multiplayer quiz showdowns.
-            </p>
-          </div>
-
-          <div className="space-y-4 p-8 rounded-3xl bg-neutral-200/50 dark:bg-neutral-900/50">
-            <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-              <Trophy className="h-7 w-7 text-primary" />
-            </div>
-            <h3 className="text-xl font-extrabold text-neutral-900 dark:text-white">Global Leaderboards</h3>
-            <p className="text-neutral-600 dark:text-neutral-400 font-medium">
-              Earn XP, unlock premium badges, maintain your daily streak, and fight for the number one spot.
-            </p>
-          </div>
-
-        </div>
+        </section>
       </main>
+
+      {/* FULL WIDTH FOOTER */}
+      <footer className="w-full bg-white/50 dark:bg-slate-950/50 backdrop-blur-sm border-t border-slate-200/80 dark:border-slate-800/80 relative z-10 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-2 text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+            Built with Drive, Guide by Dream 
+          </div>
+          <p className="text-slate-500 dark:text-slate-500 text-sm">
+            © {new Date().getFullYear()} Damra App. All rights reserved.
+          </p>
+        </div>
+      </footer>
+
     </div>
-  )
+  );
 }
