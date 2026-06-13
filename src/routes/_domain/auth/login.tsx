@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Loader2, Mail, Lock, Sun, Moon, ArrowLeft } from 'lucide-react'
 import { useAuthStore } from '@/store/useAuthStore'
 import { Label } from '@/components/ui/label'
+import { authApi } from '@/api/auth'
 
 export const Route = createFileRoute('/_domain/auth/login')({
   component: LoginPage,
@@ -90,19 +91,7 @@ function LoginPage() {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: { email: string; password: string }) => {
-      const response = await fetch('http://localhost:3000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials),
-      })
-
-      const result: LoginResponse = await response.json()
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || 'Invalid credentials')
-      }
-
-      return result
+      return authApi.login(credentials)
     },
     onSuccess: (data) => {
       toast.success(data.message_kh, {

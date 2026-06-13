@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Activity, CheckCircle2, AlertTriangle, Loader2, RefreshCw } from "lucide-react"
+import { healthApi } from "@/api/health"
 
 // Update the route path to perfectly match the file structure
 export const Route = createFileRoute('/_domain/super-admin/check-health')({
@@ -20,11 +21,7 @@ function CheckHealthPage() {
     setStatus("loading")
     setError(null)
     try {
-      const res = await fetch("http://localhost:3000/api/health")
-      if (!res.ok) {
-        throw new Error(`Server returned HTTP ${res.status}`)
-      }
-      const data = await res.json()
+      const data = await healthApi.checkHealth()
       setResponse(data)
       setStatus("success")
       setLastChecked(new Date().toLocaleTimeString())
@@ -37,12 +34,12 @@ function CheckHealthPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center py-12 text-slate-100">
+    <div className="flex flex-col items-center justify-center py-12 text-slate-900 dark:text-slate-50">
       <div className="flex w-full max-w-md flex-col gap-6">
         
         {/* Welcome Section */}
         <div className="space-y-2 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-medium border border-emerald-500/20">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-medium border border-emerald-500/20">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -58,15 +55,15 @@ function CheckHealthPage() {
         </div>
 
         {/* Health Checker Card */}
-        <Card className="border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md shadow-xl transition-all duration-300 dark:hover:shadow-emerald-500/5">
+        <Card className="border-slate-200/50 dark:border-slate-800/50 bg-white/70 dark:bg-slate-900/30 backdrop-blur-2xl shadow-[0_8px_40px_rgb(0,0,0,0.08)] dark:shadow-[0_8px_40px_rgb(0,0,0,0.2)] rounded-2xl overflow-hidden transition-all duration-300">
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <CardTitle className="text-lg font-semibold text-neutral-900 dark:text-slate-200 flex items-center gap-2">
+                <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                   <Activity className="h-5 w-5 text-emerald-500 dark:text-emerald-400 animate-pulse" />
                   API Health Status
                 </CardTitle>
-                <CardDescription className="text-neutral-500 dark:text-slate-400">
+                <CardDescription className="text-slate-500 dark:text-slate-400">
                   Verify real-time status of the backend API
                 </CardDescription>
               </div>
@@ -91,11 +88,11 @@ function CheckHealthPage() {
           
           <CardContent className="space-y-4">
             {/* Status Display */}
-            <div className="rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40 p-4 transition-all duration-300">
+            <div className="rounded-xl border border-slate-200/50 dark:border-slate-800/50 bg-slate-50/50 dark:bg-slate-900/20 p-4 transition-all duration-300">
               {status === "idle" && (
                 <div className="flex flex-col items-center justify-center py-6 text-center text-slate-500 dark:text-slate-400 space-y-2">
                   <Activity className="h-8 w-8 text-slate-400 dark:text-slate-600" />
-                  <p className="text-xs">No status data available yet. Run a check to fetch.</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">No status data available yet. Run a check to fetch.</p>
                 </div>
               )}
 
@@ -112,7 +109,7 @@ function CheckHealthPage() {
                     <CheckCircle2 className="h-5 w-5 shrink-0" />
                     <span className="font-semibold text-sm">Connection Successful</span>
                   </div>
-                  <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300 font-mono bg-white dark:bg-slate-950/80 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+                  <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300 font-mono bg-white/70 dark:bg-slate-900/30 p-3 rounded-lg border border-slate-200/50 dark:border-slate-800/50">
                     <div><span className="text-slate-400 dark:text-slate-500">endpoint:</span> /api/health</div>
                     <div><span className="text-slate-400 dark:text-slate-500">response:</span> {JSON.stringify(response)}</div>
                     {lastChecked && (
@@ -128,7 +125,7 @@ function CheckHealthPage() {
                     <AlertTriangle className="h-5 w-5 shrink-0" />
                     <span className="font-semibold text-sm">Connection Error</span>
                   </div>
-                  <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300 font-mono bg-white dark:bg-slate-950/80 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+                  <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300 font-mono bg-white/70 dark:bg-slate-900/30 p-3 rounded-lg border border-slate-200/50 dark:border-slate-800/50">
                     <div className="text-rose-500 dark:text-rose-400/90"><span className="text-slate-400 dark:text-slate-500">error:</span> {error}</div>
                     {lastChecked && (
                       <div><span className="text-slate-400 dark:text-slate-500">failed at:</span> {lastChecked}</div>
@@ -142,13 +139,15 @@ function CheckHealthPage() {
             <Button 
               onClick={checkHealth}
               disabled={status === "loading"}
-              className="w-full !h-10 relative overflow-hidden group bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium shadow-md transition-all duration-300 hover:from-emerald-400 hover:to-teal-500 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+              className="w-full relative overflow-hidden bg-primary hover:bg-primary/90 text-white rounded-lg !h-12 text-base font-semibold transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none group"
             >
+              <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+              
               <span className="relative flex items-center justify-center gap-2">
                 {status === "loading" ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
-                  <RefreshCw className="h-4 w-4 transition-transform group-hover:rotate-180 duration-500" />
+                  <RefreshCw className="h-5 w-5 transition-transform group-hover:rotate-180 duration-500" />
                 )}
                 {status === "idle" ? "Verify API Connection" : "Run Diagnostics Again"}
               </span>
@@ -156,6 +155,13 @@ function CheckHealthPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Global styles for the button shimmer effect */}
+      <style>{`
+        @keyframes shimmer {
+          100% { transform: translateX(100%); }
+        }
+      `}</style>
     </div>
   )
 }

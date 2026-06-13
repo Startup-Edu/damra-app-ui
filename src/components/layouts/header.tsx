@@ -2,6 +2,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { Menu, Bell, UserCircle, LogOut, User } from 'lucide-react' 
 import { useLayoutStore } from '@/store/useLayoutStore'
 import { useAuthStore } from '@/store/useAuthStore'
+import { authApi } from '@/api/auth'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +20,12 @@ export function Header() {
   const user = useAuthStore((state) => state.user) 
   const clearAuth = useAuthStore((state) => state.clearAuth)
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await authApi.logout()
+    } catch (error) {
+      console.error('Backend logout failed:', error)
+    }
     clearAuth() 
     navigate({ to: '/auth/login' }) 
   }
