@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { LayoutDashboard, Users, GraduationCap, Shield, X, PanelsTopLeft } from 'lucide-react'
+import { LayoutDashboard, Users, GraduationCap, Shield, ShieldCheck, X, PanelsTopLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLayoutStore } from '@/store/useLayoutStore'
 
@@ -8,6 +8,7 @@ const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   // Example for the SuperAdmin route you created
   { name: 'User Management', href: '/super-admin/users-management', icon: Users },
+  { name: 'Roles & Permissions', href: '/super-admin/roles-permissions', icon: ShieldCheck },
   // Example if you have an Admin dashboard
   { name: 'Admin Portal', href: '/admin', icon: Shield },
   { name: 'Check Health', href: '/super-admin/check-health', icon: Shield },

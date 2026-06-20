@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DomainSuperAdminRouteImport } from './routes/_domain/super-admin'
 import { Route as DomainAuthRouteImport } from './routes/_domain/auth'
 import { Route as DomainSuperAdminUsersManagementRouteImport } from './routes/_domain/super-admin/users-management'
+import { Route as DomainSuperAdminRolesPermissionsRouteImport } from './routes/_domain/super-admin/roles-permissions'
 import { Route as DomainSuperAdminProfileRouteImport } from './routes/_domain/super-admin/profile'
 import { Route as DomainSuperAdminCheckHealthRouteImport } from './routes/_domain/super-admin/check-health'
 import { Route as DomainAuthResetPasswordRouteImport } from './routes/_domain/auth/reset-password'
@@ -38,6 +39,12 @@ const DomainSuperAdminUsersManagementRoute =
   DomainSuperAdminUsersManagementRouteImport.update({
     id: '/users-management',
     path: '/users-management',
+    getParentRoute: () => DomainSuperAdminRoute,
+  } as any)
+const DomainSuperAdminRolesPermissionsRoute =
+  DomainSuperAdminRolesPermissionsRouteImport.update({
+    id: '/roles-permissions',
+    path: '/roles-permissions',
     getParentRoute: () => DomainSuperAdminRoute,
   } as any)
 const DomainSuperAdminProfileRoute = DomainSuperAdminProfileRouteImport.update({
@@ -77,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof DomainAuthResetPasswordRoute
   '/super-admin/check-health': typeof DomainSuperAdminCheckHealthRoute
   '/super-admin/profile': typeof DomainSuperAdminProfileRoute
+  '/super-admin/roles-permissions': typeof DomainSuperAdminRolesPermissionsRoute
   '/super-admin/users-management': typeof DomainSuperAdminUsersManagementRoute
 }
 export interface FileRoutesByTo {
@@ -88,6 +96,7 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof DomainAuthResetPasswordRoute
   '/super-admin/check-health': typeof DomainSuperAdminCheckHealthRoute
   '/super-admin/profile': typeof DomainSuperAdminProfileRoute
+  '/super-admin/roles-permissions': typeof DomainSuperAdminRolesPermissionsRoute
   '/super-admin/users-management': typeof DomainSuperAdminUsersManagementRoute
 }
 export interface FileRoutesById {
@@ -100,6 +109,7 @@ export interface FileRoutesById {
   '/_domain/auth/reset-password': typeof DomainAuthResetPasswordRoute
   '/_domain/super-admin/check-health': typeof DomainSuperAdminCheckHealthRoute
   '/_domain/super-admin/profile': typeof DomainSuperAdminProfileRoute
+  '/_domain/super-admin/roles-permissions': typeof DomainSuperAdminRolesPermissionsRoute
   '/_domain/super-admin/users-management': typeof DomainSuperAdminUsersManagementRoute
 }
 export interface FileRouteTypes {
@@ -113,6 +123,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/super-admin/check-health'
     | '/super-admin/profile'
+    | '/super-admin/roles-permissions'
     | '/super-admin/users-management'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -124,6 +135,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/super-admin/check-health'
     | '/super-admin/profile'
+    | '/super-admin/roles-permissions'
     | '/super-admin/users-management'
   id:
     | '__root__'
@@ -135,6 +147,7 @@ export interface FileRouteTypes {
     | '/_domain/auth/reset-password'
     | '/_domain/super-admin/check-health'
     | '/_domain/super-admin/profile'
+    | '/_domain/super-admin/roles-permissions'
     | '/_domain/super-admin/users-management'
   fileRoutesById: FileRoutesById
 }
@@ -172,6 +185,13 @@ declare module '@tanstack/react-router' {
       path: '/users-management'
       fullPath: '/super-admin/users-management'
       preLoaderRoute: typeof DomainSuperAdminUsersManagementRouteImport
+      parentRoute: typeof DomainSuperAdminRoute
+    }
+    '/_domain/super-admin/roles-permissions': {
+      id: '/_domain/super-admin/roles-permissions'
+      path: '/roles-permissions'
+      fullPath: '/super-admin/roles-permissions'
+      preLoaderRoute: typeof DomainSuperAdminRolesPermissionsRouteImport
       parentRoute: typeof DomainSuperAdminRoute
     }
     '/_domain/super-admin/profile': {
@@ -231,12 +251,14 @@ const DomainAuthRouteWithChildren = DomainAuthRoute._addFileChildren(
 interface DomainSuperAdminRouteChildren {
   DomainSuperAdminCheckHealthRoute: typeof DomainSuperAdminCheckHealthRoute
   DomainSuperAdminProfileRoute: typeof DomainSuperAdminProfileRoute
+  DomainSuperAdminRolesPermissionsRoute: typeof DomainSuperAdminRolesPermissionsRoute
   DomainSuperAdminUsersManagementRoute: typeof DomainSuperAdminUsersManagementRoute
 }
 
 const DomainSuperAdminRouteChildren: DomainSuperAdminRouteChildren = {
   DomainSuperAdminCheckHealthRoute: DomainSuperAdminCheckHealthRoute,
   DomainSuperAdminProfileRoute: DomainSuperAdminProfileRoute,
+  DomainSuperAdminRolesPermissionsRoute: DomainSuperAdminRolesPermissionsRoute,
   DomainSuperAdminUsersManagementRoute: DomainSuperAdminUsersManagementRoute,
 }
 

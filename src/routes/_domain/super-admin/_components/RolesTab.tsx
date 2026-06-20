@@ -1,11 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { PageHeader } from '@/components/ui/page-header'
-import { Avatar } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
@@ -40,153 +37,156 @@ import {
   Edit,
   Trash2,
   Loader2,
-  User as UserIcon,
+  Shield,
+  Key,
 } from 'lucide-react'
-import { useUsersQuery, useDeleteUserMutation } from './_hooks/useUsers'
-import type { UserItem } from './_types/users.types'
-import { UserDialog } from './_components/UserDialog'
+import { useRolesQuery, useDeleteRoleMutation } from '../_hooks/useRolesPermissions'
+import type { RoleItem } from '../_types/rolesPermissions.types'
+import { RoleDialog } from './RoleDialog'
+import { ManagePermissionsDialog } from './ManagePermissionsDialog'
 
-export const Route = createFileRoute('/_domain/super-admin/users-management')({
-  component: UsersManagementPage,
-})
-
-function UsersManagementPage() {
+export function RolesTab() {
   const [page, setPage] = useState(1)
   const [limit] = useState(10)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
 
-  // Dialog triggers
+  // Modal triggers
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [activeUser, setActiveUser] = useState<UserItem | null>(null)
+  const [activeRole, setActiveRole] = useState<RoleItem | null>(null)
+  
+  const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false)
+  const [permissionsRole, setPermissionsRole] = useState<{ id: string; name: string } | null>(null)
 
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false)
-  const [userToDelete, setUserToDelete] = useState<UserItem | null>(null)
+  const [roleToDelete, setRoleToDelete] = useState<RoleItem | null>(null)
 
-  // Debounce search query to prevent excessive API calls
+  // Debounce search
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search)
-      setPage(1) // Reset to first page on new search
+      setPage(1)
     }, 400)
-
     return () => clearTimeout(handler)
   }, [search])
 
-  // Fetch users with React Query
-  const { data, isLoading, isError, refetch } = useUsersQuery(page, limit, debouncedSearch)
-  const deleteMutation = useDeleteUserMutation()
+  const { data, isLoading, isError, refetch } = useRolesQuery(page, limit, debouncedSearch)
+  const deleteMutation = useDeleteRoleMutation()
 
   const response = data
-  const users = response?.data || []
+  const roles = response?.data || []
   const totalElements = response?.total_elements || 0
   const totalPages = response?.total_pages || 1
 
+  const handleEdit = (role: RoleItem) => {
+    setActiveRole(role)
+    setDialogOpen(true)
+  }
+
   const handleAdd = () => {
-    setActiveUser(null)
+    setActiveRole(null)
     setDialogOpen(true)
   }
 
-  const handleEdit = (user: UserItem) => {
-    setActiveUser(user)
-    setDialogOpen(true)
+  const handleManagePermissions = (role: RoleItem) => {
+    setPermissionsRole({ id: role.id, name: role.name })
+    setPermissionsDialogOpen(true)
   }
 
-  const handleDeleteTrigger = (user: UserItem) => {
-    setUserToDelete(user)
+  const handleDeleteTrigger = (role: RoleItem) => {
+    setRoleToDelete(role)
     setDeleteAlertOpen(true)
   }
 
   const handleDeleteConfirm = () => {
-    if (userToDelete) {
-      deleteMutation.mutate(userToDelete.id, {
+    if (roleToDelete) {
+      deleteMutation.mutate(roleToDelete.id, {
         onSuccess: () => {
           setDeleteAlertOpen(false)
-          setUserToDelete(null)
+          setRoleToDelete(null)
         },
       })
     }
   }
 
   return (
-    <div className="p-6 mx-auto w-full max-w-6xl space-y-6 text-slate-900 dark:text-slate-50">
-      
-      {/* Page Header */}
-      <PageHeader
-        title="Users Management"
-        description="Manage system access, user roles, authentication status, and details."
-      >
-        {/* Add User button */}
-        <Button onClick={handleAdd} className="shadow-xs text-xs h-9">
-          <Plus className="mr-1.5 h-3.5 w-3.5" /> Add User
-        </Button>
-      </PageHeader>
+    <div className="space-y-4">
+      {/* Toolbar */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="relative flex-1 max-w-md group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+          <Input
+            placeholder="Search roles..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 h-9 text-xs"
+          />
+        </div>
 
-      {/* Main Content Card */}
-      <Card variant="glass">
-        
-        {/* Toolbar */}
-        <div className="flex items-center gap-3 p-6 pb-4">
-          <div className="relative flex-1 max-w-md group">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <Input
-              placeholder="Search users by name or email..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 h-10 text-xs"
-            />
-          </div>
-          
+        <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="icon"
             onClick={() => refetch()}
             disabled={isLoading}
-            className="h-10 w-10"
+            className="h-9 w-9"
           >
             {isLoading ? (
-              <Loader2 className="h-4.5 w-4.5 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <RefreshCw className="h-4.5 w-4.5" />
+              <RefreshCw className="h-4 w-4" />
             )}
           </Button>
+          <Button onClick={handleAdd} className="h-9 text-xs shadow-xs">
+            <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Role
+          </Button>
         </div>
+      </div>
 
+      {/* Grid Card List / Table */}
+      <Card variant="glass">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="pl-6 text-[11px] font-bold uppercase tracking-wider text-slate-400">User</TableHead>
-                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Email Address</TableHead>
-                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Roles</TableHead>
-                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Status</TableHead>
-                  <TableHead className="pr-6 text-right text-[11px] font-bold uppercase tracking-wider text-slate-400">Actions</TableHead>
+                  <TableHead className="pl-6 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    Role Name
+                  </TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    Created By
+                  </TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    Created Date
+                  </TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    Status
+                  </TableHead>
+                  <TableHead className="pr-6 text-right text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
-              
+
               <TableBody>
                 {isLoading ? (
-                  // Loading state using Skeleton components
-                  Array.from({ length: 5 }).map((_, idx) => (
+                  Array.from({ length: 4 }).map((_, idx) => (
                     <TableRow key={idx}>
                       <TableCell className="pl-6">
-                        <div className="flex items-center gap-3">
-                          <Skeleton className="h-9 w-9 rounded-full" />
-                          <Skeleton className="h-4 w-28" />
-                        </div>
+                        <Skeleton className="h-4 w-28 rounded" />
                       </TableCell>
                       <TableCell>
-                        <Skeleton className="h-4 w-40" />
+                        <Skeleton className="h-4 w-24 rounded" />
                       </TableCell>
                       <TableCell>
-                        <Skeleton className="h-5 w-16 rounded-full" />
+                        <Skeleton className="h-4 w-20 rounded" />
                       </TableCell>
                       <TableCell>
                         <Skeleton className="h-5 w-14 rounded-full" />
                       </TableCell>
                       <TableCell className="pr-6">
-                        <div className="flex justify-end gap-2">
+                        <div className="flex justify-end gap-1.5">
+                          <Skeleton className="h-8 w-8 rounded-md" />
                           <Skeleton className="h-8 w-8 rounded-md" />
                           <Skeleton className="h-8 w-8 rounded-md" />
                         </div>
@@ -194,64 +194,36 @@ function UsersManagementPage() {
                     </TableRow>
                   ))
                 ) : isError ? (
-                  // Error state
                   <TableRow>
                     <TableCell colSpan={5} className="py-12 text-center text-rose-500 font-medium text-xs">
-                      Failed to fetch users. Please make sure the API server is online.
+                      Failed to fetch system roles. Please check connection.
                     </TableCell>
                   </TableRow>
-                ) : users.length === 0 ? (
-                  // Empty state
+                ) : roles.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="py-16 text-center ">
-                      <div className="flex flex-col items-center gap-2">
-                        <UserIcon className="h-8 w-8 text-slate-300 dark:text-slate-700" />
-                        <p className="text-xs font-semibold">No users found matching your search</p>
+                    <TableCell colSpan={5} className="py-16 text-center">
+                      <div className="flex flex-col items-center gap-2 text-slate-400 dark:text-slate-600">
+                        <Shield className="h-8 w-8 opacity-60" />
+                        <p className="text-xs font-semibold">No system roles found</p>
                       </div>
                     </TableCell>
                   </TableRow>
                 ) : (
-                  // Data state
-                  users.map((user) => (
-                    <TableRow key={user.id}>
-                      {/* User Column with Avatar */}
+                  roles.map((role) => (
+                    <TableRow key={role.id}>
                       <TableCell className="pl-6 py-3.5">
-                        <div className="flex items-center gap-3">
-                          <Avatar name={user.name} />
-                          <div className="font-semibold text-slate-900 dark:text-slate-100 text-xs">
-                            {user.name}
-                            {user.default_data && (
-                              <span className="ml-1.5 text-[9px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">
-                                Default
-                              </span>
-                            )}
-                          </div>
-                        </div>
+                        <span className="font-bold text-slate-800 dark:text-slate-200 tracking-wide text-xs">
+                          {role.name}
+                        </span>
                       </TableCell>
-                      
-                      {/* Email Column */}
-                      <TableCell className="text-slate-600 dark:text-slate-300 text-xs">
-                        {user.email}
+                      <TableCell className="text-slate-600 dark:text-slate-400 text-xs">
+                        {role.user?.name || 'System / Default'}
                       </TableCell>
-                      
-                      {/* Roles Column */}
-                      <TableCell className="py-4">
-                        <div className="flex gap-1.5 flex-wrap">
-                          {user.roles && user.roles.map((role) => (
-                            <Badge
-                              key={role.id}
-                              variant="warning"
-                              className="font-semibold text-[9px]"
-                            >
-                              {role.name}
-                            </Badge>
-                          ))}
-                        </div>
+                      <TableCell className="text-slate-500 text-xs">
+                        {role.created_at}
                       </TableCell>
-                      
-                      {/* Status Column */}
                       <TableCell>
-                        {user.is_active ? (
+                        {role.is_active ? (
                           <Badge variant="success" className="font-semibold text-[9px]">
                             Active
                           </Badge>
@@ -261,26 +233,32 @@ function UsersManagementPage() {
                           </Badge>
                         )}
                       </TableCell>
-                      
-                      {/* Actions Column */}
                       <TableCell className="pr-6 text-right">
                         <div className="flex justify-end gap-1">
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleEdit(user)}
+                            onClick={() => handleManagePermissions(role)}
+                            className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-500/5 transition-all"
+                            title="Manage Permissions"
+                          >
+                            <Key className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEdit(role)}
                             className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-500/5 transition-all"
-                            title="Edit User"
+                            title="Edit Role"
                           >
                             <Edit className="h-3.5 w-3.5" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleDeleteTrigger(user)}
+                            onClick={() => handleDeleteTrigger(role)}
                             className="h-8 w-8 text-slate-400 hover:text-rose-500 hover:bg-rose-500/5 transition-all"
-                            disabled={user.default_data}
-                            title="Delete User"
+                            title="Delete Role"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
@@ -294,16 +272,16 @@ function UsersManagementPage() {
           </div>
 
           {/* Pagination Footer */}
-          {!isLoading && !isError && users.length > 0 && (
-            <div className="flex items-center justify-between p-4 px-6 border-t bg-slate-50/30 dark:bg-slate-950/10">
+          {!isLoading && !isError && roles.length > 0 && (
+            <div className="flex items-center justify-between p-4 px-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/20 dark:bg-slate-950/5">
               <div className="text-[10px] text-slate-500 dark:text-slate-400">
                 Showing <span className="font-semibold text-slate-900 dark:text-slate-100">{((page - 1) * limit) + 1}</span> to{" "}
                 <span className="font-semibold text-slate-900 dark:text-slate-100">
                   {Math.min(page * limit, totalElements)}
                 </span>{" "}
-                of <span className="font-semibold text-slate-900 dark:text-slate-100">{totalElements}</span> users
+                of <span className="font-semibold text-slate-900 dark:text-slate-100">{totalElements}</span> roles
               </div>
-              
+
               <Pagination className="mx-0 w-auto">
                 <PaginationContent>
                   <PaginationItem>
@@ -316,7 +294,7 @@ function UsersManagementPage() {
                       className={page === 1 ? "pointer-events-none opacity-50 h-8 text-[11px]" : "h-8 text-[11px]"}
                     />
                   </PaginationItem>
-                  
+
                   {Array.from({ length: totalPages }).map((_, idx) => {
                     const pageNum = idx + 1
                     if (pageNum === 1 || pageNum === totalPages || Math.abs(pageNum - page) <= 1) {
@@ -370,17 +348,27 @@ function UsersManagementPage() {
         </CardContent>
       </Card>
 
-      {/* User Create/Edit Dialog Form */}
-      <UserDialog open={dialogOpen} onOpenChange={setDialogOpen} user={activeUser} />
+      {/* Add/Edit Role Modal Dialog */}
+      <RoleDialog open={dialogOpen} onOpenChange={setDialogOpen} role={activeRole} />
 
-      {/* User Delete Confirmation Dialog */}
+      {/* Manage Role Permissions Modal Dialog */}
+      {permissionsRole && (
+        <ManagePermissionsDialog
+          open={permissionsDialogOpen}
+          onOpenChange={setPermissionsDialogOpen}
+          roleId={permissionsRole.id}
+          roleName={permissionsRole.name}
+        />
+      )}
+
+      {/* Delete Confirmation Alert Dialog */}
       <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
         <AlertDialogContent className="max-w-md p-6 text-slate-900 dark:text-slate-50 border border-slate-100 dark:border-slate-800">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-base font-bold">Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription className="text-xs text-slate-500 dark:text-slate-400">
-              This will permanently delete the user <span className="font-semibold text-slate-800 dark:text-slate-200">"{userToDelete?.name}"</span> ({userToDelete?.email}). 
-              All their profile data will be removed and their active sessions invalidated. This operation cannot be undone.
+              This will soft-delete the role <span className="font-semibold text-slate-800 dark:text-slate-200">"{roleToDelete?.name}"</span>. 
+              Users currently assigned to this role might experience authentication issues.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-4">
@@ -394,7 +382,7 @@ function UsersManagementPage() {
               className="h-9 text-xs bg-rose-600 text-white hover:bg-rose-700 dark:bg-rose-600 dark:hover:bg-rose-700"
             >
               {deleteMutation.isPending && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
-              Delete User
+              Delete Role
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
