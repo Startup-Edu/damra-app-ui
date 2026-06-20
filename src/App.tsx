@@ -27,7 +27,7 @@ export function App() {
       <ThemeProvider defaultTheme="light" storageKey="damra-theme">
         <RouterProvider router={router} />
         {/* Mount Toaster globally here */}
-        <Toaster position='top-right' /> 
+        <Toaster position='top-center' /> 
       </ThemeProvider>
     </QueryClientProvider>
   )

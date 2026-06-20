@@ -20,7 +20,8 @@ import {
 } from '@/components/ui/select'
 import { useCreateUserMutation, useUpdateUserMutation, useRolesDropdownQuery } from '../_hooks/useUsers'
 import type { UserItem } from '../_types/users.types'
-import { Loader2, Camera, User, KeyRound, AlertTriangle } from 'lucide-react'
+import { Loader2, Camera, User, KeyRound, AlertTriangle, Check } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
 
 interface UserDialogProps {
   open: boolean
@@ -165,7 +166,7 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] p-6 text-slate-900 dark:text-slate-50 border border-slate-100 dark:border-slate-800 shadow-xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[480px] text-slate-900 dark:text-slate-50 border border-slate-100 dark:border-slate-800 shadow-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="space-y-1.5">
           <DialogTitle className="text-lg font-bold">
             {isEditing ? 'Modify User Profile' : 'Register New User'}
@@ -177,7 +178,7 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 py-3">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {/* Avatar upload section (Visible only in edit mode as per requirements) */}
           {isEditing && (
             <div className="flex flex-col items-center gap-2 pb-2">
@@ -307,11 +308,10 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
 
             {isEditing && (
               <div className="flex items-start gap-2.5 p-3 rounded-lg border border-amber-500/10 bg-amber-500/5">
-                <input
-                  type="checkbox"
+                <Checkbox
                   id="reset-pass"
                   checked={resetPassword}
-                  onChange={(e) => setResetPassword(e.target.checked)}
+                  onCheckedChange={(checked) => setResetPassword(checked === true)}
                   disabled={isLoading}
                   className="mt-0.5 rounded border-amber-500/20 text-amber-600 focus:ring-amber-500/20"
                 />
@@ -340,11 +340,11 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
-              className="h-9 text-xs"
+              className="!h-9 text-xs"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading} className="h-9 text-xs">
+            <Button type="submit" disabled={isLoading} className="!h-9 text-xs">
               {isLoading && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
               {isEditing ? 'Save Profile' : 'Register User'}
             </Button>

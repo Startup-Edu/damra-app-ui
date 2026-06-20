@@ -22,6 +22,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  PaginationEllipsis,
 } from '@/components/ui/pagination'
 import {
   AlertDialog,
@@ -45,6 +46,7 @@ import {
 import { useUsersQuery, useDeleteUserMutation } from './_hooks/useUsers'
 import type { UserItem } from './_types/users.types'
 import { UserDialog } from './_components/UserDialog'
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_domain/super-admin/users-management')({
   component: UsersManagementPage,
@@ -74,7 +76,7 @@ function UsersManagementPage() {
   }, [search])
 
   // Fetch users with React Query
-  const { data, isLoading, isError, refetch } = useUsersQuery(page, limit, debouncedSearch)
+  const { data, isLoading, isFetching, isError, refetch } = useUsersQuery(page, limit, debouncedSearch)
   const deleteMutation = useDeleteUserMutation()
 
   const response = data
@@ -109,7 +111,7 @@ function UsersManagementPage() {
   }
 
   return (
-    <div className="p-6 mx-auto w-full max-w-6xl space-y-6 text-slate-900 dark:text-slate-50">
+    <div className="text-slate-900 dark:text-slate-50">
       
       {/* Page Header */}
       <PageHeader
@@ -117,13 +119,13 @@ function UsersManagementPage() {
         description="Manage system access, user roles, authentication status, and details."
       >
         {/* Add User button */}
-        <Button onClick={handleAdd} className="shadow-xs text-xs h-9">
+        <Button onClick={handleAdd} className="text-xs !h-9">
           <Plus className="mr-1.5 h-3.5 w-3.5" /> Add User
         </Button>
       </PageHeader>
 
       {/* Main Content Card */}
-      <Card variant="glass">
+      <Card className="py-0">
         
         {/* Toolbar */}
         <div className="flex items-center gap-3 p-6 pb-4">
@@ -140,11 +142,15 @@ function UsersManagementPage() {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => refetch()}
-            disabled={isLoading}
+            onClick={() => {
+              refetch().then(() => {
+                toast.success('User list refreshed successfully')
+              })
+            }}
+            disabled={isFetching}
             className="h-10 w-10"
           >
-            {isLoading ? (
+            {isFetching ? (
               <Loader2 className="h-4.5 w-4.5 animate-spin" />
             ) : (
               <RefreshCw className="h-4.5 w-4.5" />
@@ -153,15 +159,14 @@ function UsersManagementPage() {
         </div>
 
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
+          <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="pl-6 text-[11px] font-bold uppercase tracking-wider text-slate-400">User</TableHead>
-                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Email Address</TableHead>
-                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Roles</TableHead>
-                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Status</TableHead>
-                  <TableHead className="pr-6 text-right text-[11px] font-bold uppercase tracking-wider text-slate-400">Actions</TableHead>
+                  <TableHead className="pl-6">User</TableHead>
+                  <TableHead>Email Address</TableHead>
+                  <TableHead>Roles</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="pr-6 text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               
@@ -221,28 +226,24 @@ function UsersManagementPage() {
                           <div className="font-semibold text-slate-900 dark:text-slate-100 text-xs">
                             {user.name}
                             {user.default_data && (
-                              <span className="ml-1.5 text-[9px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">
+                              <Badge variant="outline" className="ml-1.5 font-medium text-[9px] px-1.5 py-0 h-4 rounded-sm">
                                 Default
-                              </span>
+                              </Badge>
                             )}
                           </div>
                         </div>
                       </TableCell>
                       
                       {/* Email Column */}
-                      <TableCell className="text-slate-600 dark:text-slate-300 text-xs">
+                      <TableCell className="text-muted-foreground">
                         {user.email}
                       </TableCell>
                       
                       {/* Roles Column */}
-                      <TableCell className="py-4">
+                      <TableCell>
                         <div className="flex gap-1.5 flex-wrap">
                           {user.roles && user.roles.map((role) => (
-                            <Badge
-                              key={role.id}
-                              variant="warning"
-                              className="font-semibold text-[9px]"
-                            >
+                            <Badge key={role.id} variant="warning">
                               {role.name}
                             </Badge>
                           ))}
@@ -252,11 +253,11 @@ function UsersManagementPage() {
                       {/* Status Column */}
                       <TableCell>
                         {user.is_active ? (
-                          <Badge variant="success" className="font-semibold text-[9px]">
+                          <Badge variant="success">
                             Active
                           </Badge>
                         ) : (
-                          <Badge variant="destructive" className="font-semibold text-[9px]">
+                          <Badge variant="destructive">
                             Inactive
                           </Badge>
                         )}
@@ -269,7 +270,7 @@ function UsersManagementPage() {
                             variant="ghost"
                             size="icon"
                             onClick={() => handleEdit(user)}
-                            className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-500/5 transition-all"
+                            className="text-blue-500 hover:text-blue-600 hover:bg-blue-500/5"
                             title="Edit User"
                           >
                             <Edit className="h-3.5 w-3.5" />
@@ -278,7 +279,7 @@ function UsersManagementPage() {
                             variant="ghost"
                             size="icon"
                             onClick={() => handleDeleteTrigger(user)}
-                            className="h-8 w-8 text-slate-400 hover:text-rose-500 hover:bg-rose-500/5 transition-all"
+                            className="text-slate-400 hover:text-rose-500 hover:bg-rose-500/5"
                             disabled={user.default_data}
                             title="Delete User"
                           >
@@ -291,8 +292,6 @@ function UsersManagementPage() {
                 )}
               </TableBody>
             </Table>
-          </div>
-
           {/* Pagination Footer */}
           {!isLoading && !isError && users.length > 0 && (
             <div className="flex items-center justify-between p-4 px-6 border-t bg-slate-50/30 dark:bg-slate-950/10">
@@ -313,7 +312,7 @@ function UsersManagementPage() {
                         e.preventDefault()
                         if (page > 1) setPage(page - 1)
                       }}
-                      className={page === 1 ? "pointer-events-none opacity-50 h-8 text-[11px]" : "h-8 text-[11px]"}
+                      className={page === 1 ? "pointer-events-none opacity-50" : undefined}
                     />
                   </PaginationItem>
                   
@@ -329,7 +328,6 @@ function UsersManagementPage() {
                               setPage(pageNum)
                             }}
                             isActive={page === pageNum}
-                            className="h-8 w-8 text-[11px]"
                           >
                             {pageNum}
                           </PaginationLink>
@@ -339,14 +337,14 @@ function UsersManagementPage() {
                     if (pageNum === 2 && page > 3) {
                       return (
                         <PaginationItem key="ellipsis-start">
-                          <span className="px-2 text-slate-400 text-xs">...</span>
+                          <PaginationEllipsis />
                         </PaginationItem>
                       )
                     }
                     if (pageNum === totalPages - 1 && page < totalPages - 2) {
                       return (
                         <PaginationItem key="ellipsis-end">
-                          <span className="px-2 text-slate-400 text-xs">...</span>
+                          <PaginationEllipsis />
                         </PaginationItem>
                       )
                     }
@@ -360,7 +358,7 @@ function UsersManagementPage() {
                         e.preventDefault()
                         if (page < totalPages) setPage(page + 1)
                       }}
-                      className={page === totalPages || totalPages === 0 ? "pointer-events-none opacity-50 h-8 text-[11px]" : "h-8 text-[11px]"}
+                      className={page === totalPages || totalPages === 0 ? "pointer-events-none opacity-50" : undefined}
                     />
                   </PaginationItem>
                 </PaginationContent>
@@ -375,23 +373,23 @@ function UsersManagementPage() {
 
       {/* User Delete Confirmation Dialog */}
       <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
-        <AlertDialogContent className="max-w-md p-6 text-slate-900 dark:text-slate-50 border border-slate-100 dark:border-slate-800">
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-base font-bold">Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription className="text-xs text-slate-500 dark:text-slate-400">
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
               This will permanently delete the user <span className="font-semibold text-slate-800 dark:text-slate-200">"{userToDelete?.name}"</span> ({userToDelete?.email}). 
               All their profile data will be removed and their active sessions invalidated. This operation cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="mt-4">
-            <AlertDialogCancel disabled={deleteMutation.isPending} className="h-9 text-xs">Cancel</AlertDialogCancel>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault()
                 handleDeleteConfirm()
               }}
               disabled={deleteMutation.isPending}
-              className="h-9 text-xs bg-rose-600 text-white hover:bg-rose-700 dark:bg-rose-600 dark:hover:bg-rose-700"
+              variant="destructive"
             >
               {deleteMutation.isPending && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
               Delete User
