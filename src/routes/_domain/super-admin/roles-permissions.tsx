@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_domain/super-admin/roles-permissions')({
 
 function RolesPermissionsPage() {
   return (
-    <div className="p-6 mx-auto w-full max-w-6xl space-y-6 text-slate-900 dark:text-slate-50">
+    <div className="text-slate-900 dark:text-slate-50">
       {/* Page Header */}
       <PageHeader
         title="Roles & Permissions"
@@ -22,10 +22,10 @@ function RolesPermissionsPage() {
       <Tabs defaultValue="roles" className="w-full">
         <div className="border-b border-slate-100 dark:border-slate-800 pb-px mb-4">
           <TabsList variant="line" className="h-9 gap-4">
-            <TabsTrigger value="roles" className="px-1.5 pb-2 pt-1 h-9 rounded-none border-b-2 data-active:border-primary text-xs font-semibold">
+            <TabsTrigger value="roles" className="px-1.5 pb-2 pt-1 h-9 rounded-none text-xs font-semibold">
               <ShieldCheck className="mr-1.5 h-3.5 w-3.5" /> Roles Management
             </TabsTrigger>
-            <TabsTrigger value="permissions" className="px-1.5 pb-2 pt-1 h-9 rounded-none border-b-2 data-active:border-primary text-xs font-semibold">
+            <TabsTrigger value="permissions" className="px-1.5 pb-2 pt-1 h-9 rounded-none text-xs font-semibold">
               <ShieldCheck className="mr-1.5 h-3.5 w-3.5" /> Permissions Registry
             </TabsTrigger>
           </TabsList>

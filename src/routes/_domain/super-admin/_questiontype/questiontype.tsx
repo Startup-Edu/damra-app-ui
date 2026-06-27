@@ -1,0 +1,368 @@
+import { createFileRoute } from '@tanstack/react-router'
+import { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { PageHeader } from '@/components/ui/page-header'
+import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from '@/components/ui/pagination'
+import {
+  Search,
+  RefreshCw,
+  Plus,
+  Loader2,
+  FileQuestion,
+} from 'lucide-react'
+import { ActionButton } from '@/components/ui/action-button'
+import { DeleteModal } from '@/components/ui/delete-modal'
+import { useQuestionTypesQuery, useDeleteQuestionTypeMutation } from '../_hooks/useQuestiontype'
+import type { QuestionTypeItem } from '../_types/questiontype.types'
+import { QuestiontypeDialog } from '../_components/QuestiontypeDialog'
+import { toast } from 'sonner'
+
+export const Route = createFileRoute('/_domain/super-admin/_questiontype/questiontype')({
+  component: QuestionTypesPage,
+})
+
+function QuestionTypesPage() {
+  const [page, setPage] = useState(1)
+  const [limit] = useState(10)
+  const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+
+  // Dialog triggers
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [activeQuestiontype, setActiveQuestiontype] = useState<QuestionTypeItem | null>(null)
+
+  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false)
+  const [questiontypeToDelete, setQuestiontypeToDelete] = useState<QuestionTypeItem | null>(null)
+
+  // Debounce search query
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search)
+      setPage(1)
+    }, 400)
+
+    return () => clearTimeout(handler)
+  }, [search])
+
+  // Fetch question types
+  const { data, isLoading, isFetching, isError, refetch } = useQuestionTypesQuery(page, limit, debouncedSearch)
+  const deleteMutation = useDeleteQuestionTypeMutation()
+
+  const questionTypes = data?.data || []
+  const totalElements = data?.total_elements || 0
+  const totalPages = data?.total_pages || 1
+
+  const handleAdd = () => {
+    setActiveQuestiontype(null)
+    setDialogOpen(true)
+  }
+
+  const handleEdit = (qt: QuestionTypeItem) => {
+    setActiveQuestiontype(qt)
+    setDialogOpen(true)
+  }
+
+  const handleDeleteTrigger = (qt: QuestionTypeItem) => {
+    setQuestiontypeToDelete(qt)
+    setDeleteAlertOpen(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (questiontypeToDelete) {
+      deleteMutation.mutate(questiontypeToDelete.id, {
+        onSuccess: () => {
+          setDeleteAlertOpen(false)
+          setQuestiontypeToDelete(null)
+        },
+      })
+    }
+  }
+
+  return (
+    <div className="text-slate-900 dark:text-slate-50 animate-fade-in">
+      {/* Page Header */}
+      <PageHeader
+        title="Question Types"
+        description="Manage the configuration of study question formats, translation labels, and order sequences."
+      >
+        <Button onClick={handleAdd} className="text-xs !h-9">
+          <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Type
+        </Button>
+      </PageHeader>
+
+      {/* Main Content Card */}
+      <Card className="py-0">
+        {/* Toolbar */}
+        <div className="flex items-center gap-3 p-6 pb-4">
+          <div className="relative flex-1 max-w-md group">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Search question types by code or name..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10 h-10 text-xs"
+            />
+          </div>
+
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => {
+              refetch().then(() => {
+                toast.success('Question types list refreshed successfully')
+              })
+            }}
+            disabled={isFetching}
+            className="h-10 w-10"
+          >
+            {isFetching ? (
+              <Loader2 className="h-4.5 w-4.5 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4.5 w-4.5" />
+            )}
+          </Button>
+        </div>
+
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="pl-6 w-[120px]">Code</TableHead>
+                <TableHead>English Name</TableHead>
+                <TableHead>Khmer Name</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Sort Order</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="pr-6 text-right w-[120px]">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {isLoading ? (
+                // Loading Skeletons
+                Array.from({ length: 5 }).map((_, idx) => (
+                  <TableRow key={idx}>
+                    <TableCell className="pl-6">
+                      <Skeleton className="h-4 w-12" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-32" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-32" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-40" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-8" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-14 rounded-full" />
+                    </TableCell>
+                    <TableCell className="pr-6">
+                      <div className="flex justify-end gap-2">
+                        <Skeleton className="h-8 w-8 rounded-md" />
+                        <Skeleton className="h-8 w-8 rounded-md" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : isError ? (
+                // Error State
+                <TableRow>
+                  <TableCell colSpan={7} className="py-12 text-center text-rose-500 font-medium text-xs">
+                    Failed to fetch question types. Please make sure the API server is online.
+                  </TableCell>
+                </TableRow>
+              ) : questionTypes.length === 0 ? (
+                // Empty State
+                <TableRow>
+                  <TableCell colSpan={7} className="py-16 text-center">
+                    <div className="flex flex-col items-center gap-2 text-slate-400">
+                      <FileQuestion className="h-8 w-8 text-slate-300 dark:text-slate-700" />
+                      <p className="text-xs font-semibold">No question types found matching search query</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                // Data List
+                questionTypes.map((qt) => (
+                  <TableRow key={qt.id}>
+                    {/* Code */}
+                    <TableCell className="pl-6 py-3.5">
+                      <Badge variant="secondary" className="font-bold text-xs uppercase bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+                        {qt.code}
+                      </Badge>
+                    </TableCell>
+
+                    {/* English Name */}
+                    <TableCell className="font-semibold text-slate-900 dark:text-slate-100 text-xs">
+                      {qt.name_en}
+                    </TableCell>
+
+                    {/* Khmer Name */}
+                    <TableCell className="text-xs text-slate-600 dark:text-slate-400">
+                      {qt.name_kh}
+                    </TableCell>
+
+                    {/* Description */}
+                    <TableCell className="text-xs text-slate-500 dark:text-slate-400 max-w-[250px] truncate">
+                      {qt.description_en || <span className="text-slate-300 dark:text-slate-700">-</span>}
+                    </TableCell>
+
+                    {/* Sort Order */}
+                    <TableCell className="text-xs font-medium">
+                      {qt.sort_order}
+                    </TableCell>
+
+                    {/* Status Column */}
+                    <TableCell>
+                      {qt.is_active ? (
+                        <Badge variant="success">
+                          Active
+                        </Badge>
+                      ) : (
+                        <Badge variant="destructive">
+                          Inactive
+                        </Badge>
+                      )}
+                    </TableCell>
+
+                    {/* Actions Column */}
+                    <TableCell className="pr-6 text-right">
+                      <div className="flex justify-end gap-1">
+                        <ActionButton
+                          actionType="edit"
+                          tooltip="Edit Type"
+                          onClick={() => handleEdit(qt)}
+                        />
+                        <ActionButton
+                          actionType="delete"
+                          tooltip="Delete Type"
+                          onClick={() => handleDeleteTrigger(qt)}
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+
+          {/* Pagination Footer */}
+          {!isLoading && !isError && questionTypes.length > 0 && (
+            <div className="flex items-center justify-between p-4 px-6 border-t bg-slate-50/30 dark:bg-slate-950/10">
+              <div className="text-[10px] text-slate-500 dark:text-slate-400">
+                Showing <span className="font-semibold text-slate-900 dark:text-slate-100">{((page - 1) * limit) + 1}</span> to{" "}
+                <span className="font-semibold text-slate-900 dark:text-slate-100">
+                  {Math.min(page * limit, totalElements)}
+                </span>{" "}
+                of <span className="font-semibold text-slate-900 dark:text-slate-100">{totalElements}</span> question types
+              </div>
+
+              <Pagination className="mx-0 w-auto">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        if (page > 1) setPage(page - 1)
+                      }}
+                      className={page === 1 ? "pointer-events-none opacity-50" : undefined}
+                    />
+                  </PaginationItem>
+
+                  {Array.from({ length: totalPages }).map((_, idx) => {
+                    const pageNum = idx + 1
+                    if (pageNum === 1 || pageNum === totalPages || Math.abs(pageNum - page) <= 1) {
+                      return (
+                        <PaginationItem key={pageNum}>
+                          <PaginationLink
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              setPage(pageNum)
+                            }}
+                            isActive={page === pageNum}
+                          >
+                            {pageNum}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )
+                    }
+                    if (pageNum === 2 && page > 3) {
+                      return (
+                        <PaginationItem key="ellipsis-start">
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      )
+                    }
+                    if (pageNum === totalPages - 1 && page < totalPages - 2) {
+                      return (
+                        <PaginationItem key="ellipsis-end">
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      )
+                    }
+                    return null
+                  })}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        if (page < totalPages) setPage(page + 1)
+                      }}
+                      className={page === totalPages || totalPages === 0 ? "pointer-events-none opacity-50" : undefined}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Question Type Create/Edit Dialog Form */}
+      <QuestiontypeDialog open={dialogOpen} onOpenChange={setDialogOpen} questiontype={activeQuestiontype} />
+
+      {/* Question Type Delete Confirmation Dialog */}
+      <DeleteModal
+        open={deleteAlertOpen}
+        onOpenChange={setDeleteAlertOpen}
+        description={
+          <>
+            This will permanently delete the question type <span className="font-semibold text-slate-800 dark:text-slate-200">"{questiontypeToDelete?.name_en}"</span> ({questiontypeToDelete?.code}).
+            All questions of this type will be affected. This operation cannot be undone.
+          </>
+        }
+        onConfirm={handleDeleteConfirm}
+        isPending={deleteMutation.isPending}
+        confirmText="Delete Type"
+      />
+    </div>
+  )
+}

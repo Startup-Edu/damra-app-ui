@@ -1,14 +1,19 @@
 import { Link } from '@tanstack/react-router'
-import { LayoutDashboard, Users, GraduationCap, Shield, ShieldCheck, X, PanelsTopLeft } from 'lucide-react'
+import { LayoutDashboard, Users, GraduationCap, Shield, ShieldCheck, X, PanelsTopLeft, FolderTree, Layers, BookOpen, FileQuestion, HelpCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLayoutStore } from '@/store/useLayoutStore'
 
-// UPDATE THIS ARRAY to match your exact generated routes in routeTree.gen.ts
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   // Example for the SuperAdmin route you created
   { name: 'User Management', href: '/super-admin/users-management', icon: Users },
   { name: 'Roles & Permissions', href: '/super-admin/roles-permissions', icon: ShieldCheck },
+  { name: 'Categories', href: '/super-admin/category', icon: FolderTree },
+  { name: 'Grades', href: '/super-admin/grade', icon: GraduationCap },
+  { name: 'Levels', href: '/super-admin/level', icon: Layers },
+  { name: 'Quiz Packages', href: '/super-admin/quizepack', icon: BookOpen },
+  { name: 'Question Types', href: '/super-admin/questiontype', icon: FileQuestion },
+  { name: 'Questions', href: '/super-admin/question', icon: HelpCircle },
   // Example if you have an Admin dashboard
   { name: 'Admin Portal', href: '/admin', icon: Shield },
   { name: 'Check Health', href: '/super-admin/check-health', icon: Shield },

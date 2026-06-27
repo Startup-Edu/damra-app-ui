@@ -19,6 +19,12 @@ import { Route as DomainSuperAdminCheckHealthRouteImport } from './routes/_domai
 import { Route as DomainAuthResetPasswordRouteImport } from './routes/_domain/auth/reset-password'
 import { Route as DomainAuthLoginRouteImport } from './routes/_domain/auth/login'
 import { Route as DomainAuthForgetPasswordRouteImport } from './routes/_domain/auth/forget-password'
+import { Route as DomainSuperAdminQuizpackQuizepackRouteImport } from './routes/_domain/super-admin/_quizpack/quizepack'
+import { Route as DomainSuperAdminQuestiontypeQuestiontypeRouteImport } from './routes/_domain/super-admin/_questiontype/questiontype'
+import { Route as DomainSuperAdminQuestionQuestionRouteImport } from './routes/_domain/super-admin/_question/question'
+import { Route as DomainSuperAdminLevelLevelRouteImport } from './routes/_domain/super-admin/_level/level'
+import { Route as DomainSuperAdminGradeGradeRouteImport } from './routes/_domain/super-admin/_grade/grade'
+import { Route as DomainSuperAdminCategoryCategoryRouteImport } from './routes/_domain/super-admin/_category/category'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -74,6 +80,42 @@ const DomainAuthForgetPasswordRoute =
     path: '/forget-password',
     getParentRoute: () => DomainAuthRoute,
   } as any)
+const DomainSuperAdminQuizpackQuizepackRoute =
+  DomainSuperAdminQuizpackQuizepackRouteImport.update({
+    id: '/_quizpack/quizepack',
+    path: '/quizepack',
+    getParentRoute: () => DomainSuperAdminRoute,
+  } as any)
+const DomainSuperAdminQuestiontypeQuestiontypeRoute =
+  DomainSuperAdminQuestiontypeQuestiontypeRouteImport.update({
+    id: '/_questiontype/questiontype',
+    path: '/questiontype',
+    getParentRoute: () => DomainSuperAdminRoute,
+  } as any)
+const DomainSuperAdminQuestionQuestionRoute =
+  DomainSuperAdminQuestionQuestionRouteImport.update({
+    id: '/_question/question',
+    path: '/question',
+    getParentRoute: () => DomainSuperAdminRoute,
+  } as any)
+const DomainSuperAdminLevelLevelRoute =
+  DomainSuperAdminLevelLevelRouteImport.update({
+    id: '/_level/level',
+    path: '/level',
+    getParentRoute: () => DomainSuperAdminRoute,
+  } as any)
+const DomainSuperAdminGradeGradeRoute =
+  DomainSuperAdminGradeGradeRouteImport.update({
+    id: '/_grade/grade',
+    path: '/grade',
+    getParentRoute: () => DomainSuperAdminRoute,
+  } as any)
+const DomainSuperAdminCategoryCategoryRoute =
+  DomainSuperAdminCategoryCategoryRouteImport.update({
+    id: '/_category/category',
+    path: '/category',
+    getParentRoute: () => DomainSuperAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -86,6 +128,12 @@ export interface FileRoutesByFullPath {
   '/super-admin/profile': typeof DomainSuperAdminProfileRoute
   '/super-admin/roles-permissions': typeof DomainSuperAdminRolesPermissionsRoute
   '/super-admin/users-management': typeof DomainSuperAdminUsersManagementRoute
+  '/super-admin/category': typeof DomainSuperAdminCategoryCategoryRoute
+  '/super-admin/grade': typeof DomainSuperAdminGradeGradeRoute
+  '/super-admin/level': typeof DomainSuperAdminLevelLevelRoute
+  '/super-admin/question': typeof DomainSuperAdminQuestionQuestionRoute
+  '/super-admin/questiontype': typeof DomainSuperAdminQuestiontypeQuestiontypeRoute
+  '/super-admin/quizepack': typeof DomainSuperAdminQuizpackQuizepackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -98,6 +146,12 @@ export interface FileRoutesByTo {
   '/super-admin/profile': typeof DomainSuperAdminProfileRoute
   '/super-admin/roles-permissions': typeof DomainSuperAdminRolesPermissionsRoute
   '/super-admin/users-management': typeof DomainSuperAdminUsersManagementRoute
+  '/super-admin/category': typeof DomainSuperAdminCategoryCategoryRoute
+  '/super-admin/grade': typeof DomainSuperAdminGradeGradeRoute
+  '/super-admin/level': typeof DomainSuperAdminLevelLevelRoute
+  '/super-admin/question': typeof DomainSuperAdminQuestionQuestionRoute
+  '/super-admin/questiontype': typeof DomainSuperAdminQuestiontypeQuestiontypeRoute
+  '/super-admin/quizepack': typeof DomainSuperAdminQuizpackQuizepackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -111,6 +165,12 @@ export interface FileRoutesById {
   '/_domain/super-admin/profile': typeof DomainSuperAdminProfileRoute
   '/_domain/super-admin/roles-permissions': typeof DomainSuperAdminRolesPermissionsRoute
   '/_domain/super-admin/users-management': typeof DomainSuperAdminUsersManagementRoute
+  '/_domain/super-admin/_category/category': typeof DomainSuperAdminCategoryCategoryRoute
+  '/_domain/super-admin/_grade/grade': typeof DomainSuperAdminGradeGradeRoute
+  '/_domain/super-admin/_level/level': typeof DomainSuperAdminLevelLevelRoute
+  '/_domain/super-admin/_question/question': typeof DomainSuperAdminQuestionQuestionRoute
+  '/_domain/super-admin/_questiontype/questiontype': typeof DomainSuperAdminQuestiontypeQuestiontypeRoute
+  '/_domain/super-admin/_quizpack/quizepack': typeof DomainSuperAdminQuizpackQuizepackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -125,6 +185,12 @@ export interface FileRouteTypes {
     | '/super-admin/profile'
     | '/super-admin/roles-permissions'
     | '/super-admin/users-management'
+    | '/super-admin/category'
+    | '/super-admin/grade'
+    | '/super-admin/level'
+    | '/super-admin/question'
+    | '/super-admin/questiontype'
+    | '/super-admin/quizepack'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -137,6 +203,12 @@ export interface FileRouteTypes {
     | '/super-admin/profile'
     | '/super-admin/roles-permissions'
     | '/super-admin/users-management'
+    | '/super-admin/category'
+    | '/super-admin/grade'
+    | '/super-admin/level'
+    | '/super-admin/question'
+    | '/super-admin/questiontype'
+    | '/super-admin/quizepack'
   id:
     | '__root__'
     | '/'
@@ -149,6 +221,12 @@ export interface FileRouteTypes {
     | '/_domain/super-admin/profile'
     | '/_domain/super-admin/roles-permissions'
     | '/_domain/super-admin/users-management'
+    | '/_domain/super-admin/_category/category'
+    | '/_domain/super-admin/_grade/grade'
+    | '/_domain/super-admin/_level/level'
+    | '/_domain/super-admin/_question/question'
+    | '/_domain/super-admin/_questiontype/questiontype'
+    | '/_domain/super-admin/_quizpack/quizepack'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -229,6 +307,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DomainAuthForgetPasswordRouteImport
       parentRoute: typeof DomainAuthRoute
     }
+    '/_domain/super-admin/_quizpack/quizepack': {
+      id: '/_domain/super-admin/_quizpack/quizepack'
+      path: '/quizepack'
+      fullPath: '/super-admin/quizepack'
+      preLoaderRoute: typeof DomainSuperAdminQuizpackQuizepackRouteImport
+      parentRoute: typeof DomainSuperAdminRoute
+    }
+    '/_domain/super-admin/_questiontype/questiontype': {
+      id: '/_domain/super-admin/_questiontype/questiontype'
+      path: '/questiontype'
+      fullPath: '/super-admin/questiontype'
+      preLoaderRoute: typeof DomainSuperAdminQuestiontypeQuestiontypeRouteImport
+      parentRoute: typeof DomainSuperAdminRoute
+    }
+    '/_domain/super-admin/_question/question': {
+      id: '/_domain/super-admin/_question/question'
+      path: '/question'
+      fullPath: '/super-admin/question'
+      preLoaderRoute: typeof DomainSuperAdminQuestionQuestionRouteImport
+      parentRoute: typeof DomainSuperAdminRoute
+    }
+    '/_domain/super-admin/_level/level': {
+      id: '/_domain/super-admin/_level/level'
+      path: '/level'
+      fullPath: '/super-admin/level'
+      preLoaderRoute: typeof DomainSuperAdminLevelLevelRouteImport
+      parentRoute: typeof DomainSuperAdminRoute
+    }
+    '/_domain/super-admin/_grade/grade': {
+      id: '/_domain/super-admin/_grade/grade'
+      path: '/grade'
+      fullPath: '/super-admin/grade'
+      preLoaderRoute: typeof DomainSuperAdminGradeGradeRouteImport
+      parentRoute: typeof DomainSuperAdminRoute
+    }
+    '/_domain/super-admin/_category/category': {
+      id: '/_domain/super-admin/_category/category'
+      path: '/category'
+      fullPath: '/super-admin/category'
+      preLoaderRoute: typeof DomainSuperAdminCategoryCategoryRouteImport
+      parentRoute: typeof DomainSuperAdminRoute
+    }
   }
 }
 
@@ -253,6 +373,12 @@ interface DomainSuperAdminRouteChildren {
   DomainSuperAdminProfileRoute: typeof DomainSuperAdminProfileRoute
   DomainSuperAdminRolesPermissionsRoute: typeof DomainSuperAdminRolesPermissionsRoute
   DomainSuperAdminUsersManagementRoute: typeof DomainSuperAdminUsersManagementRoute
+  DomainSuperAdminCategoryCategoryRoute: typeof DomainSuperAdminCategoryCategoryRoute
+  DomainSuperAdminGradeGradeRoute: typeof DomainSuperAdminGradeGradeRoute
+  DomainSuperAdminLevelLevelRoute: typeof DomainSuperAdminLevelLevelRoute
+  DomainSuperAdminQuestionQuestionRoute: typeof DomainSuperAdminQuestionQuestionRoute
+  DomainSuperAdminQuestiontypeQuestiontypeRoute: typeof DomainSuperAdminQuestiontypeQuestiontypeRoute
+  DomainSuperAdminQuizpackQuizepackRoute: typeof DomainSuperAdminQuizpackQuizepackRoute
 }
 
 const DomainSuperAdminRouteChildren: DomainSuperAdminRouteChildren = {
@@ -260,6 +386,14 @@ const DomainSuperAdminRouteChildren: DomainSuperAdminRouteChildren = {
   DomainSuperAdminProfileRoute: DomainSuperAdminProfileRoute,
   DomainSuperAdminRolesPermissionsRoute: DomainSuperAdminRolesPermissionsRoute,
   DomainSuperAdminUsersManagementRoute: DomainSuperAdminUsersManagementRoute,
+  DomainSuperAdminCategoryCategoryRoute: DomainSuperAdminCategoryCategoryRoute,
+  DomainSuperAdminGradeGradeRoute: DomainSuperAdminGradeGradeRoute,
+  DomainSuperAdminLevelLevelRoute: DomainSuperAdminLevelLevelRoute,
+  DomainSuperAdminQuestionQuestionRoute: DomainSuperAdminQuestionQuestionRoute,
+  DomainSuperAdminQuestiontypeQuestiontypeRoute:
+    DomainSuperAdminQuestiontypeQuestiontypeRoute,
+  DomainSuperAdminQuizpackQuizepackRoute:
+    DomainSuperAdminQuizpackQuizepackRoute,
 }
 
 const DomainSuperAdminRouteWithChildren =

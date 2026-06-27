@@ -24,25 +24,15 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from '@/components/ui/pagination'
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from '@/components/ui/alert-dialog'
+import { DeleteModal } from '@/components/ui/delete-modal'
 import {
   Search,
   RefreshCw,
   Plus,
-  Edit,
-  Trash2,
   Loader2,
   User as UserIcon,
 } from 'lucide-react'
+import { ActionButton } from '@/components/ui/action-button'
 import { useUsersQuery, useDeleteUserMutation } from './_hooks/useUsers'
 import type { UserItem } from './_types/users.types'
 import { UserDialog } from './_components/UserDialog'
@@ -266,25 +256,17 @@ function UsersManagementPage() {
                       {/* Actions Column */}
                       <TableCell className="pr-6 text-right">
                         <div className="flex justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
+                          <ActionButton
+                            actionType="edit"
+                            tooltip="Edit User"
                             onClick={() => handleEdit(user)}
-                            className="text-blue-500 hover:text-blue-600 hover:bg-blue-500/5"
-                            title="Edit User"
-                          >
-                            <Edit className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
+                          />
+                          <ActionButton
+                            actionType="delete"
+                            tooltip="Delete User"
                             onClick={() => handleDeleteTrigger(user)}
-                            className="text-slate-400 hover:text-rose-500 hover:bg-rose-500/5"
                             disabled={user.default_data}
-                            title="Delete User"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
+                          />
                         </div>
                       </TableCell>
                     </TableRow>
@@ -372,31 +354,19 @@ function UsersManagementPage() {
       <UserDialog open={dialogOpen} onOpenChange={setDialogOpen} user={activeUser} />
 
       {/* User Delete Confirmation Dialog */}
-      <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete the user <span className="font-semibold text-slate-800 dark:text-slate-200">"{userToDelete?.name}"</span> ({userToDelete?.email}). 
-              All their profile data will be removed and their active sessions invalidated. This operation cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteMutation.isPending}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(e) => {
-                e.preventDefault()
-                handleDeleteConfirm()
-              }}
-              disabled={deleteMutation.isPending}
-              variant="destructive"
-            >
-              {deleteMutation.isPending && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
-              Delete User
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteModal
+        open={deleteAlertOpen}
+        onOpenChange={setDeleteAlertOpen}
+        description={
+          <>
+            This will permanently delete the user <span className="font-semibold text-slate-800 dark:text-slate-200">"{userToDelete?.name}"</span> ({userToDelete?.email}). 
+            All their profile data will be removed and their active sessions invalidated. This operation cannot be undone.
+          </>
+        }
+        onConfirm={handleDeleteConfirm}
+        isPending={deleteMutation.isPending}
+        confirmText="Delete User"
+      />
     </div>
   )
 }

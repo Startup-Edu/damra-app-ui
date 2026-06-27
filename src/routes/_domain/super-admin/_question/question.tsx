@@ -1,0 +1,568 @@
+import { createFileRoute } from '@tanstack/react-router'
+import { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { PageHeader } from '@/components/ui/page-header'
+import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from '@/components/ui/pagination'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Search,
+  RefreshCw,
+  Plus,
+  Loader2,
+  HelpCircle,
+} from 'lucide-react'
+import { ActionButton } from '@/components/ui/action-button'
+import { DeleteModal } from '@/components/ui/delete-modal'
+import { useQuestionsQuery, useDeleteQuestionMutation } from '../_hooks/useQuestion'
+import { useCategoriesQuery } from '../_hooks/useCategory'
+import { useLevelsQuery } from '../_hooks/useLevel'
+import type { QuestionItem, QuestionTypeEnum, DifficultyEnum } from '../_types/question.types'
+import { QuestionDialog } from '../_components/QuestionDialog'
+import { toast } from 'sonner'
+import {
+  useReactTable,
+  getCoreRowModel,
+  flexRender,
+  createColumnHelper,
+} from '@tanstack/react-table'
+
+export const Route = createFileRoute('/_domain/super-admin/_question/question')({
+  component: QuestionsPage,
+})
+
+function QuestionsPage() {
+  const [page, setPage] = useState(1)
+  const [limit] = useState(10)
+  const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+
+  // Filter States
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('all')
+  const [selectedLevelId, setSelectedLevelId] = useState<string>('all')
+  const [selectedType, setSelectedType] = useState<string>('all')
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all')
+
+  // Dialog triggers
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [activeQuestion, setActiveQuestion] = useState<QuestionItem | null>(null)
+
+  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false)
+  const [questionToDelete, setQuestionToDelete] = useState<QuestionItem | null>(null)
+
+  // Debounce search query
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search)
+      setPage(1)
+    }, 400)
+
+    return () => clearTimeout(handler)
+  }, [search])
+
+  const filterCategory = selectedCategoryId === 'all' ? undefined : selectedCategoryId
+  const filterLevel = selectedLevelId === 'all' ? undefined : selectedLevelId
+  const filterType = selectedType === 'all' ? undefined : selectedType
+  const filterDifficulty = selectedDifficulty === 'all' ? undefined : selectedDifficulty
+
+  // Fetch Questions
+  const { data, isLoading, isFetching, isError, refetch } = useQuestionsQuery(
+    page,
+    limit,
+    debouncedSearch,
+    filterCategory,
+    filterLevel,
+    filterType,
+    filterDifficulty
+  )
+
+  // Fetch categories and levels for filters
+  const { data: categoriesResponse } = useCategoriesQuery(1, 100, '', true)
+  const { data: levelsResponse } = useLevelsQuery(1, 100, '')
+
+  const categories = categoriesResponse?.data || []
+  const allLevels = levelsResponse?.data || []
+
+  // Filter levels selector options relative to selected category filter
+  const filteredLevelOptions = selectedCategoryId === 'all' 
+    ? allLevels 
+    : allLevels.filter(l => l.category_id === selectedCategoryId)
+
+  // Reset selected level filter if it no longer matches the selected category filter
+  useEffect(() => {
+    if (selectedLevelId !== 'all') {
+      const match = filteredLevelOptions.find(l => l.id === selectedLevelId)
+      if (!match) {
+        setSelectedLevelId('all')
+      }
+    }
+  }, [selectedCategoryId])
+
+  const deleteMutation = useDeleteQuestionMutation()
+
+  const questions = data?.data || []
+  const totalElements = data?.total_elements || 0
+  const totalPages = data?.total_pages || 1
+
+  const handleAdd = () => {
+    setActiveQuestion(null)
+    setDialogOpen(true)
+  }
+
+  const handleEdit = (q: QuestionItem) => {
+    setActiveQuestion(q)
+    setDialogOpen(true)
+  }
+
+  const handleDeleteTrigger = (q: QuestionItem) => {
+    setQuestionToDelete(q)
+    setDeleteAlertOpen(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (questionToDelete) {
+      deleteMutation.mutate(questionToDelete.id, {
+        onSuccess: () => {
+          setDeleteAlertOpen(false)
+          setQuestionToDelete(null)
+        },
+      })
+    }
+  }
+
+  const getDifficultyBadge = (diff: DifficultyEnum) => {
+    switch (diff) {
+      case 'EASY':
+        return <Badge className="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border-emerald-500/10">Easy</Badge>
+      case 'MEDIUM':
+        return <Badge className="bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 border-amber-500/10">Medium</Badge>
+      case 'HARD':
+        return <Badge className="bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border-rose-500/10">Hard</Badge>
+      default:
+        return <Badge variant="outline">{diff}</Badge>
+    }
+  }
+
+  // TanStack Table Column Definitions
+  const columnHelper = createColumnHelper<QuestionItem>()
+  const columns = [
+    columnHelper.accessor('question_text_en', {
+      header: 'Question Text Preview',
+      cell: (info) => {
+        const q = info.row.original
+        return (
+          <div>
+            <div className="font-semibold text-slate-900 dark:text-slate-100 text-xs max-w-[320px] truncate">
+              {q.question_text_en}
+            </div>
+            <div className="text-[10px] text-slate-400 dark:text-slate-500 max-w-[320px] truncate">
+              {q.question_text_kh}
+            </div>
+          </div>
+        )
+      },
+    }),
+    columnHelper.accessor('category', {
+      header: 'Category',
+      cell: (info) => info.getValue()?.name_en || '-',
+    }),
+    columnHelper.accessor('level', {
+      header: 'Level',
+      cell: (info) => {
+        const lvl = info.getValue()
+        return lvl ? (
+          <Badge variant="outline" className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+            {lvl.title_en}
+          </Badge>
+        ) : (
+          <span className="text-slate-300 dark:text-slate-700">-</span>
+        )
+      },
+    }),
+    columnHelper.accessor('question_type', {
+      header: 'Type',
+      cell: (info) => (
+        <Badge variant="secondary" className="font-bold text-[10px] uppercase bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+          {info.getValue()}
+        </Badge>
+      ),
+    }),
+    columnHelper.accessor('difficulty_level', {
+      header: 'Difficulty',
+      cell: (info) => getDifficultyBadge(info.getValue()),
+    }),
+    columnHelper.accessor('xp_value', {
+      header: 'XP Value',
+      cell: (info) => `${info.getValue()} XP`,
+    }),
+    columnHelper.accessor('is_active', {
+      header: 'Status',
+      cell: (info) => (
+        info.getValue() ? (
+          <Badge variant="success">Active</Badge>
+        ) : (
+          <Badge variant="destructive">Inactive</Badge>
+        )
+      ),
+    }),
+    columnHelper.display({
+      id: 'actions',
+      header: () => <div className="text-right pr-6 w-[120px]">Actions</div>,
+      cell: (info) => {
+        const q = info.row.original
+        return (
+          <div className="flex justify-end gap-1">
+            <ActionButton
+              actionType="edit"
+              tooltip="Edit Question"
+              onClick={() => handleEdit(q)}
+            />
+            <ActionButton
+              actionType="delete"
+              tooltip="Delete Question"
+              onClick={() => handleDeleteTrigger(q)}
+            />
+          </div>
+        )
+      },
+    }),
+  ]
+
+  // Setup table instance
+  const table = useReactTable({
+    data: questions,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  })
+
+  return (
+    <div className="text-slate-900 dark:text-slate-50 animate-fade-in">
+      {/* Page Header */}
+      <PageHeader
+        title="Questions"
+        description="Manage the study question repository database, formats validation, difficulty levels, and categories."
+      >
+        <Button onClick={handleAdd} className="text-xs !h-9">
+          <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Question
+        </Button>
+      </PageHeader>
+
+      {/* Main Content Card */}
+      <Card className="py-0">
+        {/* Toolbar Filters */}
+        <div className="flex flex-col gap-3 p-6 pb-4">
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Search Input */}
+            <div className="relative flex-1 min-w-[280px] group">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Input
+                placeholder="Search questions by text..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10 h-10 text-xs"
+              />
+            </div>
+
+            {/* Category Filter */}
+            <Select value={selectedCategoryId} onValueChange={(val) => { setSelectedCategoryId(val); setPage(1); }}>
+              <SelectTrigger className="w-[160px] h-10 text-xs">
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name_en}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Level Filter */}
+            <Select value={selectedLevelId} onValueChange={(val) => { setSelectedLevelId(val); setPage(1); }}>
+              <SelectTrigger className="w-[140px] h-10 text-xs">
+                <SelectValue placeholder="All Levels" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Levels</SelectItem>
+                {filteredLevelOptions.map((l) => (
+                  <SelectItem key={l.id} value={l.id}>
+                    {l.title_en}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Type Filter */}
+            <Select value={selectedType} onValueChange={(val) => { setSelectedType(val); setPage(1); }}>
+              <SelectTrigger className="w-[140px] h-10 text-xs">
+                <SelectValue placeholder="All Types" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="MCQ">MCQ</SelectItem>
+                <SelectItem value="MULTI_SELECT">Multi-Select</SelectItem>
+                <SelectItem value="TRUE_FALSE">True / False</SelectItem>
+                <SelectItem value="FILL_BLANK">Fill Blank</SelectItem>
+                <SelectItem value="MATCHING">Matching</SelectItem>
+                <SelectItem value="ORDER">Reordering</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Difficulty Filter */}
+            <Select value={selectedDifficulty} onValueChange={(val) => { setSelectedDifficulty(val); setPage(1); }}>
+              <SelectTrigger className="w-[120px] h-10 text-xs">
+                <SelectValue placeholder="All Difficulties" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Difficulties</SelectItem>
+                <SelectItem value="EASY">Easy</SelectItem>
+                <SelectItem value="MEDIUM">Medium</SelectItem>
+                <SelectItem value="HARD">Hard</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => {
+                refetch().then(() => {
+                  toast.success('Questions database refreshed')
+                })
+              }}
+              disabled={isFetching}
+              className="h-10 w-10 shrink-0 ml-auto"
+            >
+              {isFetching ? (
+                <Loader2 className="h-4.5 w-4.5 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4.5 w-4.5" />
+              )}
+            </Button>
+          </div>
+        </div>
+
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id} className="hover:bg-transparent">
+                  {headerGroup.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
+                      className={
+                        header.id === 'question_text_en'
+                          ? 'pl-6'
+                          : header.id === 'actions'
+                          ? 'pr-6 text-right w-[120px]'
+                          : undefined
+                      }
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+
+            <TableBody>
+              {isLoading ? (
+                // Loading Skeletons
+                Array.from({ length: 5 }).map((_, idx) => (
+                  <TableRow key={idx}>
+                    <TableCell className="pl-6">
+                      <div className="space-y-1.5">
+                        <Skeleton className="h-4 w-64" />
+                        <Skeleton className="h-3.5 w-48" />
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-20" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-16" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-14 rounded-full" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-14 rounded-full" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-8" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-14 rounded-full" />
+                    </TableCell>
+                    <TableCell className="pr-6">
+                      <div className="flex justify-end gap-2">
+                        <Skeleton className="h-8 w-8 rounded-md" />
+                        <Skeleton className="h-8 w-8 rounded-md" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : isError ? (
+                // Error State
+                <TableRow>
+                  <TableCell colSpan={8} className="py-12 text-center text-rose-500 font-medium text-xs">
+                    Failed to fetch questions. Please make sure the API server is online.
+                  </TableCell>
+                </TableRow>
+              ) : questions.length === 0 ? (
+                // Empty State
+                <TableRow>
+                  <TableCell colSpan={8} className="py-16 text-center">
+                    <div className="flex flex-col items-center gap-2 text-slate-400">
+                      <HelpCircle className="h-8 w-8 text-slate-300 dark:text-slate-700" />
+                      <p className="text-xs font-semibold">No questions found matching your filter options</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                // Data List rendered via TanStack Table
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className={
+                          cell.column.id === 'question_text_en'
+                            ? 'pl-6 py-3'
+                            : cell.column.id === 'actions'
+                            ? 'pr-6 text-right'
+                            : undefined
+                        }
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+
+          {/* Pagination Footer */}
+          {!isLoading && !isError && questions.length > 0 && (
+            <div className="flex items-center justify-between p-4 px-6 border-t bg-slate-50/30 dark:bg-slate-950/10">
+              <div className="text-[10px] text-slate-500 dark:text-slate-400">
+                Showing <span className="font-semibold text-slate-900 dark:text-slate-100">{((page - 1) * limit) + 1}</span> to{" "}
+                <span className="font-semibold text-slate-900 dark:text-slate-100">
+                  {Math.min(page * limit, totalElements)}
+                </span>{" "}
+                of <span className="font-semibold text-slate-900 dark:text-slate-100">{totalElements}</span> questions
+              </div>
+
+              <Pagination className="mx-0 w-auto">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        if (page > 1) setPage(page - 1)
+                      }}
+                      className={page === 1 ? "pointer-events-none opacity-50" : undefined}
+                    />
+                  </PaginationItem>
+
+                  {Array.from({ length: totalPages }).map((_, idx) => {
+                    const pageNum = idx + 1
+                    if (pageNum === 1 || pageNum === totalPages || Math.abs(pageNum - page) <= 1) {
+                      return (
+                        <PaginationItem key={pageNum}>
+                          <PaginationLink
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              setPage(pageNum)
+                            }}
+                            isActive={page === pageNum}
+                          >
+                            {pageNum}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )
+                    }
+                    if (pageNum === 2 && page > 3) {
+                      return (
+                        <PaginationItem key="ellipsis-start">
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      )
+                    }
+                    if (pageNum === totalPages - 1 && page < totalPages - 2) {
+                      return (
+                        <PaginationItem key="ellipsis-end">
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      )
+                    }
+                    return null
+                  })}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        if (page < totalPages) setPage(page + 1)
+                      }}
+                      className={page === totalPages || totalPages === 0 ? "pointer-events-none opacity-50" : undefined}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Question Form Dialog Modal */}
+      <QuestionDialog open={dialogOpen} onOpenChange={setDialogOpen} question={activeQuestion} />
+
+      {/* Question Delete Confirmation Dialog (using reusable DeleteModal) */}
+      <DeleteModal
+        open={deleteAlertOpen}
+        onOpenChange={setDeleteAlertOpen}
+        description={
+          <>
+            This will permanently delete the question <span className="font-semibold text-slate-800 dark:text-slate-200">"{questionToDelete?.question_text_en}"</span>.
+            This action cannot be undone.
+          </>
+        }
+        onConfirm={handleDeleteConfirm}
+        isPending={deleteMutation.isPending}
+        confirmText="Delete Question"
+      />
+    </div>
+  )
+}

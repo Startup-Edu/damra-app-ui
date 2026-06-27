@@ -34,12 +34,10 @@ import {
   Search,
   RefreshCw,
   Plus,
-  Edit,
-  Trash2,
   Loader2,
   Shield,
-  Key,
 } from 'lucide-react'
+import { ActionButton } from '@/components/ui/action-button'
 import { useRolesQuery, useDeleteRoleMutation } from '../_hooks/useRolesPermissions'
 import type { RoleItem } from '../_types/rolesPermissions.types'
 import { RoleDialog } from './RoleDialog'
@@ -111,40 +109,40 @@ export function RolesTab() {
 
   return (
     <div className="space-y-4">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="relative flex-1 max-w-md group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
-          <Input
-            placeholder="Search roles..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 h-9 text-xs"
-          />
+      {/* Main Content Card */}
+      <Card className="py-0">
+        {/* Toolbar */}
+        <div className="flex items-center gap-3 p-6 pb-4">
+          <div className="relative flex-1 max-w-md group">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Search roles..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9 h-9 text-xs"
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => refetch()}
+              disabled={isLoading}
+              className="h-9 w-9"
+            >
+              {isLoading ? (
+                <Loader2 className="h-4.5 w-4.5 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4.5 w-4.5" />
+              )}
+            </Button>
+            <Button onClick={handleAdd} className="h-10 text-xs">
+              <Plus className="mr-1.5 h-4 w-4" /> Add Role
+            </Button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => refetch()}
-            disabled={isLoading}
-            className="h-9 w-9"
-          >
-            {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="h-4 w-4" />
-            )}
-          </Button>
-          <Button onClick={handleAdd} className="h-9 text-xs shadow-xs">
-            <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Role
-          </Button>
-        </div>
-      </div>
-
-      {/* Grid Card List / Table */}
-      <Card variant="glass">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
@@ -235,33 +233,21 @@ export function RolesTab() {
                       </TableCell>
                       <TableCell className="pr-6 text-right">
                         <div className="flex justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
+                          <ActionButton
+                            actionType="key"
+                            tooltip="Manage Permissions"
                             onClick={() => handleManagePermissions(role)}
-                            className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-500/5 transition-all"
-                            title="Manage Permissions"
-                          >
-                            <Key className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
+                          />
+                          <ActionButton
+                            actionType="edit"
+                            tooltip="Edit Role"
                             onClick={() => handleEdit(role)}
-                            className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-500/5 transition-all"
-                            title="Edit Role"
-                          >
-                            <Edit className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
+                          />
+                          <ActionButton
+                            actionType="delete"
+                            tooltip="Delete Role"
                             onClick={() => handleDeleteTrigger(role)}
-                            className="h-8 w-8 text-slate-400 hover:text-rose-500 hover:bg-rose-500/5 transition-all"
-                            title="Delete Role"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
+                          />
                         </div>
                       </TableCell>
                     </TableRow>
@@ -273,7 +259,7 @@ export function RolesTab() {
 
           {/* Pagination Footer */}
           {!isLoading && !isError && roles.length > 0 && (
-            <div className="flex items-center justify-between p-4 px-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/20 dark:bg-slate-950/5">
+            <div className="flex items-center justify-between p-4 px-6 border-t bg-slate-50/30 dark:bg-slate-950/10">
               <div className="text-[10px] text-slate-500 dark:text-slate-400">
                 Showing <span className="font-semibold text-slate-900 dark:text-slate-100">{((page - 1) * limit) + 1}</span> to{" "}
                 <span className="font-semibold text-slate-900 dark:text-slate-100">
