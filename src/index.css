@@ -132,3 +132,68 @@
     @apply font-sans;
     }
 }
+
+/* Quill custom overrides */
+.quill-editor-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.quill-editor-wrapper .ql-toolbar {
+  border-top-left-radius: var(--radius-md);
+  border-top-right-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background-color: var(--card);
+}
+
+.quill-editor-wrapper .ql-container {
+  border-bottom-left-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  border-top: none;
+  font-family: var(--font-sans);
+  font-size: 0.75rem; /* text-xs */
+  background-color: var(--background);
+}
+
+.text-editor-question .ql-container {
+  min-height: 100px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.text-editor-explanation .ql-container {
+  min-height: 80px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+/* Dark mode styling for Quill */
+.dark .quill-editor-wrapper .ql-toolbar {
+  background-color: var(--card);
+  border-color: var(--border);
+}
+
+.dark .quill-editor-wrapper .ql-container {
+  background-color: var(--background);
+  border-color: var(--border);
+  color: var(--foreground);
+}
+
+.dark .quill-editor-wrapper .ql-stroke {
+  stroke: var(--foreground);
+}
+
+.dark .quill-editor-wrapper .ql-fill {
+  fill: var(--foreground);
+}
+
+.dark .quill-editor-wrapper .ql-picker {
+  color: var(--foreground);
+}
+
+.dark .quill-editor-wrapper .ql-picker-options {
+  background-color: var(--card);
+  border-color: var(--border);
+  color: var(--foreground);
+}

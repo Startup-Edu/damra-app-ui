@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -29,6 +28,15 @@ import { useCategoriesQuery } from '../_hooks/useCategory'
 import { useLevelsQuery } from '../_hooks/useLevel'
 import type { QuestionItem, QuestionTypeEnum, DifficultyEnum } from '../_types/question.types'
 import { Loader2, AlertTriangle, Plus, Trash2 } from 'lucide-react'
+import ReactQuill from 'react-quill-new'
+import 'react-quill-new/dist/quill.snow.css'
+
+const isQuillEmpty = (html: string) => {
+  if (!html) return true
+  const clean = html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim()
+  return clean === ''
+}
+
 
 interface QuestionDialogProps {
   open: boolean
@@ -40,26 +48,26 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
   const [validationError, setValidationError] = useState('')
 
   // TYPE-SPECIFIC EDITOR STATES (linked alongside TanStack Form)
-  const [options, setOptions] = useState<{ id: string; textEn: string; textKh: string }[]>([
-    { id: 'opt-1', textEn: '', textKh: '' },
-    { id: 'opt-2', textEn: '', textKh: '' },
+  const [options, setOptions] = useState<{ id: string; text_en: string; text_kh: string }[]>([
+    { id: 'opt-1', text_en: '', text_kh: '' },
+    { id: 'opt-2', text_en: '', text_kh: '' },
   ])
   const [correctOptionId, setCorrectOptionId] = useState('')
   const [correctOptionIds, setCorrectOptionIds] = useState<string[]>([])
   const [correctAnswerTF, setCorrectAnswerTF] = useState(true)
-  const [blanks, setBlanks] = useState<{ id: string; isCaseSensitive: boolean; acceptedAnswersRaw: string }[]>([
-    { id: 'blank-1', isCaseSensitive: false, acceptedAnswersRaw: '' },
+  const [blanks, setBlanks] = useState<{ id: string; is_case_sensitive: boolean; accepted_answers_raw: string }[]>([
+    { id: 'blank-1', is_case_sensitive: false, accepted_answers_raw: '' },
   ])
-  const [leftSide, setLeftSide] = useState<{ id: string; textEn: string; textKh: string }[]>([
-    { id: 'left-1', textEn: '', textKh: '' },
+  const [leftSide, setLeftSide] = useState<{ id: string; text_en: string; text_kh: string }[]>([
+    { id: 'left-1', text_en: '', text_kh: '' },
   ])
-  const [rightSide, setRightSide] = useState<{ id: string; textEn: string; textKh: string }[]>([
-    { id: 'right-1', textEn: '', textKh: '' },
+  const [rightSide, setRightSide] = useState<{ id: string; text_en: string; text_kh: string }[]>([
+    { id: 'right-1', text_en: '', text_kh: '' },
   ])
-  const [correctPairs, setCorrectPairs] = useState<{ leftId: string; rightId: string }[]>([])
-  const [orderItems, setOrderItems] = useState<{ id: string; textEn: string; textKh: string }[]>([
-    { id: 'ord-1', textEn: '', textKh: '' },
-    { id: 'ord-2', textEn: '', textKh: '' },
+  const [correctPairs, setCorrectPairs] = useState<{ left_id: string; right_id: string }[]>([])
+  const [orderItems, setOrderItems] = useState<{ id: string; text_en: string; text_kh: string }[]>([
+    { id: 'ord-1', text_en: '', text_kh: '' },
+    { id: 'ord-2', text_en: '', text_kh: '' },
   ])
   const [correctOrder, setCorrectOrder] = useState<string[]>([])
 
@@ -102,7 +110,7 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
         return
       }
 
-      if (!value.questionTextEn.trim() || !value.questionTextKh.trim()) {
+      if (isQuillEmpty(value.questionTextEn) || isQuillEmpty(value.questionTextKh)) {
         setValidationError('Both English and Khmer question texts are required')
         return
       }
@@ -114,10 +122,10 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
       if (value.questionType === 'MCQ') {
         const cleanOptions = options.map((o) => ({
           id: o.id.trim(),
-          textEn: o.textEn.trim(),
-          textKh: o.textKh.trim(),
+          text_en: o.text_en.trim(),
+          text_kh: o.text_kh.trim(),
         }))
-        if (cleanOptions.some((o) => !o.textEn || !o.textKh)) {
+        if (cleanOptions.some((o) => !o.text_en || !o.text_kh)) {
           setValidationError('All options must contain English and Khmer texts')
           return
         }
@@ -130,14 +138,14 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
           return
         }
         contentPayload = { options: cleanOptions }
-        validationPayload = { correctOptionId }
+        validationPayload = { correct_option_id: correctOptionId }
       } else if (value.questionType === 'MULTI_SELECT') {
         const cleanOptions = options.map((o) => ({
           id: o.id.trim(),
-          textEn: o.textEn.trim(),
-          textKh: o.textKh.trim(),
+          text_en: o.text_en.trim(),
+          text_kh: o.text_kh.trim(),
         }))
-        if (cleanOptions.some((o) => !o.textEn || !o.textKh)) {
+        if (cleanOptions.some((o) => !o.text_en || !o.text_kh)) {
           setValidationError('All options must contain English and Khmer texts')
           return
         }
@@ -150,37 +158,37 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
           return
         }
         contentPayload = { options: cleanOptions }
-        validationPayload = { correctOptionIds }
+        validationPayload = { correct_option_ids: correctOptionIds }
       } else if (value.questionType === 'TRUE_FALSE') {
         contentPayload = {}
-        validationPayload = { correctAnswer: correctAnswerTF }
+        validationPayload = { correct_answer: correctAnswerTF }
       } else if (value.questionType === 'FILL_BLANK') {
         const cleanBlanks = blanks.map((b) => ({
           id: b.id.trim(),
-          isCaseSensitive: b.isCaseSensitive,
-          acceptedAnswers: b.acceptedAnswersRaw
+          is_case_sensitive: b.is_case_sensitive,
+          accepted_answers: b.accepted_answers_raw
             .split(',')
             .map((a) => a.trim())
             .filter(Boolean),
         }))
-        if (cleanBlanks.some((b) => b.acceptedAnswers.length === 0)) {
+        if (cleanBlanks.some((b) => b.accepted_answers.length === 0)) {
           setValidationError('All blanks must have at least one accepted answer')
           return
         }
-        contentPayload = { blanksCount: cleanBlanks.length }
-        validationPayload = { correctBlanks: cleanBlanks }
+        contentPayload = { blanks_count: cleanBlanks.length }
+        validationPayload = { correct_blanks: cleanBlanks }
       } else if (value.questionType === 'MATCHING') {
         const cleanLeft = leftSide.map((i) => ({
           id: i.id.trim(),
-          textEn: i.textEn.trim(),
-          textKh: i.textKh.trim(),
+          text_en: i.text_en.trim(),
+          text_kh: i.text_kh.trim(),
         }))
         const cleanRight = rightSide.map((i) => ({
           id: i.id.trim(),
-          textEn: i.textEn.trim(),
-          textKh: i.textKh.trim(),
+          text_en: i.text_en.trim(),
+          text_kh: i.text_kh.trim(),
         }))
-        if (cleanLeft.some((i) => !i.textEn || !i.textKh) || cleanRight.some((i) => !i.textEn || !i.textKh)) {
+        if (cleanLeft.some((i) => !i.text_en || !i.text_kh) || cleanRight.some((i) => !i.text_en || !i.text_kh)) {
           setValidationError('All items in matching must contain English and Khmer texts')
           return
         }
@@ -192,15 +200,15 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
           setValidationError('Please configure at least one correct match connection pair')
           return
         }
-        contentPayload = { leftSide: cleanLeft, rightSide: cleanRight }
-        validationPayload = { correctPairs }
+        contentPayload = { left_side: cleanLeft, right_side: cleanRight }
+        validationPayload = { correct_pairs: correctPairs }
       } else if (value.questionType === 'ORDER') {
         const cleanItems = orderItems.map((i) => ({
           id: i.id.trim(),
-          textEn: i.textEn.trim(),
-          textKh: i.textKh.trim(),
+          text_en: i.text_en.trim(),
+          text_kh: i.text_kh.trim(),
         }))
-        if (cleanItems.some((i) => !i.textEn || !i.textKh)) {
+        if (cleanItems.some((i) => !i.text_en || !i.text_kh)) {
           setValidationError('All items must contain English and Khmer texts')
           return
         }
@@ -210,7 +218,7 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
         }
         const order = correctOrder.length === cleanItems.length ? correctOrder : cleanItems.map((i) => i.id)
         contentPayload = { items: cleanItems }
-        validationPayload = { correctOrder: order }
+        validationPayload = { correct_order: order }
       }
 
       const payload = {
@@ -222,8 +230,8 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
         scenarioKh: value.scenarioKh.trim() || null,
         questionTextEn: value.questionTextEn.trim(),
         questionTextKh: value.questionTextKh.trim(),
-        explanationEn: value.explanationEn.trim() || null,
-        explanationKh: value.explanationKh.trim() || null,
+        explanationEn: isQuillEmpty(value.explanationEn) ? null : value.explanationEn.trim(),
+        explanationKh: isQuillEmpty(value.explanationKh) ? null : value.explanationKh.trim(),
         imageUrl: value.imageUrl.trim() || null,
         xpValue: Number(value.xpValue),
         timeLimitSeconds: value.timeLimitSeconds === '' ? null : Number(value.timeLimitSeconds),
@@ -232,8 +240,9 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
       }
 
       if (isEditing && question) {
-        const { categoryId: _, ...updatePayload } = payload
-        updatePayload.isActive = value.isActive as any
+        const updatePayload: any = { ...payload }
+        delete updatePayload.categoryId
+        updatePayload.isActive = value.isActive
 
         updateMutation.mutate(
           { id: question.id, data: updatePayload },
@@ -284,49 +293,84 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
 
         // Populate Type-Specific States
         const type = question.question_type
-        const content = question.content
-        const validation = question.validation
+        const content = question.content || {}
+        const validation = question.validation || {}
 
         if (type === 'MCQ') {
-          setOptions(content.options || [])
-          setCorrectOptionId(validation.correctOptionId || '')
+          setOptions(
+            (content.options || []).map((o: any) => ({
+              id: o.id,
+              text_en: o.text_en || o.textEn || '',
+              text_kh: o.text_kh || o.textKh || '',
+            }))
+          )
+          setCorrectOptionId(validation.correct_option_id || validation.correctOptionId || '')
         } else if (type === 'MULTI_SELECT') {
-          setOptions(content.options || [])
-          setCorrectOptionIds(validation.correctOptionIds || [])
+          setOptions(
+            (content.options || []).map((o: any) => ({
+              id: o.id,
+              text_en: o.text_en || o.textEn || '',
+              text_kh: o.text_kh || o.textKh || '',
+            }))
+          )
+          setCorrectOptionIds(validation.correct_option_ids || validation.correctOptionIds || [])
         } else if (type === 'TRUE_FALSE') {
-          setCorrectAnswerTF(validation.correctAnswer ?? true)
+          setCorrectAnswerTF(validation.correct_answer ?? validation.correctAnswer ?? true)
         } else if (type === 'FILL_BLANK') {
-          const loadedBlanks = (validation.correctBlanks || []).map((b: any) => ({
+          const loadedBlanks = (validation.correct_blanks || validation.correctBlanks || []).map((b: any) => ({
             id: b.id,
-            isCaseSensitive: b.isCaseSensitive || false,
-            acceptedAnswersRaw: (b.acceptedAnswers || []).join(', '),
+            is_case_sensitive: b.is_case_sensitive ?? b.isCaseSensitive ?? false,
+            accepted_answers_raw: (b.accepted_answers || b.acceptedAnswers || []).join(', '),
           }))
-          setBlanks(loadedBlanks.length ? loadedBlanks : [{ id: 'blank-1', isCaseSensitive: false, acceptedAnswersRaw: '' }])
+          setBlanks(loadedBlanks.length ? loadedBlanks : [{ id: 'blank-1', is_case_sensitive: false, accepted_answers_raw: '' }])
         } else if (type === 'MATCHING') {
-          setLeftSide(content.leftSide || [])
-          setRightSide(content.rightSide || [])
-          setCorrectPairs(validation.correctPairs || [])
+          setLeftSide(
+            (content.left_side || content.leftSide || []).map((i: any) => ({
+              id: i.id,
+              text_en: i.text_en || i.textEn || '',
+              text_kh: i.text_kh || i.textKh || '',
+            }))
+          )
+          setRightSide(
+            (content.right_side || content.rightSide || []).map((i: any) => ({
+              id: i.id,
+              text_en: i.text_en || i.textEn || '',
+              text_kh: i.text_kh || i.textKh || '',
+            }))
+          )
+          setCorrectPairs(
+            (validation.correct_pairs || validation.correctPairs || []).map((p: any) => ({
+              left_id: p.left_id || p.leftId,
+              right_id: p.right_id || p.rightId,
+            }))
+          )
         } else if (type === 'ORDER') {
-          setOrderItems(content.items || [])
-          setCorrectOrder(validation.correctOrder || [])
+          setOrderItems(
+            (content.items || []).map((i: any) => ({
+              id: i.id,
+              text_en: i.text_en || i.textEn || '',
+              text_kh: i.text_kh || i.textKh || '',
+            }))
+          )
+          setCorrectOrder(validation.correct_order || validation.correctOrder || [])
         }
       } else {
         form.reset()
         // Reset type configs
         setOptions([
-          { id: 'opt-1', textEn: '', textKh: '' },
-          { id: 'opt-2', textEn: '', textKh: '' },
+          { id: 'opt-1', text_en: '', text_kh: '' },
+          { id: 'opt-2', text_en: '', text_kh: '' },
         ])
         setCorrectOptionId('')
         setCorrectOptionIds([])
         setCorrectAnswerTF(true)
-        setBlanks([{ id: 'blank-1', isCaseSensitive: false, acceptedAnswersRaw: '' }])
-        setLeftSide([{ id: 'left-1', textEn: '', textKh: '' }])
-        setRightSide([{ id: 'right-1', textEn: '', textKh: '' }])
+        setBlanks([{ id: 'blank-1', is_case_sensitive: false, accepted_answers_raw: '' }])
+        setLeftSide([{ id: 'left-1', text_en: '', text_kh: '' }])
+        setRightSide([{ id: 'right-1', text_en: '', text_kh: '' }])
         setCorrectPairs([])
         setOrderItems([
-          { id: 'ord-1', textEn: '', textKh: '' },
-          { id: 'ord-2', textEn: '', textKh: '' },
+          { id: 'ord-1', text_en: '', text_kh: '' },
+          { id: 'ord-2', text_en: '', text_kh: '' },
         ])
         setCorrectOrder([])
       }
@@ -344,21 +388,21 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
   // OPTION HELPERS (MCQ, MULTI_SELECT)
   const addOption = () => {
     const nextId = `opt-${Date.now()}`
-    setOptions([...options, { id: nextId, textEn: '', textKh: '' }])
+    setOptions([...options, { id: nextId, text_en: '', text_kh: '' }])
   }
   const removeOption = (id: string) => {
     setOptions(options.filter((o) => o.id !== id))
     if (correctOptionId === id) setCorrectOptionId('')
     setCorrectOptionIds(correctOptionIds.filter((cid) => cid !== id))
   }
-  const handleOptionTextChange = (id: string, field: 'textEn' | 'textKh', value: string) => {
+  const handleOptionTextChange = (id: string, field: 'text_en' | 'text_kh', value: string) => {
     setOptions(options.map((o) => (o.id === id ? { ...o, [field]: value } : o)))
   }
 
   // BLANK HELPERS (FILL_BLANK)
   const addBlank = () => {
     const nextId = `blank-${blanks.length + 1}`
-    setBlanks([...blanks, { id: nextId, isCaseSensitive: false, acceptedAnswersRaw: '' }])
+    setBlanks([...blanks, { id: nextId, is_case_sensitive: false, accepted_answers_raw: '' }])
   }
   const removeBlank = (id: string) => {
     setBlanks(blanks.filter((b) => b.id !== id))
@@ -370,21 +414,21 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
   // MATCHING HELPERS
   const addLeft = () => {
     const nextId = `left-${Date.now()}`
-    setLeftSide([...leftSide, { id: nextId, textEn: '', textKh: '' }])
+    setLeftSide([...leftSide, { id: nextId, text_en: '', text_kh: '' }])
   }
   const addRight = () => {
     const nextId = `right-${Date.now()}`
-    setRightSide([...rightSide, { id: nextId, textEn: '', textKh: '' }])
+    setRightSide([...rightSide, { id: nextId, text_en: '', text_kh: '' }])
   }
   const removeLeft = (id: string) => {
     setLeftSide(leftSide.filter((i) => i.id !== id))
-    setCorrectPairs(correctPairs.filter((p) => p.leftId !== id))
+    setCorrectPairs(correctPairs.filter((p) => p.left_id !== id))
   }
   const removeRight = (id: string) => {
     setRightSide(rightSide.filter((i) => i.id !== id))
-    setCorrectPairs(correctPairs.filter((p) => p.rightId !== id))
+    setCorrectPairs(correctPairs.filter((p) => p.right_id !== id))
   }
-  const handleItemTextChange = (side: 'left' | 'right', id: string, field: 'textEn' | 'textKh', value: string) => {
+  const handleItemTextChange = (side: 'left' | 'right', id: string, field: 'text_en' | 'text_kh', value: string) => {
     if (side === 'left') {
       setLeftSide(leftSide.map((i) => (i.id === id ? { ...i, [field]: value } : i)))
     } else {
@@ -392,30 +436,31 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
     }
   }
   const togglePair = (lId: string, rId: string) => {
-    const exists = correctPairs.find((p) => p.leftId === lId && p.rightId === rId)
+    const exists = correctPairs.find((p) => p.left_id === lId && p.right_id === rId)
     if (exists) {
-      setCorrectPairs(correctPairs.filter((p) => !(p.leftId === lId && p.rightId === rId)))
+      setCorrectPairs(correctPairs.filter((p) => !(p.left_id === lId && p.right_id === rId)))
     } else {
-      setCorrectPairs([...correctPairs, { leftId: lId, rightId: rId }])
+      setCorrectPairs([...correctPairs, { left_id: lId, right_id: rId }])
     }
   }
 
   // ORDER HELPERS
   const addOrderItem = () => {
     const nextId = `ord-${Date.now()}`
-    setOrderItems([...orderItems, { id: nextId, textEn: '', textKh: '' }])
+    setOrderItems([...orderItems, { id: nextId, text_en: '', text_kh: '' }])
   }
   const removeOrderItem = (id: string) => {
     setOrderItems(orderItems.filter((i) => i.id !== id))
     setCorrectOrder(correctOrder.filter((cid) => cid !== id))
   }
-  const handleOrderItemChange = (id: string, field: 'textEn' | 'textKh', value: string) => {
+  const handleOrderItemChange = (id: string, field: 'text_en' | 'text_kh', value: string) => {
     setOrderItems(orderItems.map((i) => (i.id === id ? { ...i, [field]: value } : i)))
   }
 
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[640px] text-slate-900 dark:text-slate-50 border border-slate-100 dark:border-slate-800 shadow-xl max-h-[90vh] !flex !flex-col !p-0 !gap-0 overflow-hidden">
+      <DialogContent className="sm:max-w-[960px] md:max-w-[960px] w-[95vw] text-slate-900 dark:text-slate-50 border border-slate-100 dark:border-slate-800 shadow-xl max-h-[90vh] !flex !flex-col !p-0 !gap-0 overflow-hidden">
         <DialogHeader className="p-6 pb-2 space-y-1.5 shrink-0">
           <DialogTitle className="text-lg font-bold">
             {isEditing ? 'Modify Question Details' : 'Create New Question'}
@@ -436,11 +481,11 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
           className="flex flex-col flex-1 overflow-hidden"
         >
           {/* Scrollable inputs viewport */}
-          <ScrollArea className="flex-1 min-h-0 w-full border-t border-b border-slate-100 dark:border-slate-800/80">
-            <div className="p-6 space-y-4">
-              
-              {/* Metadata Inputs */}
-              <div className="grid grid-cols-3 gap-4">
+          <ScrollArea className="flex-1 min-h-0 w-full overflow-y-auto border-t border-b border-border">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 p-6">
+
+              {/* Left Column: Metadata & Status */}
+              <div className="md:col-span-4 space-y-4 md:border-r md:pr-6 border-slate-100 dark:border-slate-800">
                 <form.Field
                   name="categoryId"
                   children={(field) => (
@@ -527,9 +572,7 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
                     </div>
                   )}
                 />
-              </div>
 
-              <div className="grid grid-cols-3 gap-4">
                 <form.Field
                   name="questionType"
                   children={(field) => (
@@ -596,109 +639,11 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
                     </div>
                   )}
                 />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <form.Field
-                  name="questionTextEn"
-                  children={(field) => (
-                    <div className="space-y-1.5">
-                      <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                        Question Text (English) <span className="text-rose-500">*</span>
-                      </Label>
-                      <Input
-                        placeholder="What is 2 + 2?"
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        disabled={isLoading}
-                        className="h-9.5 text-xs"
-                      />
-                    </div>
-                  )}
-                />
-
-                <form.Field
-                  name="questionTextKh"
-                  children={(field) => (
-                    <div className="space-y-1.5">
-                      <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                        Question Text (Khmer) <span className="text-rose-500">*</span>
-                      </Label>
-                      <Input
-                        placeholder="២ + ២ ស្មើនឹងប៉ុន្មាន?"
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        disabled={isLoading}
-                        className="h-9.5 text-xs"
-                      />
-                    </div>
-                  )}
-                />
-              </div>
-
-              {/* Explanations */}
-              <div className="grid grid-cols-2 gap-4 pt-1.5 border-t border-slate-100 dark:border-slate-800/80">
-                <form.Field
-                  name="explanationEn"
-                  children={(field) => (
-                    <div className="space-y-1.5">
-                      <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                        Explanation (English)
-                      </Label>
-                      <Textarea
-                        placeholder="Brief hint or logic overview..."
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        disabled={isLoading}
-                        className="text-xs min-h-[45px] py-1.5"
-                      />
-                    </div>
-                  )}
-                />
-
-                <form.Field
-                  name="explanationKh"
-                  children={(field) => (
-                    <div className="space-y-1.5">
-                      <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                        Explanation (Khmer)
-                      </Label>
-                      <Textarea
-                        placeholder="ការពន្យល់សង្ខេប..."
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        disabled={isLoading}
-                        className="text-xs min-h-[45px] py-1.5"
-                      />
-                    </div>
-                  )}
-                />
-              </div>
-
-              {/* Scenarios / Image / Status */}
-              <div className="grid grid-cols-2 gap-4">
-                <form.Field
-                  name="imageUrl"
-                  children={(field) => (
-                    <div className="space-y-1.5">
-                      <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                        Image URL
-                      </Label>
-                      <Input
-                        placeholder="https://example.com/asset.jpg"
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        disabled={isLoading}
-                        className="h-9.5 text-xs"
-                      />
-                    </div>
-                  )}
-                />
 
                 <form.Field
                   name="isActive"
                   children={(field) => (
-                    <div className="space-y-1.5 flex flex-col justify-end">
+                    <div className="space-y-1.5 flex flex-col justify-end pt-2">
                       <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50/50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 h-9.5">
                         <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
                           Active Status
@@ -714,44 +659,110 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
                 />
               </div>
 
-              {/* Scenarios */}
-              <div className="grid grid-cols-2 gap-4 pt-1 border-t">
+              {/* Right Column: Question Texts, Explanations & Answer Config */}
+              <div className="md:col-span-8 space-y-4">
                 <form.Field
-                  name="scenarioEn"
+                  name="questionTextEn"
                   children={(field) => (
-                    <div className="space-y-1.5">
+                    <div className="space-y-1.5 quill-editor-wrapper text-editor-question">
                       <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                        Scenario (English)
+                        Question Text (English) <span className="text-rose-500">*</span>
                       </Label>
-                      <Input
-                        placeholder="Intro context context..."
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        disabled={isLoading}
-                        className="h-9.5 text-xs"
+                      <ReactQuill
+                        theme="snow"
+                        value={field.state.value || ''}
+                        onChange={field.handleChange}
+                        readOnly={isLoading}
+                        modules={{
+                          toolbar: [
+                            ['bold', 'italic', 'underline', 'strike'],
+                            [{ list: 'ordered' }, { list: 'bullet' }],
+                            ['clean'],
+                          ],
+                        }}
+                        placeholder="What is 2 + 2?"
                       />
                     </div>
                   )}
                 />
 
                 <form.Field
-                  name="scenarioKh"
+                  name="questionTextKh"
                   children={(field) => (
-                    <div className="space-y-1.5">
+                    <div className="space-y-1.5 quill-editor-wrapper text-editor-question">
                       <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                        Scenario (Khmer)
+                        Question Text (Khmer) <span className="text-rose-500">*</span>
                       </Label>
-                      <Input
-                        placeholder="បរិបទសំណួរ..."
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        disabled={isLoading}
-                        className="h-9.5 text-xs"
+                      <ReactQuill
+                        theme="snow"
+                        value={field.state.value || ''}
+                        onChange={field.handleChange}
+                        readOnly={isLoading}
+                        modules={{
+                          toolbar: [
+                            ['bold', 'italic', 'underline', 'strike'],
+                            [{ list: 'ordered' }, { list: 'bullet' }],
+                            ['clean'],
+                          ],
+                        }}
+                        placeholder="២ + ២ ស្មើនឹងប៉ុន្មាន?"
                       />
                     </div>
                   )}
                 />
-              </div>
+
+                {/* Explanations */}
+                <form.Field
+                  name="explanationEn"
+                  children={(field) => (
+                    <div className="space-y-1.5 quill-editor-wrapper text-editor-explanation pt-1.5 border-t border-slate-100 dark:border-slate-800/80">
+                      <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                        Explanation (English)
+                      </Label>
+                      <ReactQuill
+                        theme="snow"
+                        value={field.state.value || ''}
+                        onChange={field.handleChange}
+                        readOnly={isLoading}
+                        modules={{
+                          toolbar: [
+                            ['bold', 'italic', 'underline', 'strike'],
+                            [{ list: 'ordered' }, { list: 'bullet' }],
+                            ['clean'],
+                          ],
+                        }}
+                        placeholder="Brief hint or logic overview..."
+                      />
+                    </div>
+                  )}
+                />
+
+                <form.Field
+                  name="explanationKh"
+                  children={(field) => (
+                    <div className="space-y-1.5 quill-editor-wrapper text-editor-explanation">
+                      <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                        Explanation (Khmer)
+                      </Label>
+                      <ReactQuill
+                        theme="snow"
+                        value={field.state.value || ''}
+                        onChange={field.handleChange}
+                        readOnly={isLoading}
+                        modules={{
+                          toolbar: [
+                            ['bold', 'italic', 'underline', 'strike'],
+                            [{ list: 'ordered' }, { list: 'bullet' }],
+                            ['clean'],
+                          ],
+                        }}
+                        placeholder="ការពន្យល់សង្ខេប..."
+                      />
+                    </div>
+                  )}
+                />
+
+
 
               {/* DYNAMIC ANSWER CONFIG PANELS */}
               <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/30 space-y-4">
@@ -791,15 +802,15 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
                           )}
                           <Input
                             placeholder={`Option ${idx + 1} English`}
-                            value={opt.textEn}
-                            onChange={(e) => handleOptionTextChange(opt.id, 'textEn', e.target.value)}
+                            value={opt.text_en}
+                            onChange={(e) => handleOptionTextChange(opt.id, 'text_en', e.target.value)}
                             disabled={isLoading}
                             className="h-8.5 text-xs flex-1"
                           />
                           <Input
                             placeholder={`Option ${idx + 1} Khmer`}
-                            value={opt.textKh}
-                            onChange={(e) => handleOptionTextChange(opt.id, 'textKh', e.target.value)}
+                            value={opt.text_kh}
+                            onChange={(e) => handleOptionTextChange(opt.id, 'text_kh', e.target.value)}
                             disabled={isLoading}
                             className="h-8.5 text-xs flex-1"
                           />
@@ -872,15 +883,15 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
                           </span>
                           <Input
                             placeholder="Comma separated acceptable answers (e.g. 4, four, IV)"
-                            value={b.acceptedAnswersRaw}
-                            onChange={(e) => handleBlankChange(b.id, 'acceptedAnswersRaw', e.target.value)}
+                            value={b.accepted_answers_raw}
+                            onChange={(e) => handleBlankChange(b.id, 'accepted_answers_raw', e.target.value)}
                             disabled={isLoading}
                             className="h-8.5 text-xs flex-1"
                           />
                           <label className="flex items-center gap-1.5 text-[10px] cursor-pointer shrink-0 font-medium">
                             <Switch
-                              checked={b.isCaseSensitive}
-                              onCheckedChange={(checked) => handleBlankChange(b.id, 'isCaseSensitive', checked)}
+                              checked={b.is_case_sensitive}
+                              onCheckedChange={(checked) => handleBlankChange(b.id, 'is_case_sensitive', checked)}
                               disabled={isLoading}
                             />
                             Case Sensitive
@@ -926,14 +937,14 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
                             <div key={i.id} className="flex gap-1.5 items-center">
                               <Input
                                 placeholder={`Left ${idx + 1} English`}
-                                value={i.textEn}
-                                onChange={(e) => handleItemTextChange('left', i.id, 'textEn', e.target.value)}
+                                value={i.text_en}
+                                onChange={(e) => handleItemTextChange('left', i.id, 'text_en', e.target.value)}
                                 className="h-8 text-xs"
                               />
                               <Input
                                 placeholder="Khmer"
-                                value={i.textKh}
-                                onChange={(e) => handleItemTextChange('left', i.id, 'textKh', e.target.value)}
+                                value={i.text_kh}
+                                onChange={(e) => handleItemTextChange('left', i.id, 'text_kh', e.target.value)}
                                 className="h-8 text-xs"
                               />
                               {leftSide.length > 1 && (
@@ -963,14 +974,14 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
                             <div key={i.id} className="flex gap-1.5 items-center">
                               <Input
                                 placeholder={`Right ${idx + 1} English`}
-                                value={i.textEn}
-                                onChange={(e) => handleItemTextChange('right', i.id, 'textEn', e.target.value)}
+                                value={i.text_en}
+                                onChange={(e) => handleItemTextChange('right', i.id, 'text_en', e.target.value)}
                                 className="h-8 text-xs"
                               />
                               <Input
                                 placeholder="Khmer"
-                                value={i.textKh}
-                                onChange={(e) => handleItemTextChange('right', i.id, 'textKh', e.target.value)}
+                                value={i.text_kh}
+                                onChange={(e) => handleItemTextChange('right', i.id, 'text_kh', e.target.value)}
                                 className="h-8 text-xs"
                               />
                               {rightSide.length > 1 && (
@@ -1000,7 +1011,7 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
                       <div className="flex flex-wrap gap-2">
                         {leftSide.map((l) =>
                           rightSide.map((r) => {
-                            const isLinked = correctPairs.some((p) => p.leftId === l.id && p.rightId === r.id)
+                            const isLinked = correctPairs.some((p) => p.left_id === l.id && p.right_id === r.id)
                             return (
                               <Button
                                 key={`${l.id}-${r.id}`}
@@ -1009,7 +1020,7 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
                                 onClick={() => togglePair(l.id, r.id)}
                                 className="text-[10px] h-7.5 px-2"
                               >
-                                {l.textEn || '(left)'} ↔ {r.textEn || '(right)'}
+                                {l.text_en || '(left)'} ↔ {r.text_en || '(right)'}
                               </Button>
                             )
                           })
@@ -1029,14 +1040,14 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
                           <span className="text-xs font-bold text-slate-400 shrink-0 w-6">#{idx + 1}</span>
                           <Input
                             placeholder={`Item English text`}
-                            value={item.textEn}
-                            onChange={(e) => handleOrderItemChange(item.id, 'textEn', e.target.value)}
+                            value={item.text_en}
+                            onChange={(e) => handleOrderItemChange(item.id, 'text_en', e.target.value)}
                             className="h-8.5 text-xs flex-1"
                           />
                           <Input
                             placeholder={`Item Khmer text`}
-                            value={item.textKh}
-                            onChange={(e) => handleOrderItemChange(item.id, 'textKh', e.target.value)}
+                            value={item.text_kh}
+                            onChange={(e) => handleOrderItemChange(item.id, 'text_kh', e.target.value)}
                             className="h-8.5 text-xs flex-1"
                           />
                           {orderItems.length > 2 && (
@@ -1060,9 +1071,10 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
                   </div>
                 )}
               </div>
+            </div>
 
               {validationError && (
-                <div className="flex items-start gap-2 p-3 rounded-lg border border-rose-500/10 bg-rose-500/5 text-rose-500">
+                <div className="md:col-span-12 flex items-start gap-2 p-3 rounded-lg border border-rose-500/10 bg-rose-500/5 text-rose-500">
                   <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
                   <p className="text-xs font-medium leading-tight">{validationError}</p>
                 </div>

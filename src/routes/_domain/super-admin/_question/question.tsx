@@ -42,8 +42,9 @@ import { DeleteModal } from '@/components/ui/delete-modal'
 import { useQuestionsQuery, useDeleteQuestionMutation } from '../_hooks/useQuestion'
 import { useCategoriesQuery } from '../_hooks/useCategory'
 import { useLevelsQuery } from '../_hooks/useLevel'
-import type { QuestionItem, QuestionTypeEnum, DifficultyEnum } from '../_types/question.types'
+import type { QuestionItem, DifficultyEnum } from '../_types/question.types'
 import { QuestionDialog } from '../_components/QuestionDialog'
+import { QuestionDetailDialog } from '../_components/QuestionDetailDialog'
 import { toast } from 'sonner'
 import {
   useReactTable,
@@ -51,6 +52,11 @@ import {
   flexRender,
   createColumnHelper,
 } from '@tanstack/react-table'
+
+const stripHtml = (html: string) => {
+  if (!html) return ''
+  return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim()
+}
 
 export const Route = createFileRoute('/_domain/super-admin/_question/question')({
   component: QuestionsPage,
@@ -71,6 +77,9 @@ function QuestionsPage() {
   // Dialog triggers
   const [dialogOpen, setDialogOpen] = useState(false)
   const [activeQuestion, setActiveQuestion] = useState<QuestionItem | null>(null)
+
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false)
+  const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null)
 
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false)
   const [questionToDelete, setQuestionToDelete] = useState<QuestionItem | null>(null)
@@ -139,6 +148,11 @@ function QuestionsPage() {
     setDialogOpen(true)
   }
 
+  const handleViewDetail = (q: QuestionItem) => {
+    setActiveQuestionId(q.id)
+    setDetailDialogOpen(true)
+  }
+
   const handleDeleteTrigger = (q: QuestionItem) => {
     setQuestionToDelete(q)
     setDeleteAlertOpen(true)
@@ -178,10 +192,10 @@ function QuestionsPage() {
         return (
           <div>
             <div className="font-semibold text-slate-900 dark:text-slate-100 text-xs max-w-[320px] truncate">
-              {q.question_text_en}
+              {stripHtml(q.question_text_en)}
             </div>
             <div className="text-[10px] text-slate-400 dark:text-slate-500 max-w-[320px] truncate">
-              {q.question_text_kh}
+              {stripHtml(q.question_text_kh)}
             </div>
           </div>
         )
@@ -237,6 +251,11 @@ function QuestionsPage() {
         const q = info.row.original
         return (
           <div className="flex justify-end gap-1">
+            <ActionButton
+              actionType="info"
+              tooltip="View Details"
+              onClick={() => handleViewDetail(q)}
+            />
             <ActionButton
               actionType="edit"
               tooltip="Edit Question"
@@ -548,6 +567,9 @@ function QuestionsPage() {
 
       {/* Question Form Dialog Modal */}
       <QuestionDialog open={dialogOpen} onOpenChange={setDialogOpen} question={activeQuestion} />
+
+      {/* Question Detail View Dialog Modal */}
+      <QuestionDetailDialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen} questionId={activeQuestionId} />
 
       {/* Question Delete Confirmation Dialog (using reusable DeleteModal) */}
       <DeleteModal

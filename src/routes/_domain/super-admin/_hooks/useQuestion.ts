@@ -75,3 +75,12 @@ export function useDeleteQuestionMutation() {
     },
   })
 }
+
+export function useQuestionQuery(id: string, enabled = false) {
+  return useQuery({
+    queryKey: ['question', id],
+    queryFn: () => superAdminQuestionService.getQuestion(id),
+    enabled: enabled && !!id,
+  })
+}
+
