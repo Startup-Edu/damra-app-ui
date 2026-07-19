@@ -33,9 +33,9 @@ import {
   User as UserIcon,
 } from 'lucide-react'
 import { ActionButton } from '@/components/ui/action-button'
-import { useUsersQuery, useDeleteUserMutation } from './_hooks/useUsers'
-import type { UserItem } from './_types/users.types'
-import { UserDialog } from './_components/UserDialog'
+import { useUsersQuery, useDeleteUserMutation } from './_user/_hooks/useUsers'
+import type { UserItem } from './_user/_types/users.types'
+import { UserDialog } from './_user/_components/UserDialog'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_domain/super-admin/users-management')({

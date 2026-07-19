@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { PageHeader } from '@/components/ui/page-header'
-import { ProfileDetailsCard } from './_components/ProfileDetailsCard'
-import { ChangePasswordCard } from './_components/ChangePasswordCard'
+import { ProfileDetailsCard } from './_profile/_components/ProfileDetailsCard'
+import { ChangePasswordCard } from './_profile/_components/ChangePasswordCard'
 
 export const Route = createFileRoute('/_domain/super-admin/profile')({
   component: ProfilePage,

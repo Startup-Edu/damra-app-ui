@@ -10,7 +10,7 @@ const navigation = [
   { name: 'Roles & Permissions', href: '/super-admin/roles-permissions', icon: ShieldCheck },
   { name: 'Categories', href: '/super-admin/category', icon: FolderTree },
   { name: 'Grades', href: '/super-admin/grade', icon: GraduationCap },
-  { name: 'Levels', href: '/super-admin/level', icon: Layers },
+  { name: 'Learning Path', href: '/super-admin/learning-path', icon: Layers },
   { name: 'Quiz Packages', href: '/super-admin/quizepack', icon: BookOpen },
   { name: 'Question Types', href: '/super-admin/questiontype', icon: FileQuestion },
   { name: 'Questions', href: '/super-admin/question', icon: HelpCircle },

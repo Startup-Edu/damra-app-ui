@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { PageHeader } from '@/components/ui/page-header'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { RolesTab } from './_components/RolesTab'
-import { PermissionsTab } from './_components/PermissionsTab'
+import { RolesTab } from './_role/_components/RolesTab'
+import { PermissionsTab } from './_role/_components/PermissionsTab'
 import { ShieldCheck } from 'lucide-react'
 
 export const Route = createFileRoute('/_domain/super-admin/roles-permissions')({

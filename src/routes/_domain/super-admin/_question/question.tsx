@@ -36,15 +36,18 @@ import {
   Plus,
   Loader2,
   HelpCircle,
+  UploadCloud,
 } from 'lucide-react'
 import { ActionButton } from '@/components/ui/action-button'
 import { DeleteModal } from '@/components/ui/delete-modal'
-import { useQuestionsQuery, useDeleteQuestionMutation } from '../_hooks/useQuestion'
-import { useCategoriesQuery } from '../_hooks/useCategory'
-import { useLevelsQuery } from '../_hooks/useLevel'
-import type { QuestionItem, DifficultyEnum } from '../_types/question.types'
-import { QuestionDialog } from '../_components/QuestionDialog'
-import { QuestionDetailDialog } from '../_components/QuestionDetailDialog'
+import { useQuestionsQuery, useDeleteQuestionMutation } from './_hooks/useQuestion'
+import { useCategoriesQuery } from '../_category/_hooks/useCategory'
+import { useGradesQuery } from '../_grade/_hooks/useGrade'
+import { useGradeCategoriesQuery } from '../_grade/_hooks/useGradeCategory'
+import type { QuestionItem, DifficultyEnum } from './_types/question.types'
+import { QuestionDialog } from './components/QuestionDialog'
+import { QuestionDetailDialog } from './components/QuestionDetailDialog'
+import { QuestionImportDialog } from './components/QuestionImportDialog'
 import { toast } from 'sonner'
 import {
   useReactTable,
@@ -69,14 +72,16 @@ function QuestionsPage() {
   const [debouncedSearch, setDebouncedSearch] = useState('')
 
   // Filter States
+  const [selectedGradeId, setSelectedGradeId] = useState<string>('all')
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('all')
-  const [selectedLevelId, setSelectedLevelId] = useState<string>('all')
   const [selectedType, setSelectedType] = useState<string>('all')
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all')
 
   // Dialog triggers
   const [dialogOpen, setDialogOpen] = useState(false)
   const [activeQuestion, setActiveQuestion] = useState<QuestionItem | null>(null)
+
+  const [importDialogOpen, setImportDialogOpen] = useState(false)
 
   const [detailDialogOpen, setDetailDialogOpen] = useState(false)
   const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null)
@@ -94,8 +99,8 @@ function QuestionsPage() {
     return () => clearTimeout(handler)
   }, [search])
 
+  const filterGrade = selectedGradeId === 'all' ? undefined : selectedGradeId
   const filterCategory = selectedCategoryId === 'all' ? undefined : selectedCategoryId
-  const filterLevel = selectedLevelId === 'all' ? undefined : selectedLevelId
   const filterType = selectedType === 'all' ? undefined : selectedType
   const filterDifficulty = selectedDifficulty === 'all' ? undefined : selectedDifficulty
 
@@ -105,32 +110,21 @@ function QuestionsPage() {
     limit,
     debouncedSearch,
     filterCategory,
-    filterLevel,
+    filterGrade,
     filterType,
     filterDifficulty
   )
 
-  // Fetch categories and levels for filters
-  const { data: categoriesResponse } = useCategoriesQuery(1, 100, '', true)
-  const { data: levelsResponse } = useLevelsQuery(1, 100, '')
+  // Fetch grades and categories for filters
+  const { data: gradesResponse } = useGradesQuery(1, 100, '')
+  const { data: allCategoriesResponse } = useCategoriesQuery(1, 100, '', true)
+  const { data: gradeCategoriesResponse } = useGradeCategoriesQuery(selectedGradeId, selectedGradeId !== 'all')
 
-  const categories = categoriesResponse?.data || []
-  const allLevels = levelsResponse?.data || []
-
-  // Filter levels selector options relative to selected category filter
-  const filteredLevelOptions = selectedCategoryId === 'all' 
-    ? allLevels 
-    : allLevels.filter(l => l.category_id === selectedCategoryId)
-
-  // Reset selected level filter if it no longer matches the selected category filter
-  useEffect(() => {
-    if (selectedLevelId !== 'all') {
-      const match = filteredLevelOptions.find(l => l.id === selectedLevelId)
-      if (!match) {
-        setSelectedLevelId('all')
-      }
-    }
-  }, [selectedCategoryId])
+  const grades = gradesResponse?.data || []
+  const allCategories = allCategoriesResponse?.data || []
+  const availableCategories = selectedGradeId !== 'all' && gradeCategoriesResponse?.data
+    ? gradeCategoriesResponse.data
+    : allCategories
 
   const deleteMutation = useDeleteQuestionMutation()
 
@@ -201,22 +195,22 @@ function QuestionsPage() {
         )
       },
     }),
-    columnHelper.accessor('category', {
-      header: 'Category',
-      cell: (info) => info.getValue()?.name_en || '-',
-    }),
-    columnHelper.accessor('level', {
-      header: 'Level',
+    columnHelper.accessor('grade', {
+      header: 'Grade',
       cell: (info) => {
-        const lvl = info.getValue()
-        return lvl ? (
-          <Badge variant="outline" className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-            {lvl.title_en}
+        const grade = info.getValue()
+        return grade ? (
+          <Badge variant="outline" className="bg-slate-50 dark:bg-slate-900 border">
+            {grade.name_en}
           </Badge>
         ) : (
           <span className="text-slate-300 dark:text-slate-700">-</span>
         )
       },
+    }),
+    columnHelper.accessor('category', {
+      header: 'Category',
+      cell: (info) => info.getValue()?.name_en || '-',
     }),
     columnHelper.accessor('question_type', {
       header: 'Type',
@@ -286,9 +280,14 @@ function QuestionsPage() {
         title="Questions"
         description="Manage the study question repository database, formats validation, difficulty levels, and categories."
       >
-        <Button onClick={handleAdd} className="text-xs !h-9">
-          <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Question
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setImportDialogOpen(true)} className="text-xs !h-9">
+            <UploadCloud className="mr-1.5 h-3.5 w-3.5" /> Import Questions
+          </Button>
+          <Button onClick={handleAdd} className="text-xs !h-9">
+            <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Question
+          </Button>
+        </div>
       </PageHeader>
 
       {/* Main Content Card */}
@@ -303,18 +302,34 @@ function QuestionsPage() {
                 placeholder="Search questions by text..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 h-10 text-xs"
+                className="pl-10 h-9.5 text-xs"
               />
             </div>
 
             {/* Category Filter */}
+            {/* Grade Filter */}
+            <Select value={selectedGradeId} onValueChange={(val) => { setSelectedGradeId(val); setSelectedCategoryId('all'); setPage(1); }}>
+              <SelectTrigger className="w-[140px] text-xs">
+                <SelectValue placeholder="All Grades" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Grades</SelectItem>
+                {grades.map((g) => (
+                  <SelectItem key={g.id} value={g.id}>
+                    {g.name_en}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Category Filter */}
             <Select value={selectedCategoryId} onValueChange={(val) => { setSelectedCategoryId(val); setPage(1); }}>
-              <SelectTrigger className="w-[160px] h-10 text-xs">
+              <SelectTrigger className="w-[160px] text-xs">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((c) => (
+                {availableCategories.map((c) => (
                   <SelectItem key={c.id} value={c.id}>
                     {c.name_en}
                   </SelectItem>
@@ -322,24 +337,9 @@ function QuestionsPage() {
               </SelectContent>
             </Select>
 
-            {/* Level Filter */}
-            <Select value={selectedLevelId} onValueChange={(val) => { setSelectedLevelId(val); setPage(1); }}>
-              <SelectTrigger className="w-[140px] h-10 text-xs">
-                <SelectValue placeholder="All Levels" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Levels</SelectItem>
-                {filteredLevelOptions.map((l) => (
-                  <SelectItem key={l.id} value={l.id}>
-                    {l.title_en}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
             {/* Type Filter */}
             <Select value={selectedType} onValueChange={(val) => { setSelectedType(val); setPage(1); }}>
-              <SelectTrigger className="w-[140px] h-10 text-xs">
+              <SelectTrigger className="w-[140px] text-xs">
                 <SelectValue placeholder="All Types" />
               </SelectTrigger>
               <SelectContent>
@@ -355,7 +355,7 @@ function QuestionsPage() {
 
             {/* Difficulty Filter */}
             <Select value={selectedDifficulty} onValueChange={(val) => { setSelectedDifficulty(val); setPage(1); }}>
-              <SelectTrigger className="w-[120px] h-10 text-xs">
+              <SelectTrigger className="w-[120px] text-xs">
                 <SelectValue placeholder="All Difficulties" />
               </SelectTrigger>
               <SelectContent>
@@ -375,7 +375,7 @@ function QuestionsPage() {
                 })
               }}
               disabled={isFetching}
-              className="h-10 w-10 shrink-0 ml-auto"
+              className="h-9 w-9 shrink-0 ml-auto"
             >
               {isFetching ? (
                 <Loader2 className="h-4.5 w-4.5 animate-spin" />
@@ -398,8 +398,8 @@ function QuestionsPage() {
                         header.id === 'question_text_en'
                           ? 'pl-6'
                           : header.id === 'actions'
-                          ? 'pr-6 text-right w-[120px]'
-                          : undefined
+                            ? 'pr-6 text-right w-[120px]'
+                            : undefined
                       }
                     >
                       {header.isPlaceholder
@@ -476,8 +476,8 @@ function QuestionsPage() {
                           cell.column.id === 'question_text_en'
                             ? 'pl-6 py-3'
                             : cell.column.id === 'actions'
-                            ? 'pr-6 text-right'
-                            : undefined
+                              ? 'pr-6 text-right'
+                              : undefined
                         }
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -567,6 +567,9 @@ function QuestionsPage() {
 
       {/* Question Form Dialog Modal */}
       <QuestionDialog open={dialogOpen} onOpenChange={setDialogOpen} question={activeQuestion} />
+
+      {/* Question Import Dialog Modal */}
+      <QuestionImportDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} />
 
       {/* Question Detail View Dialog Modal */}
       <QuestionDetailDialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen} questionId={activeQuestionId} />

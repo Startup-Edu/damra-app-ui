@@ -40,11 +40,11 @@ import {
 } from 'lucide-react'
 import { ActionButton } from '@/components/ui/action-button'
 import { DeleteModal } from '@/components/ui/delete-modal'
-import { useQuizPackagesQuery, useDeleteQuizPackageMutation } from '../_hooks/useQuizpack'
-import { useCategoriesQuery } from '../_hooks/useCategory'
-import { useLevelsQuery } from '../_hooks/useLevel'
-import type { QuizPackageItem } from '../_types/quizpack.types'
-import { QuizpackDialog } from '../_components/QuizpackDialog'
+import { useQuizPackagesQuery, useDeleteQuizPackageMutation } from './_hooks/useQuizpack'
+import { useCategoriesQuery } from '../_category/_hooks/useCategory'
+import type { QuizPackageItem } from './_types/quizpack.types'
+import { QuizpackDialog } from './_components/QuizpackDialog'
+import { QuizPackageQuestionsDialog } from './_components/QuizPackageQuestionsDialog'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_domain/super-admin/_quizpack/quizepack')({
@@ -59,11 +59,13 @@ function QuizPackagesPage() {
 
   // Filter States
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('all')
-  const [selectedLevelId, setSelectedLevelId] = useState<string>('all')
 
   // Dialog triggers
   const [dialogOpen, setDialogOpen] = useState(false)
   const [activeQuizpack, setActiveQuizpack] = useState<QuizPackageItem | null>(null)
+
+  const [questionsDialogOpen, setQuestionsDialogOpen] = useState(false)
+  const [activeQuestionsQuizpack, setActiveQuestionsQuizpack] = useState<QuizPackageItem | null>(null)
 
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false)
   const [quizpackToDelete, setQuizpackToDelete] = useState<QuizPackageItem | null>(null)
@@ -79,23 +81,18 @@ function QuizPackagesPage() {
   }, [search])
 
   const filterCategory = selectedCategoryId === 'all' ? undefined : selectedCategoryId
-  const filterLevel = selectedLevelId === 'all' ? undefined : selectedLevelId
 
-  // Fetch quiz packages
+  // Fetch standalone quiz packages
   const { data, isLoading, isFetching, isError, refetch } = useQuizPackagesQuery(
     page,
     limit,
     debouncedSearch,
-    filterLevel,
     filterCategory
   )
 
-  // Fetch categories and levels for filters (limit 100)
+  // Fetch categories for filters (limit 100)
   const { data: categoriesResponse } = useCategoriesQuery(1, 100, '', true)
-  const { data: levelsResponse } = useLevelsQuery(1, 100, '')
-
   const categories = categoriesResponse?.data || []
-  const levels = levelsResponse?.data || []
 
   const deleteMutation = useDeleteQuizPackageMutation()
 
@@ -111,6 +108,11 @@ function QuizPackagesPage() {
   const handleEdit = (pkg: QuizPackageItem) => {
     setActiveQuizpack(pkg)
     setDialogOpen(true)
+  }
+
+  const handleManageQuestions = (pkg: QuizPackageItem) => {
+    setActiveQuestionsQuizpack(pkg)
+    setQuestionsDialogOpen(true)
   }
 
   const handleDeleteTrigger = (pkg: QuizPackageItem) => {
@@ -130,11 +132,11 @@ function QuizPackagesPage() {
   }
 
   return (
-    <div className="text-slate-900 dark:text-slate-50 animate-fade-in">
+    <div className="animate-fade-in">
       {/* Page Header */}
       <PageHeader
         title="Quiz Packages"
-        description="Manage study bundles, pricing economics, and roadmap level linkages."
+        description="Manage standalone practice quiz packages, coin pricing, and category filters."
       >
         <Button onClick={handleAdd} className="text-xs !h-9">
           <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Package
@@ -144,16 +146,16 @@ function QuizPackagesPage() {
       {/* Main Content Card */}
       <Card className="py-0">
         {/* Toolbar */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-6 pb-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-5 pb-0">
           <div className="flex flex-1 items-center gap-3 max-w-2xl">
             {/* Search Input */}
             <div className="relative flex-1 group">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4" />
               <Input
                 placeholder="Search packages by title..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 h-9 text-xs"
+                className="pl-9 h-9.5 text-xs"
               />
             </div>
 
@@ -171,21 +173,6 @@ function QuizPackagesPage() {
                 ))}
               </SelectContent>
             </Select>
-
-            {/* Level Filter */}
-            <Select value={selectedLevelId} onValueChange={(val) => { setSelectedLevelId(val); setPage(1); }}>
-              <SelectTrigger className="w-[150px] h-10 text-xs border border-input">
-                <SelectValue placeholder="All Levels" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Levels</SelectItem>
-                {levels.map((l) => (
-                  <SelectItem key={l.id} value={l.id}>
-                    {l.title_en}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
 
           <Button
@@ -197,7 +184,7 @@ function QuizPackagesPage() {
               })
             }}
             disabled={isFetching}
-            className="h-10 w-10 shrink-0"
+            className="h-9.5 w-9.5 shrink-0"
           >
             {isFetching ? (
               <Loader2 className="h-4.5 w-4.5 animate-spin" />
@@ -212,7 +199,6 @@ function QuizPackagesPage() {
             <TableHeader>
               <TableRow className="hover:bg-transparent">
                 <TableHead className="pl-6">Title</TableHead>
-                <TableHead>Associated Level</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Access Status</TableHead>
                 <TableHead>Questions / Session</TableHead>
@@ -223,7 +209,6 @@ function QuizPackagesPage() {
 
             <TableBody>
               {isLoading ? (
-                // Loading Skeletons
                 Array.from({ length: 5 }).map((_, idx) => (
                   <TableRow key={idx}>
                     <TableCell className="pl-6">
@@ -231,9 +216,6 @@ function QuizPackagesPage() {
                         <Skeleton className="h-4 w-36" />
                         <Skeleton className="h-3.5 w-24" />
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-4 w-20" />
                     </TableCell>
                     <TableCell>
                       <Skeleton className="h-4 w-24" />
@@ -256,46 +238,32 @@ function QuizPackagesPage() {
                   </TableRow>
                 ))
               ) : isError ? (
-                // Error State
                 <TableRow>
-                  <TableCell colSpan={7} className="py-12 text-center text-rose-500 font-medium text-xs">
+                  <TableCell colSpan={6} className="py-12 text-center text-rose-500 font-medium text-xs">
                     Failed to fetch quiz packages. Please make sure the API server is online.
                   </TableCell>
                 </TableRow>
               ) : packages.length === 0 ? (
-                // Empty State
                 <TableRow>
-                  <TableCell colSpan={7} className="py-16 text-center">
-                    <div className="flex flex-col items-center gap-2 text-slate-400">
-                      <BookOpen className="h-8 w-8 text-slate-300 dark:text-slate-700" />
+                  <TableCell colSpan={6} className="py-16 text-center">
+                    <div className="flex flex-col items-center gap-2">
+                      <BookOpen className="h-8 w-8" />
                       <p className="text-xs font-semibold">No quiz packages found matching filters</p>
                     </div>
                   </TableCell>
                 </TableRow>
               ) : (
-                // Data List
                 packages.map((pkg) => (
                   <TableRow key={pkg.id}>
                     {/* Title & Description */}
                     <TableCell className="pl-6 py-3.5">
-                      <div className="font-semibold text-slate-900 dark:text-slate-100 text-xs">
+                      <div className="font-semibold text-xs">
                         {pkg.title}
                       </div>
                       {pkg.description && (
-                        <div className="text-[10px] text-slate-400 dark:text-slate-500 max-w-[220px] truncate">
+                        <div className="text-[10px] max-w-[220px] truncate">
                           {pkg.description}
                         </div>
-                      )}
-                    </TableCell>
-
-                    {/* Level Column */}
-                    <TableCell className="text-xs font-medium">
-                      {pkg.level ? (
-                        <Badge variant="outline" className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-                          {pkg.level.title_en}
-                        </Badge>
-                      ) : (
-                        <span className="text-slate-300 dark:text-slate-700">-</span>
                       )}
                     </TableCell>
 
@@ -304,7 +272,7 @@ function QuizPackagesPage() {
                       {pkg.category ? (
                         <span>{pkg.category.name_en}</span>
                       ) : (
-                        <span className="text-slate-300 dark:text-slate-700">-</span>
+                        <span>-</span>
                       )}
                     </TableCell>
 
@@ -323,7 +291,7 @@ function QuizPackagesPage() {
                     </TableCell>
 
                     {/* Questions per Session */}
-                    <TableCell className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                    <TableCell className="text-xs font-medium">
                       {pkg.questions_per_session !== null ? pkg.questions_per_session : 'Default (10)'}
                     </TableCell>
 
@@ -344,6 +312,11 @@ function QuizPackagesPage() {
                     <TableCell className="pr-6 text-right">
                       <div className="flex justify-end gap-1">
                         <ActionButton
+                          actionType="view"
+                          tooltip="Manage Questions"
+                          onClick={() => handleManageQuestions(pkg)}
+                        />
+                        <ActionButton
                           actionType="edit"
                           tooltip="Edit Package"
                           onClick={() => handleEdit(pkg)}
@@ -363,13 +336,13 @@ function QuizPackagesPage() {
 
           {/* Pagination Footer */}
           {!isLoading && !isError && packages.length > 0 && (
-            <div className="flex items-center justify-between p-4 px-6 border-t bg-slate-50/30 dark:bg-slate-950/10">
-              <div className="text-[10px] text-slate-500 dark:text-slate-400">
-                Showing <span className="font-semibold text-slate-900 dark:text-slate-100">{((page - 1) * limit) + 1}</span> to{" "}
-                <span className="font-semibold text-slate-900 dark:text-slate-100">
+            <div className="flex items-center justify-between p-4 px-6 border-t ">
+              <div className="text-[10px] ">
+                Showing <span className="font-semibold">{((page - 1) * limit) + 1}</span> to{" "}
+                <span className="font-semibold">
                   {Math.min(page * limit, totalElements)}
                 </span>{" "}
-                of <span className="font-semibold text-slate-900 dark:text-slate-100">{totalElements}</span> packages
+                of <span className="font-semibold">{totalElements}</span> packages
               </div>
 
               <Pagination className="mx-0 w-auto">
@@ -440,14 +413,23 @@ function QuizPackagesPage() {
       {/* Quizpack Dialog Modal */}
       <QuizpackDialog open={dialogOpen} onOpenChange={setDialogOpen} quizpack={activeQuizpack} />
 
-      {/* Quizpack Delete Confirmation Dialog (using reusable DeleteModal) */}
+      {/* Manage Questions Dialog */}
+      {activeQuestionsQuizpack && (
+        <QuizPackageQuestionsDialog
+          open={questionsDialogOpen}
+          onOpenChange={setQuestionsDialogOpen}
+          quizpack={activeQuestionsQuizpack}
+        />
+      )}
+
+      {/* Quizpack Delete Confirmation Dialog */}
       <DeleteModal
         open={deleteAlertOpen}
         onOpenChange={setDeleteAlertOpen}
         description={
           <>
-            This will permanently delete the quiz package <span className="font-semibold text-slate-800 dark:text-slate-200">"{quizpackToDelete?.title}"</span>. 
-            All its contents will be archived. This operation cannot be undone.
+            This will permanently delete the quiz package <span className="font-semibold text-destructive">"{quizpackToDelete?.title}"</span>. 
+            This operation cannot be undone.
           </>
         }
         onConfirm={handleDeleteConfirm}
