@@ -41,9 +41,9 @@ export const superAdminQuizPackageService = {
   },
 
   syncQuizPackageQuestions: async (id: string, data: SyncQuizPackageQuestionsDTO) => {
-    return apiClient.post<{ success: boolean; message: string; data: QuizPackageItem }>(
-      `/admin/quiz-packages/${id}/questions`,
-      data
+    return apiClient.patch<{ success: boolean; message: string; data: QuizPackageItem }>(
+      `/admin/quiz-packages/${id}`,
+      { questionIds: data.questionIds }
     )
   },
 }

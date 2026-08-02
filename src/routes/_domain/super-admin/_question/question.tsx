@@ -56,10 +56,7 @@ import {
   createColumnHelper,
 } from '@tanstack/react-table'
 
-const stripHtml = (html: string) => {
-  if (!html) return ''
-  return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim()
-}
+import { cleanText } from '@/lib/utils'
 
 export const Route = createFileRoute('/_domain/super-admin/_question/question')({
   component: QuestionsPage,
@@ -186,10 +183,10 @@ function QuestionsPage() {
         return (
           <div>
             <div className="font-semibold text-slate-900 dark:text-slate-100 text-xs max-w-[320px] truncate">
-              {stripHtml(q.question_text_en)}
+              {cleanText(q.question_text_en)}
             </div>
             <div className="text-[10px] text-slate-400 dark:text-slate-500 max-w-[320px] truncate">
-              {stripHtml(q.question_text_kh)}
+              {cleanText(q.question_text_kh)}
             </div>
           </div>
         )
@@ -336,6 +333,8 @@ function QuestionsPage() {
                 ))}
               </SelectContent>
             </Select>
+
+            
 
             {/* Type Filter */}
             <Select value={selectedType} onValueChange={(val) => { setSelectedType(val); setPage(1); }}>

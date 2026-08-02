@@ -15,6 +15,7 @@ export interface QuizPackageItem {
   updated_at: string
   is_deleted: boolean
   category?: CategoryItem | null
+  questions?: QuestionItem[]
   package_questions?: QuizPackageQuestionItem[]
 }
 

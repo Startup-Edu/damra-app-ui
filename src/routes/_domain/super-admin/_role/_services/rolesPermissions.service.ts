@@ -54,10 +54,10 @@ export const rolesPermissionsService = {
   },
 
   getRolePermissions: async (roleId: string) => {
-    return apiClient.get<GetRolePermissionsResponse>(`/admin/roles/${roleId}/permissions`)
+    return apiClient.get<GetRolePermissionsResponse>(`/admin/permissions/role/${roleId}`)
   },
 
   updateRolePermissions: async (roleId: string, permissions: RolePermissionStatus[]) => {
-    return apiClient.post<{ success: boolean; message: string }>(`/admin/roles/${roleId}/permissions`, { permissions })
+    return apiClient.patch<{ success: boolean; message: string }>('/admin/permissions/role/update', { roleId, permissions })
   },
 }

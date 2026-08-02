@@ -30,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { SearchableSelect } from '@/components/ui/searchable-select'
 import {
   Search,
   RefreshCw,
@@ -93,6 +94,13 @@ function QuizPackagesPage() {
   // Fetch categories for filters (limit 100)
   const { data: categoriesResponse } = useCategoriesQuery(1, 100, '', true)
   const categories = categoriesResponse?.data || []
+  const categoryOptions = [
+    { value: 'all', label: 'All Categories' },
+    ...categories.map((c) => ({
+      value: c.id,
+      label: c.name_kh ? `${c.name_en} (${c.name_kh})` : c.name_en,
+    })),
+  ]
 
   const deleteMutation = useDeleteQuizPackageMutation()
 
@@ -160,19 +168,17 @@ function QuizPackagesPage() {
             </div>
 
             {/* Category Filter */}
-            <Select value={selectedCategoryId} onValueChange={(val) => { setSelectedCategoryId(val); setPage(1); }}>
-              <SelectTrigger className="w-[180px] h-10 text-xs border border-input">
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name_en}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableSelect
+              options={categoryOptions}
+              value={selectedCategoryId}
+              onChange={(val) => {
+                setSelectedCategoryId(val)
+                setPage(1)
+              }}
+              placeholder="All Categories"
+              searchPlaceholder="Search category..."
+              className="w-[200px]"
+            />
           </div>
 
           <Button

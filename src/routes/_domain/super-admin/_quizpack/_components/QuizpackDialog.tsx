@@ -130,8 +130,8 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto custom-scrollbar">
-        <DialogHeader className="space-y-1.5 border-b pb-3">
+      <DialogContent className="sm:max-w-[500px] max-h-[85vh] flex flex-col p-0 overflow-hidden">
+        <DialogHeader className="p-6 pb-3.5 border-b shrink-0">
           <DialogTitle className="text-lg font-bold">
             {isEditing ? 'Modify Quiz Package' : 'Create Standalone Quiz Package'}
           </DialogTitle>
@@ -142,7 +142,7 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form id="quizpack-form" onSubmit={handleSubmit} className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-6 space-y-6">
           {/* Title */}
           <div className="space-y-1.5">
             <Label htmlFor="quizpack-title">
@@ -279,23 +279,28 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
               <p className="text-xs font-medium leading-tight">{validationError}</p>
             </div>
           )}
-
-          <DialogFooter className="pt-3 border-t">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isLoading}
-              className="!h-9 text-xs"
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading} className="!h-9 text-xs">
-              {isLoading && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
-              {isEditing ? 'Save Changes' : 'Create Package'}
-            </Button>
-          </DialogFooter>
         </form>
+
+        <DialogFooter className="p-6 pt-3 border-t shrink-0">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isLoading}
+            className="!h-9 text-xs"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            form="quizpack-form"
+            disabled={isLoading}
+            className="!h-9 text-xs"
+          >
+            {isLoading && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
+            {isEditing ? 'Save Changes' : 'Create Package'}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

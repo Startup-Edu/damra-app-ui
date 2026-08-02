@@ -12,13 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Checkbox } from '@/components/ui/checkbox'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { SearchableSelect } from '@/components/ui/searchable-select'
 import {
   Search,
   Loader2,
@@ -31,6 +25,7 @@ import {
 import { useQuizPackageQuery, useSyncQuizPackageQuestionsMutation } from '../_hooks/useQuizpack'
 import { useQuestionsQuery } from '../../_question/_hooks/useQuestion'
 import { useCategoriesQuery } from '../../_category/_hooks/useCategory'
+import { cleanText } from '@/lib/utils'
 import type { QuizPackageItem } from '../_types/quizpack.types'
 import type { QuestionItem } from '../../_question/_types/question.types'
 
@@ -59,7 +54,7 @@ export function QuizPackageQuestionsDialog({
 
   // Fetch question bank
   const { data: questionsRes, isLoading: questionsLoading } = useQuestionsQuery(
-    1, 200, search,
+    1, 100, search,
     filterCategory === 'all' ? undefined : filterCategory,
     undefined
   )
@@ -68,36 +63,54 @@ export function QuizPackageQuestionsDialog({
   const { data: categoriesRes } = useCategoriesQuery(1, 100, '', true)
   const categories = categoriesRes?.data || []
 
+  const categoryOptions = useMemo(() => [
+    { value: 'all', label: 'All Categories' },
+    ...categories.map((c) => ({
+      value: c.id,
+      label: c.name_kh ? `${c.name_en} (${c.name_kh})` : c.name_en,
+    })),
+  ], [categories])
+
   const allQuestions = questionsRes?.data || []
 
   // On open, preload selections from existing attached questions
   useEffect(() => {
     if (!open) return
     if (pkgLoading) return
-    const attached = pkgRes?.data?.package_questions ?? []
-    const sorted = [...attached].sort((a, b) => a.sequence_order - b.sequence_order)
-    const ids = sorted.map((pq) => pq.question_id)
-    setSelectedIds(ids)
-    setOrderedQuestions(sorted.map((pq) => pq.question).filter(Boolean))
-    setSearch('')
-    setFilterCategory(quizpack.category_id ?? 'all')
-    setActiveTab('pick')
-  }, [open, pkgLoading])
+    const rawPkg = pkgRes?.data
+    let attached: QuestionItem[] = []
+    if (rawPkg?.questions && Array.isArray(rawPkg.questions)) {
+      attached = rawPkg.questions
+    } else if (rawPkg?.package_questions && Array.isArray(rawPkg.package_questions)) {
+      attached = [...rawPkg.package_questions]
+        .sort((a, b) => a.sequence_order - b.sequence_order)
+        .map((pq) => pq.question)
+        .filter(Boolean)
+    }
 
-  const questionMap = useMemo(() => {
-    const m: Record<string, QuestionItem> = {}
-    allQuestions.forEach((q) => { m[q.id] = q })
-    return m
-  }, [allQuestions])
+    const uniqueAttached = attached.filter(
+      (q, index, self) => self.findIndex((item) => item.id === q.id) === index
+    )
+    const ids = uniqueAttached.map((q) => q.id)
+    setSelectedIds(ids)
+    setOrderedQuestions(uniqueAttached)
+    setSearch('')
+    setFilterCategory('all')
+    setActiveTab('pick')
+  }, [open, pkgLoading, pkgRes])
 
   const toggleSelect = (q: QuestionItem) => {
-    setSelectedIds((prev) => {
-      if (prev.includes(q.id)) {
-        setOrderedQuestions((o) => o.filter((oq) => oq.id !== q.id))
-        return prev.filter((id) => id !== q.id)
+    setSelectedIds((prevIds) => {
+      if (prevIds.includes(q.id)) {
+        setOrderedQuestions((prevOrders) => prevOrders.filter((oq) => oq.id !== q.id))
+        return prevIds.filter((id) => id !== q.id)
       } else {
-        setOrderedQuestions((o) => [...o, q])
-        return [...prev, q.id]
+        setOrderedQuestions((prevOrders) => {
+          if (prevOrders.some((oq) => oq.id === q.id)) return prevOrders
+          return [...prevOrders, q]
+        })
+        if (prevIds.includes(q.id)) return prevIds
+        return [...prevIds, q.id]
       }
     })
   }
@@ -142,8 +155,8 @@ export function QuizPackageQuestionsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="min-w-4xl w-full max-h-[80vh] flex flex-col p-0 gap-0 overflow-hidden">
-        <DialogHeader className="px-5 pt-4 pb-4 border-b shrink-0">
+      <DialogContent className="sm:max-w-[850px] w-full max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
+        <DialogHeader className="p-6 pb-4 border-b shrink-0">
           <DialogTitle className="text-base font-bold flex items-center gap-2">
             <BookOpen className="h-4 w-4 text-primary" />
             Manage Questions
@@ -157,35 +170,37 @@ export function QuizPackageQuestionsDialog({
         </DialogHeader>
 
         {/* Tab Bar */}
-        <div className="flex items-center gap-3 px-5 pt-3 pb-3 shrink-0">
+        <div className="flex items-center gap-3 px-6 pt-3.5 pb-3 shrink-0 border-b bg-muted/20">
           <button
+            type="button"
             onClick={() => setActiveTab('pick')}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-all ${
               activeTab === 'pick'
-                ? 'bg-primary text-white'
-                : 'bg-muted'
+                ? 'bg-primary text-primary-foreground shadow-xs'
+                : 'bg-muted text-muted-foreground hover:text-foreground'
             }`}
           >
             <CheckSquare className="h-3.5 w-3.5" />
             Select Questions
             <span className={`ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
-              activeTab === 'pick' ? 'bg-white text-primary' : 'bg-muted'
+              activeTab === 'pick' ? 'bg-primary-foreground text-primary' : 'bg-background'
             }`}>
               {selectedIds.length}
             </span>
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab('order')}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-all ${
               activeTab === 'order'
-                ? 'bg-primary text-white'
-                : 'bg-muted'
+                ? 'bg-primary text-primary-foreground shadow-xs'
+                : 'bg-muted text-muted-foreground hover:text-foreground'
             }`}
           >
             <ListOrdered className="h-3.5 w-3.5" />
             Order & Review
             <span className={`ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
-              activeTab === 'order' ? 'bg-white text-primary' : 'bg-muted'
+              activeTab === 'order' ? 'bg-primary-foreground text-primary' : 'bg-background'
             }`}>
               {orderedQuestions.length}
             </span>
@@ -194,29 +209,26 @@ export function QuizPackageQuestionsDialog({
 
         {/* Panel: Question Picker */}
         {activeTab === 'pick' && (
-          <div className="flex-1 overflow-y-auto custom-scrollbar px-5 pb-4 space-y-3">
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-3 min-h-0">
             {/* Filters */}
-            <div className="flex items-center gap-2 pb-1">
+            <div className="flex items-center gap-3 pb-1">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                 <Input
-                  placeholder="Search questions..."
+                  placeholder="Search questions by text..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="pl-8 h-9 text-xs"
                 />
               </div>
-              <Select value={filterCategory} onValueChange={setFilterCategory}>
-                <SelectTrigger className="w-[160px] h-8 text-xs">
-                  <SelectValue placeholder="All Categories" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  {categories.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>{c.name_en}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                options={categoryOptions}
+                value={filterCategory}
+                onChange={setFilterCategory}
+                placeholder="All Categories"
+                searchPlaceholder="Search category..."
+                className="w-[200px]"
+              />
             </div>
 
             {isLoading ? (
@@ -224,40 +236,59 @@ export function QuizPackageQuestionsDialog({
                 <Skeleton key={i} className="h-14 w-full rounded-lg" />
               ))
             ) : allQuestions.length === 0 ? (
-              <div className="py-16 text-center">
-                <BookOpen className="mx-auto h-8 w-8 mb-2 opacity-40" />
+              <div className="py-16 text-center text-muted-foreground flex flex-col items-center justify-center space-y-2">
+                <BookOpen className="h-8 w-8 mb-1 opacity-40" />
                 <p className="text-xs font-semibold">No questions found</p>
+                {(filterCategory !== 'all' || search) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setFilterCategory('all')
+                      setSearch('')
+                    }}
+                    className="text-xs h-8 mt-2"
+                  >
+                    Clear Filters
+                  </Button>
+                )}
               </div>
             ) : (
               allQuestions.map((q) => {
                 const selected = selectedIds.includes(q.id)
                 const order = orderedQuestions.findIndex((oq) => oq.id === q.id) + 1
+                const diff = q.difficulty_level || (q as any).difficulty || 'EASY'
+                const textPreview = cleanText(q.question_text_en)
+                const khmerTextPreview = cleanText(q.question_text_kh)
                 return (
                   <div
                     key={q.id}
                     onClick={() => toggleSelect(q)}
-                    className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all select-none ${
+                    className={`flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer transition-all select-none ${
                       selected
-                        ? 'border-primary/30 bg-primary/5 dark:bg-primary/10'
-                        : 'border bg-muted/60 hover:bg-muted'
+                        ? 'border-primary/40 bg-primary/5 dark:bg-primary/10 shadow-xs'
+                        : 'border-border bg-card hover:bg-accent/40'
                     }`}
                   >
                     <Checkbox
                       checked={selected}
-                      onCheckedChange={() => toggleSelect(q)}
-                      className="mt-0.5 shrink-0"
-                      onClick={(e) => e.stopPropagation()}
+                      className="mt-0.5 shrink-0 pointer-events-none"
                     />
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-semibold leading-snug line-clamp-2">
-                        {q.question_text_en}
+                        {textPreview}
                       </div>
-                      <div className="flex items-center gap-2 mt-1 flex-wrap">
-                        <span className={`text-[10px] font-bold ${difficultyColor[q.difficulty_level] || 'text-muted'}`}>
-                          {q.difficulty_level}
+                      {khmerTextPreview && (
+                        <div className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5">
+                          {khmerTextPreview}
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2 mt-1.5 flex-wrap text-muted-foreground">
+                        <span className={`text-[10px] font-bold ${difficultyColor[diff] || 'text-muted-foreground'}`}>
+                          {diff}
                         </span>
                         <span className="text-[10px]">•</span>
-                        <span className="text-[10px]">{q.question_type}</span>
+                        <span className="text-[10px] uppercase font-medium">{q.question_type}</span>
                         {q.category && (
                           <>
                             <span className="text-[10px]">•</span>
@@ -269,7 +300,7 @@ export function QuizPackageQuestionsDialog({
                       </div>
                     </div>
                     {selected && (
-                      <span className="shrink-0 flex items-center justify-center h-5 w-5 rounded-full bg-primary text-white text-[10px] font-bold">
+                      <span className="shrink-0 flex items-center justify-center h-5 w-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
                         {order}
                       </span>
                     )}
@@ -282,60 +313,65 @@ export function QuizPackageQuestionsDialog({
 
         {/* Panel: Order & Review */}
         {activeTab === 'order' && (
-          <div className="flex-1 overflow-y-auto custom-scrollbar px-5 pb-5 space-y-3">
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-3 min-h-0">
             {orderedQuestions.length === 0 ? (
-              <div className="py-16 text-center">
+              <div className="py-16 text-center text-muted-foreground">
                 <ListOrdered className="mx-auto h-8 w-8 mb-2 opacity-40" />
                 <p className="text-xs font-semibold">No questions selected yet</p>
                 <p className="text-[10px] mt-1">Switch to "Select Questions" tab to add questions.</p>
               </div>
             ) : (
-              orderedQuestions.map((q, idx) => (
-                <div
-                  key={q.id}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, idx)}
-                  onDragOver={(e) => { e.preventDefault(); setDragOverIdx(idx) }}
-                  onDragLeave={() => setDragOverIdx(null)}
-                  onDrop={(e) => handleDrop(e, idx)}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-all cursor-grab active:cursor-grabbing ${
-                    dragOverIdx === idx
-                      ? 'border-primary bg-primary/5 dark:bg-primary/10 scale-[1.01]'
-                      : 'border bg-muted/60 hover:bg-muted'
-                  }`}
-                >
-                  <GripVertical className="h-4 w-4 shrink-0" />
-                  <span className="flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 text-primary text-[10px] font-bold shrink-0">
-                    {idx + 1}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-semibold leading-snug line-clamp-1">
-                      {q.question_text_en}
-                    </div>
-                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                      <span className={`text-[10px] font-bold ${difficultyColor[q.difficulty_level] || 'text-neutral-400'}`}>
-                        {q.difficulty_level}
-                      </span>
-                      <span className="text-[10px]">•</span>
-                      <span className="text-[10px]">{q.question_type}</span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleRemoveOrdered(q.id)}
-                    className="shrink-0 p-1 rounded-md hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
-                    title="Remove question"
+              orderedQuestions.map((q, idx) => {
+                const diff = q.difficulty_level || (q as any).difficulty || 'EASY'
+                const textPreview = cleanText(q.question_text_en)
+                return (
+                  <div
+                    key={q.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, idx)}
+                    onDragOver={(e) => { e.preventDefault(); setDragOverIdx(idx) }}
+                    onDragLeave={() => setDragOverIdx(null)}
+                    onDrop={(e) => handleDrop(e, idx)}
+                    className={`flex items-center gap-3 p-3 rounded-xl border transition-all cursor-grab active:cursor-grabbing ${
+                      dragOverIdx === idx
+                        ? 'border-primary bg-primary/5 dark:bg-primary/10 scale-[1.01]'
+                        : 'border-border bg-card hover:bg-accent/40'
+                    }`}
                   >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              ))
+                    <GripVertical className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 text-primary text-[10px] font-bold shrink-0">
+                      {idx + 1}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-semibold leading-snug line-clamp-1">
+                        {textPreview}
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5 flex-wrap text-muted-foreground">
+                        <span className={`text-[10px] font-bold ${difficultyColor[diff] || 'text-muted-foreground'}`}>
+                          {diff}
+                        </span>
+                        <span className="text-[10px]">•</span>
+                        <span className="text-[10px] uppercase font-medium">{q.question_type}</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveOrdered(q.id)}
+                      className="shrink-0 p-1.5 rounded-md text-muted-foreground hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                      title="Remove question"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                )
+              })
             )}
           </div>
         )}
 
-        <DialogFooter className="px-5 py-4 border-t shrink-0 flex items-center justify-between gap-3">
-          <div className="text-[11px]">
-            <span className="font-semibold">{orderedQuestions.length}</span> question{orderedQuestions.length !== 1 ? 's' : ''} selected
+        <DialogFooter className="p-6 pt-3.5 border-t shrink-0 flex items-center justify-between gap-3">
+          <div className="text-[11px] text-muted-foreground">
+            <span className="font-semibold text-foreground">{orderedQuestions.length}</span> question{orderedQuestions.length !== 1 ? 's' : ''} selected
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -348,6 +384,7 @@ export function QuizPackageQuestionsDialog({
               Cancel
             </Button>
             <Button
+              type="button"
               onClick={handleSave}
               disabled={isPending}
               className="!h-9 text-xs"
