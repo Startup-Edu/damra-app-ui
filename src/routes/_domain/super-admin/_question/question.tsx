@@ -290,10 +290,10 @@ function QuestionsPage() {
       {/* Main Content Card */}
       <Card className="py-0">
         {/* Toolbar Filters */}
-        <div className="flex flex-col gap-3 p-6 pb-4">
+        <div className="flex flex-col gap-3 p-5 pb-4">
           <div className="flex flex-wrap items-center gap-3">
             {/* Search Input */}
-            <div className="relative flex-1 min-w-[280px] group">
+            <div className="relative flex-1 max-w-xs min-w-[240px] group">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input
                 placeholder="Search questions by text..."
@@ -374,7 +374,7 @@ function QuestionsPage() {
                 })
               }}
               disabled={isFetching}
-              className="h-9 w-9 shrink-0 ml-auto"
+              className="h-9.5 w-9.5 shrink-0 ml-auto"
             >
               {isFetching ? (
                 <Loader2 className="h-4.5 w-4.5 animate-spin" />

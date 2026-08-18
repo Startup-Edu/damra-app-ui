@@ -221,10 +221,12 @@ function LearningPathPage() {
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="pl-6 w-[120px]">Sequence</TableHead>
+                <TableHead className="pl-6 w-[90px]">Sequence</TableHead>
                 <TableHead>Learning Path Title</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Grade</TableHead>
+                <TableHead>XP & Pass Rules</TableHead>
+                <TableHead>Quiz Packages</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="pr-6 text-right w-[140px]">Actions</TableHead>
               </TableRow>
@@ -251,6 +253,12 @@ function LearningPathPage() {
                       <Skeleton className="h-4 w-20" />
                     </TableCell>
                     <TableCell>
+                      <Skeleton className="h-4 w-24" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-20" />
+                    </TableCell>
+                    <TableCell>
                       <Skeleton className="h-5 w-14 rounded-full" />
                     </TableCell>
                     <TableCell className="pr-6">
@@ -264,14 +272,14 @@ function LearningPathPage() {
               ) : isError ? (
                 // Error State
                 <TableRow>
-                  <TableCell colSpan={6} className="py-12 text-center text-rose-500 font-medium text-xs">
+                  <TableCell colSpan={8} className="py-12 text-center text-rose-500 font-medium text-xs">
                     Failed to fetch learning paths. Please make sure the API server is online.
                   </TableCell>
                 </TableRow>
               ) : learningPaths.length === 0 ? (
                 // Empty State
                 <TableRow>
-                  <TableCell colSpan={6} className="py-16 text-center">
+                  <TableCell colSpan={8} className="py-16 text-center">
                     <div className="flex flex-col items-center gap-2">
                       <Layers className="h-8 w-8" />
                       <p className="text-xs font-semibold">No learning paths found matching your filters</p>
@@ -280,78 +288,109 @@ function LearningPathPage() {
                 </TableRow>
               ) : (
                 // Data List
-                learningPaths.map((l) => (
-                  <TableRow key={l.id}>
-                    {/* Sequence */}
-                    <TableCell className="pl-6 py-3.5 font-bold">
-                      {l.sequence}
-                    </TableCell>
+                learningPaths.map((l) => {
+                  const pkgs = l.quiz_packages || l.quizPackages || []
+                  const xp = l.xp_reward ?? l.xpReward ?? 100
+                  const pass = l.pass_score_percentage ?? l.passScorePercentage ?? 70
+                  const skip = l.allow_skip ?? l.allowSkip ?? false
 
-                    {/* Learning Path Title */}
-                    <TableCell>
-                      <div className="font-semibold text-xs">
-                        {l.title_en}
-                      </div>
-                      <div className="text-[10px] font-medium">
-                        {l.title_kh}
-                      </div>
-                    </TableCell>
+                  return (
+                    <TableRow key={l.id}>
+                      {/* Sequence */}
+                      <TableCell className="pl-6 py-3.5 font-bold">
+                        #{l.sequence_order ?? l.sequenceOrder ?? l.sequence ?? 1}
+                      </TableCell>
 
-                    {/* Category Column */}
-                    <TableCell className="text-xs font-medium">
-                      {l.category ? (
-                        <span>{l.category.name_en}</span>
-                      ) : (
-                        <span>-</span>
-                      )}
-                    </TableCell>
+                      {/* Learning Path Title */}
+                      <TableCell>
+                        <div className="font-semibold text-xs">
+                          {l.title_en}
+                        </div>
+                        <div className="text-[10px] font-medium text-muted-foreground">
+                          {l.title_kh}
+                        </div>
+                      </TableCell>
 
-                    {/* Grade Column */}
-                    <TableCell className="text-xs font-medium">
-                      {l.grade ? (
-                        <Badge variant="outline">
-                          {l.grade.name_en}
+                      {/* Category Column */}
+                      <TableCell className="text-xs font-medium">
+                        {l.category ? (
+                          <span>{l.category.name_en}</span>
+                        ) : (
+                          <span>-</span>
+                        )}
+                      </TableCell>
+
+                      {/* Grade Column */}
+                      <TableCell className="text-xs font-medium">
+                        {l.grade ? (
+                          <Badge variant="outline">
+                            {l.grade.name_en}
+                          </Badge>
+                        ) : (
+                          <span>-</span>
+                        )}
+                      </TableCell>
+
+                      {/* XP & Pass Rules Column */}
+                      <TableCell>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <Badge variant="secondary" className="text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20">
+                            {xp} XP
+                          </Badge>
+                          <Badge variant="secondary" className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20">
+                            {pass}% Pass
+                          </Badge>
+                          {skip && (
+                            <Badge variant="outline" className="text-[9px] text-blue-600 border-blue-500/30">
+                              Skip Allowed
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
+
+                      {/* Quiz Packages Column */}
+                      <TableCell>
+                        <Badge variant={pkgs.length > 0 ? "secondary" : "outline"} className="text-[10px]">
+                          {pkgs.length} Package{pkgs.length === 1 ? '' : 's'}
                         </Badge>
-                      ) : (
-                        <span>-</span>
-                      )}
-                    </TableCell>
+                      </TableCell>
 
-                    {/* Status Column */}
-                    <TableCell>
-                      {l.is_active ? (
-                        <Badge variant="success">
-                          Active
-                        </Badge>
-                      ) : (
-                        <Badge variant="destructive">
-                          Inactive
-                        </Badge>
-                      )}
-                    </TableCell>
+                      {/* Status Column */}
+                      <TableCell>
+                        {l.is_active ? (
+                          <Badge variant="success">
+                            Active
+                          </Badge>
+                        ) : (
+                          <Badge variant="destructive">
+                            Inactive
+                          </Badge>
+                        )}
+                      </TableCell>
 
-                    {/* Actions Column */}
-                    <TableCell className="pr-6 text-right">
-                      <div className="flex justify-end gap-1">
-                        <ActionButton
-                          actionType="info"
-                          tooltip="Path Builder & Nodes"
-                          onClick={() => handleBuildPath(l)}
-                        />
-                        <ActionButton
-                          actionType="edit"
-                          tooltip="Edit Learning Path"
-                          onClick={() => handleEdit(l)}
-                        />
-                        <ActionButton
-                          actionType="delete"
-                          tooltip="Delete Learning Path"
-                          onClick={() => handleDeleteTrigger(l)}
-                        />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+                      {/* Actions Column */}
+                      <TableCell className="pr-6 text-right">
+                        <div className="flex justify-end gap-1">
+                          <ActionButton
+                            actionType="info"
+                            tooltip="Path Builder & Quiz Packages"
+                            onClick={() => handleBuildPath(l)}
+                          />
+                          <ActionButton
+                            actionType="edit"
+                            tooltip="Edit Learning Path"
+                            onClick={() => handleEdit(l)}
+                          />
+                          <ActionButton
+                            actionType="delete"
+                            tooltip="Delete Learning Path"
+                            onClick={() => handleDeleteTrigger(l)}
+                          />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
               )}
             </TableBody>
           </Table>

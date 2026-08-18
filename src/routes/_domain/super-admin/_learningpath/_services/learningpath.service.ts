@@ -51,4 +51,8 @@ export const superAdminLearningPathService = {
   syncNodeQuestions: async (nodeId: string, questionIds: string[]) => {
     return apiClient.post<{ success: boolean; message: string }>(`/admin/learning-paths/nodes/${nodeId}/questions`, { questionIds })
   },
+
+  syncQuizPackages: async (id: string, packageIds: string[]) => {
+    return apiClient.post<{ success: boolean; message: string }>(`/admin/learning-paths/${id}/quiz-packages`, { packageIds })
+  },
 }

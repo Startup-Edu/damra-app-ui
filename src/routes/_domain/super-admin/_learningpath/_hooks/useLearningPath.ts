@@ -44,7 +44,7 @@ export function useUpdateLearningPathMutation() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateLearningPathDTO }) =>
       superAdminLearningPathService.updateLearningPath(id, data),
-    onSuccess: (res) => {
+    onSuccess: (res, { id }) => {
       if (res.success) {
         toast.success('Learning path updated successfully')
         queryClient.invalidateQueries({ queryKey: ['learning-paths'] })
@@ -139,6 +139,24 @@ export function useSyncNodeQuestionsMutation() {
     },
     onError: (error: any) => {
       toast.error(error?.message || 'Failed to sync node questions')
+    },
+  })
+}
+
+export function useSyncQuizPackagesMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, packageIds }: { id: string; packageIds: string[] }) =>
+      superAdminLearningPathService.syncQuizPackages(id, packageIds),
+    onSuccess: (res, { id }) => {
+      if (res.success) {
+        toast.success('Attached quiz packages updated successfully')
+        queryClient.invalidateQueries({ queryKey: ['learning-paths'] })
+        queryClient.invalidateQueries({ queryKey: ['learning-path', id] })
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || 'Failed to sync quiz packages')
     },
   })
 }

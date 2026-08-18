@@ -21,6 +21,7 @@ import {
 import {
   useCreateLearningPathMutation,
   useUpdateLearningPathMutation,
+  useLearningPathsQuery,
 } from '../_hooks/useLearningPath'
 import { useCategoriesQuery } from '../../_category/_hooks/useCategory'
 import { useGradesQuery } from '../../_grade/_hooks/useGrade'
@@ -41,6 +42,9 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
   const [gradeId, setGradeId] = useState<string>('')
   const [categoryId, setCategoryId] = useState<string>('')
   const [isActive, setIsActive] = useState(true)
+  const [xpReward, setXpReward] = useState<number>(100)
+  const [passScorePercentage, setPassScorePercentage] = useState<number>(70)
+  const [allowSkip, setAllowSkip] = useState<boolean>(false)
 
   const [validationError, setValidationError] = useState('')
 
@@ -55,6 +59,10 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
   const { data: allCategoriesResponse, isLoading: allCategoriesLoading } = useCategoriesQuery(1, 100, '', true)
   const { data: gradeCategoriesResponse, isLoading: gradeCategoriesLoading } = useGradeCategoriesQuery(gradeId, !!gradeId)
 
+  // Fetch existing paths for the selected category & grade to suggest next sequence number
+  const { data: existingPathsResponse } = useLearningPathsQuery(1, 100, '', categoryId || undefined, gradeId || undefined)
+  const existingPaths = existingPathsResponse?.data || []
+
   const allCategories = allCategoriesResponse?.data || []
   const availableCategories = gradeId && gradeCategoriesResponse?.data ? gradeCategoriesResponse.data : allCategories
 
@@ -66,10 +74,13 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
       if (learningPath) {
         setTitleEn(learningPath.title_en)
         setTitleKh(learningPath.title_kh)
-        setSequence(learningPath.sequence)
+        setSequence(learningPath.sequence_order ?? learningPath.sequenceOrder ?? learningPath.sequence ?? 1)
         setGradeId(learningPath.grade_id || '')
         setCategoryId(learningPath.category_id || '')
         setIsActive(learningPath.is_active)
+        setXpReward(learningPath.xp_reward ?? learningPath.xpReward ?? 100)
+        setPassScorePercentage(learningPath.pass_score_percentage ?? learningPath.passScorePercentage ?? 70)
+        setAllowSkip(learningPath.allow_skip ?? learningPath.allowSkip ?? false)
       } else {
         setTitleEn('')
         setTitleKh('')
@@ -77,10 +88,21 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
         setGradeId('')
         setCategoryId('')
         setIsActive(true)
+        setXpReward(100)
+        setPassScorePercentage(70)
+        setAllowSkip(false)
       }
       setValidationError('')
     }
   }, [open, learningPath])
+
+  // Auto-suggest next sequence order when category & grade are selected for a new path
+  useEffect(() => {
+    if (open && !isEditing && categoryId && gradeId && existingPaths.length > 0) {
+      const maxSeq = existingPaths.reduce((max, lp) => Math.max(max, lp.sequence_order ?? lp.sequenceOrder ?? lp.sequence ?? 0), 0)
+      setSequence(maxSeq + 1)
+    }
+  }, [open, categoryId, gradeId, isEditing, existingPaths])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -104,10 +126,15 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
     const payload = {
       titleEn: titleEn.trim(),
       titleKh: titleKh.trim(),
+      sequenceOrder: sequence,
+      sequence_order: sequence,
       sequence,
       gradeId,
       categoryId,
       isActive,
+      xpReward,
+      passScorePercentage,
+      allowSkip,
     }
 
     if (isEditing && learningPath) {
@@ -140,47 +167,43 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto custom-scrollbar">
-        <DialogHeader className="space-y-1.5 border-b pb-4">
-          <DialogTitle className="text-lg font-bold">
-            {isEditing ? 'Modify Learning Path' : 'Create Learning Path'}
+      <DialogContent className="sm:max-w-[540px]">
+        <DialogHeader>
+          <DialogTitle className="text-base font-bold">
+            {isEditing ? 'Edit Learning Path' : 'Create New Learning Path'}
           </DialogTitle>
           <DialogDescription className="text-xs">
-            {isEditing
-              ? 'Update the learning path roadmap details, sequencing, and category/grade alignments.'
-              : 'Add a new learning path roadmap for Duolingo-style progression.'}
+            Configure the title, target grade, category alignment, sequence order, and XP completion rules.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="path-title-en">
-                English Title <span className="text-rose-500">*</span>
-              </Label>
-              <Input
-                id="path-title-en"
-                placeholder="e.g. Unit 1: Algebra Fundamentals"
-                value={titleEn}
-                onChange={(e) => setTitleEn(e.target.value)}
-                disabled={isLoading}
-                className="h-9.5 text-xs"
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="space-y-4 py-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="path-title-en">
+              English Title <span className="text-rose-500">*</span>
+            </Label>
+            <Input
+              id="path-title-en"
+              placeholder="e.g. Unit 1: Introduction to Algebra"
+              value={titleEn}
+              onChange={(e) => setTitleEn(e.target.value)}
+              disabled={isLoading}
+              className="h-9.5 text-xs"
+            />
+          </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="path-title-kh">
-                Khmer Title <span className="text-rose-500">*</span>
-              </Label>
-              <Input
-                id="path-title-kh"
-                placeholder="e.g. មេរៀនទី១៖ មូលដ្ឋានគ្រឹះពិជគណិត"
-                value={titleKh}
-                onChange={(e) => setTitleKh(e.target.value)}
-                disabled={isLoading}
-                className="h-9.5 text-xs"
-              />
-            </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="path-title-kh">
+              Khmer Title <span className="text-rose-500">*</span>
+            </Label>
+            <Input
+              id="path-title-kh"
+              placeholder="e.g. មេរៀនទី១៖ ពិជគណិតដំបូង"
+              value={titleKh}
+              onChange={(e) => setTitleKh(e.target.value)}
+              disabled={isLoading}
+              className="h-9.5 text-xs"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -232,36 +255,74 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="path-sequence">
-              Sequence Order (Roadmap Index)
-            </Label>
-            <Input
-              id="path-sequence"
-              type="number"
-              min={1}
-              value={sequence}
-              onChange={(e) => setSequence(Number(e.target.value))}
-              disabled={isLoading}
-              className="h-9.5 text-xs"
-            />
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="path-sequence">Sequence Order</Label>
+              <Input
+                id="path-sequence"
+                type="number"
+                min={1}
+                value={sequence}
+                onChange={(e) => setSequence(Number(e.target.value))}
+                disabled={isLoading}
+                className="h-9.5 text-xs"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="path-xp">XP Reward</Label>
+              <Input
+                id="path-xp"
+                type="number"
+                min={0}
+                value={xpReward}
+                onChange={(e) => setXpReward(Number(e.target.value))}
+                disabled={isLoading}
+                className="h-9.5 text-xs"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="path-pass">Pass Score (%)</Label>
+              <Input
+                id="path-pass"
+                type="number"
+                min={0}
+                max={100}
+                value={passScorePercentage}
+                onChange={(e) => setPassScorePercentage(Number(e.target.value))}
+                disabled={isLoading}
+                className="h-9.5 text-xs"
+              />
+            </div>
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted border mt-2">
-            <div className="space-y-0.5">
-              <Label htmlFor="path-status">
-                Active Status
-              </Label>
-              <p className="text-[11px] text-muted-foreground">
-                Inactive learning paths will be hidden from mobile roadmap feeds.
-              </p>
+          <div className="grid grid-cols-2 gap-3 mt-2">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted border">
+              <div className="space-y-0.5">
+                <Label htmlFor="path-skip" className="text-xs font-semibold">Allow Skip</Label>
+                <p className="text-[10px] text-muted-foreground">Skip prerequisite check</p>
+              </div>
+              <Switch
+                id="path-skip"
+                checked={allowSkip}
+                onCheckedChange={setAllowSkip}
+                disabled={isLoading}
+              />
             </div>
-            <Switch
-              id="path-status"
-              checked={isActive}
-              onCheckedChange={setIsActive}
-              disabled={isLoading}
-            />
+
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted border">
+              <div className="space-y-0.5">
+                <Label htmlFor="path-status" className="text-xs font-semibold">Active Status</Label>
+                <p className="text-[10px] text-muted-foreground">Show in mobile feed</p>
+              </div>
+              <Switch
+                id="path-status"
+                checked={isActive}
+                onCheckedChange={setIsActive}
+                disabled={isLoading}
+              />
+            </div>
           </div>
 
           {validationError && (
