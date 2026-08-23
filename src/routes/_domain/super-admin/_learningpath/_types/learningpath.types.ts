@@ -33,6 +33,8 @@ export interface LearningPathItem {
   category_id: string
   grade_id: string
   is_active: boolean
+  is_published?: boolean
+  isPublished?: boolean
   xp_reward?: number
   xpReward?: number
   pass_score_percentage?: number
@@ -73,6 +75,8 @@ export interface CreateLearningPathDTO {
   categoryId: string
   gradeId: string
   isActive?: boolean
+  isPublished?: boolean
+  is_published?: boolean
   xpReward?: number
   passScorePercentage?: number
   allowSkip?: boolean
@@ -88,6 +92,8 @@ export interface UpdateLearningPathDTO {
   categoryId?: string
   gradeId?: string
   isActive?: boolean
+  isPublished?: boolean
+  is_published?: boolean
   xpReward?: number
   passScorePercentage?: number
   allowSkip?: boolean

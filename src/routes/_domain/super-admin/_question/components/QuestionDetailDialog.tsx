@@ -22,15 +22,27 @@ import {
   ArrowRight,
 } from 'lucide-react'
 
+import type { QuestionItem } from '../_types/question.types'
+
 interface QuestionDetailDialogProps {
   open: boolean
-  onOpenChange: (open: boolean) => void
-  questionId: string | null
+  onOpenChange?: (open: boolean) => void
+  setOpen?: (open: boolean) => void
+  questionId?: string | null
+  question?: QuestionItem | null
 }
 
-export function QuestionDetailDialog({ open, onOpenChange, questionId }: QuestionDetailDialogProps) {
-  const { data: response, isLoading, isError, refetch } = useQuestionQuery(questionId || '', open)
-  const question = response?.data
+export function QuestionDetailDialog({
+  open,
+  onOpenChange: propOnOpenChange,
+  setOpen: propSetOpen,
+  questionId: propQuestionId,
+  question: propQuestion,
+}: QuestionDetailDialogProps) {
+  const onOpenChange = propOnOpenChange || propSetOpen || (() => {})
+  const targetId = propQuestionId || propQuestion?.id || null
+  const { data: response, isLoading, isError, refetch } = useQuestionQuery(targetId || '', open && !!targetId)
+  const question = response?.data || propQuestion
 
   const getDifficultyBadge = (difficulty: string) => {
     switch (difficulty) {
@@ -55,8 +67,8 @@ export function QuestionDetailDialog({ open, onOpenChange, questionId }: Questio
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[900px] md:max-w-[900px] w-[95vw] text-slate-900 dark:text-slate-50 border border-slate-100 dark:border-slate-800 shadow-xl max-h-[90vh] !flex !flex-col !p-0 !gap-0 overflow-hidden">
-        <DialogHeader className="p-6 pb-2 space-y-1.5 shrink-0 border-b border-slate-100 dark:border-slate-800/80">
+      <DialogContent className="sm:max-w-[900px] md:max-w-[900px] w-[95vw] h-[88vh] max-h-[90vh] text-slate-900 dark:text-slate-50 !flex !flex-col !p-0 !gap-0 overflow-hidden">
+        <DialogHeader className="p-6 pb-2 space-y-1.5 shrink-0 border-b">
           <div className="flex items-center gap-2">
             <DialogTitle className="text-base font-bold">
               Question Details & Validation
@@ -73,19 +85,19 @@ export function QuestionDetailDialog({ open, onOpenChange, questionId }: Questio
           </DialogDescription>
         </DialogHeader>
 
-        {/* Scrollable details viewport */}
-        <div className="flex-1 min-h-0 w-full overflow-y-auto custom-scrollbar">
+        {/* Main Body Viewport */}
+        <div className="flex-1 min-h-0 w-full overflow-hidden">
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 p-6">
+            <div className="grid grid-cols-1 md:grid-cols-12 h-full min-h-0">
               {/* Left Column Skeleton */}
-              <div className="md:col-span-4 space-y-5 md:border-r md:pr-6 border-slate-100 dark:border-slate-800">
+              <div className="md:col-span-4 p-6 space-y-5 md:border-r border-slate-100 dark:border-slate-800">
                 <div className="space-y-2"><Skeleton className="h-4 w-20" /><Skeleton className="h-9 w-full" /></div>
                 <div className="space-y-2"><Skeleton className="h-4 w-24" /><Skeleton className="h-9 w-full" /></div>
                 <div className="space-y-2"><Skeleton className="h-4 w-20" /><Skeleton className="h-9 w-full" /></div>
                 <div className="space-y-2"><Skeleton className="h-10 w-full rounded-lg" /></div>
               </div>
               {/* Right Column Skeleton */}
-              <div className="md:col-span-8 space-y-6">
+              <div className="md:col-span-8 p-6 space-y-6 overflow-y-auto custom-scrollbar h-full">
                 <div className="space-y-2"><Skeleton className="h-4 w-40" /><Skeleton className="h-20 w-full" /></div>
                 <div className="space-y-2"><Skeleton className="h-4 w-32" /><Skeleton className="h-24 w-full" /></div>
               </div>
@@ -99,10 +111,10 @@ export function QuestionDetailDialog({ open, onOpenChange, questionId }: Questio
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 p-6">
+            <div className="grid grid-cols-1 md:grid-cols-12 h-full min-h-0 overflow-hidden">
 
-              {/* Left Column: Info parameters list */}
-              <div className="md:col-span-4 space-y-4 md:border-r md:pr-6 border-slate-100 dark:border-slate-800">
+              {/* Left Column: Fixed Info parameters list */}
+              <div className="md:col-span-4 p-6 space-y-4 md:border-r overflow-y-auto custom-scrollbar h-full">
                 <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Question Parameters</h4>
 
                 {/* Category */}
@@ -175,8 +187,8 @@ export function QuestionDetailDialog({ open, onOpenChange, questionId }: Questio
                 </div>
               </div>
 
-              {/* Right Column: Question Content Rendering & Answer Key */}
-              <div className="md:col-span-8 space-y-4">
+              {/* Right Column: Scrollable Question Content Rendering & Answer Key */}
+              <div className="md:col-span-8 p-6 space-y-4 overflow-y-auto custom-scrollbar h-full">
 
                 {/* Question Texts */}
                 <div className="space-y-3">
@@ -390,7 +402,7 @@ export function QuestionDetailDialog({ open, onOpenChange, questionId }: Questio
           )}
         </div>
 
-        <DialogFooter className="p-6 pt-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 shrink-0">
+        <DialogFooter className="p-6 pb-3 pt-3 border-t bg-slate-50/50 dark:bg-slate-900/50 shrink-0">
           <Button
             type="button"
             variant="outline"

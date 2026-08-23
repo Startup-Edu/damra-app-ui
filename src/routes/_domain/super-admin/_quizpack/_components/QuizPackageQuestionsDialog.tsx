@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Checkbox } from '@/components/ui/checkbox'
-import { SearchableSelect } from '@/components/ui/searchable-select'
+import { SearchableSelect } from '@/components/ui/shared/SearchableSelect'
 import {
   Search,
   Loader2,
@@ -25,14 +25,143 @@ import {
 import { useQuizPackageQuery, useSyncQuizPackageQuestionsMutation } from '../_hooks/useQuizpack'
 import { useQuestionsQuery } from '../../_question/_hooks/useQuestion'
 import { useCategoriesQuery } from '../../_category/_hooks/useCategory'
-import { cleanText } from '@/lib/utils'
+import { cleanText, cn } from '@/lib/utils'
 import type { QuizPackageItem } from '../_types/quizpack.types'
 import type { QuestionItem } from '../../_question/_types/question.types'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+  type DragEndEvent,
+  type DragStartEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 
 interface QuizPackageQuestionsDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   quizpack: QuizPackageItem
+}
+
+interface SortableQuestionRowProps {
+  question: QuestionItem
+  index: number
+  onRemove: (id: string) => void
+  difficultyColor: Record<string, string>
+}
+
+function SortableQuestionRow({
+  question,
+  index,
+  onRemove,
+  difficultyColor,
+}: SortableQuestionRowProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: question.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  const diff = question.difficulty_level || (question as any).difficulty || 'EASY'
+  const textPreview = cleanText(question.question_text_en)
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        "flex items-center gap-3 p-3 rounded-xl border border-border bg-card transition-all select-none hover:bg-accent/40",
+        isDragging && "opacity-30 border-primary/50"
+      )}
+    >
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-accent shrink-0 text-muted-foreground hover:text-foreground touch-none"
+        title="Drag to re-order"
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+      <span className="flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 text-primary text-[10px] font-bold shrink-0">
+        {index + 1}
+      </span>
+      <div className="flex-1 min-w-0">
+        <div className="text-xs font-semibold leading-snug line-clamp-1">
+          {textPreview}
+        </div>
+        <div className="flex items-center gap-2 mt-0.5 flex-wrap text-muted-foreground">
+          <span className={`text-[10px] font-bold ${difficultyColor[diff] || 'text-muted-foreground'}`}>
+            {diff}
+          </span>
+          <span className="text-[10px]">•</span>
+          <span className="text-[10px] uppercase font-medium">{question.question_type}</span>
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={() => onRemove(question.id)}
+        className="shrink-0 p-1.5 rounded-md text-muted-foreground hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+        title="Remove question"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  )
+}
+
+function QuestionDragOverlayItem({
+  question,
+  index,
+  difficultyColor,
+}: {
+  question: QuestionItem
+  index: number
+  difficultyColor: Record<string, string>
+}) {
+  const diff = question.difficulty_level || (question as any).difficulty || 'EASY'
+  const textPreview = cleanText(question.question_text_en)
+
+  return (
+    <div className="flex items-center gap-3 p-3 rounded-xl border border-primary bg-popover shadow-2xl scale-[1.02] text-popover-foreground">
+      <GripVertical className="h-4 w-4 text-primary shrink-0" />
+      <span className="flex items-center justify-center h-6 w-6 rounded-full bg-primary text-primary-foreground text-[10px] font-bold shrink-0">
+        {index + 1}
+      </span>
+      <div className="flex-1 min-w-0">
+        <div className="text-xs font-semibold leading-snug line-clamp-1">
+          {textPreview}
+        </div>
+        <div className="flex items-center gap-2 mt-0.5 flex-wrap text-muted-foreground">
+          <span className={`text-[10px] font-bold ${difficultyColor[diff] || 'text-muted-foreground'}`}>
+            {diff}
+          </span>
+          <span className="text-[10px]">•</span>
+          <span className="text-[10px] uppercase font-medium">{question.question_type}</span>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export function QuizPackageQuestionsDialog({
@@ -45,7 +174,18 @@ export function QuizPackageQuestionsDialog({
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [orderedQuestions, setOrderedQuestions] = useState<QuestionItem[]>([])
   const [activeTab, setActiveTab] = useState<'pick' | 'order'>('pick')
-  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null)
+  const [activeDragId, setActiveDragId] = useState<string | null>(null)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   const syncMutation = useSyncQuizPackageQuestionsMutation()
 
@@ -120,21 +260,22 @@ export function QuizPackageQuestionsDialog({
     setOrderedQuestions((prev) => prev.filter((q) => q.id !== id))
   }
 
-  // Drag & drop reordering
-  const handleDragStart = (e: React.DragEvent, idx: number) => {
-    e.dataTransfer.setData('text/plain', String(idx))
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveDragId(String(event.active.id))
   }
 
-  const handleDrop = (e: React.DragEvent, targetIdx: number) => {
-    e.preventDefault()
-    const fromIdx = Number(e.dataTransfer.getData('text/plain'))
-    if (fromIdx === targetIdx) { setDragOverIdx(null); return }
-    const updated = [...orderedQuestions]
-    const [moved] = updated.splice(fromIdx, 1)
-    updated.splice(targetIdx, 0, moved)
-    setOrderedQuestions(updated)
-    setSelectedIds(updated.map((q) => q.id))
-    setDragOverIdx(null)
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (over && active.id !== over.id) {
+      setOrderedQuestions((items) => {
+        const oldIndex = items.findIndex((i) => i.id === active.id)
+        const newIndex = items.findIndex((i) => i.id === over.id)
+        const updated = arrayMove(items, oldIndex, newIndex)
+        setSelectedIds(updated.map((q) => q.id))
+        return updated
+      })
+    }
+    setActiveDragId(null)
   }
 
   const handleSave = () => {
@@ -211,79 +352,62 @@ export function QuizPackageQuestionsDialog({
         {activeTab === 'pick' && (
           <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-3 min-h-0">
             {/* Filters */}
-            <div className="flex items-center gap-3 pb-1">
-              <div className="relative flex-1">
+            <div className="flex items-center gap-3 mb-2 flex-wrap">
+              <div className="relative flex-1 min-w-[200px]">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                 <Input
-                  placeholder="Search questions by text..."
+                  placeholder="Search questions..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-8 h-9 text-xs"
+                  className="pl-9 h-8.5 text-xs"
                 />
               </div>
+
               <SearchableSelect
                 options={categoryOptions}
                 value={filterCategory}
-                onChange={setFilterCategory}
+                onChange={(val) => setFilterCategory(val || 'all')}
                 placeholder="All Categories"
                 searchPlaceholder="Search category..."
-                className="w-[200px]"
+                triggerClassName="w-[180px] h-8.5 text-xs"
               />
             </div>
 
             {isLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-14 w-full rounded-lg" />
-              ))
+              <div className="space-y-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <Skeleton key={i} className="h-14 w-full rounded-xl" />
+                ))}
+              </div>
             ) : allQuestions.length === 0 ? (
-              <div className="py-16 text-center text-muted-foreground flex flex-col items-center justify-center space-y-2">
-                <BookOpen className="h-8 w-8 mb-1 opacity-40" />
-                <p className="text-xs font-semibold">No questions found</p>
-                {(filterCategory !== 'all' || search) && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setFilterCategory('all')
-                      setSearch('')
-                    }}
-                    className="text-xs h-8 mt-2"
-                  >
-                    Clear Filters
-                  </Button>
-                )}
+              <div className="py-12 text-center text-muted-foreground text-xs">
+                No questions found. Try adjusting filters or search.
               </div>
             ) : (
               allQuestions.map((q) => {
-                const selected = selectedIds.includes(q.id)
-                const order = orderedQuestions.findIndex((oq) => oq.id === q.id) + 1
+                const isSelected = selectedIds.includes(q.id)
                 const diff = q.difficulty_level || (q as any).difficulty || 'EASY'
                 const textPreview = cleanText(q.question_text_en)
-                const khmerTextPreview = cleanText(q.question_text_kh)
                 return (
                   <div
                     key={q.id}
                     onClick={() => toggleSelect(q)}
-                    className={`flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer transition-all select-none ${
-                      selected
-                        ? 'border-primary/40 bg-primary/5 dark:bg-primary/10 shadow-xs'
-                        : 'border-border bg-card hover:bg-accent/40'
+                    className={`flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
+                      isSelected
+                        ? 'border-primary/50 bg-primary/5 dark:bg-primary/10'
+                        : 'border-border bg-card hover:bg-accent/50'
                     }`}
                   >
                     <Checkbox
-                      checked={selected}
-                      className="mt-0.5 shrink-0 pointer-events-none"
+                      checked={isSelected}
+                      onCheckedChange={() => toggleSelect(q)}
+                      className="shrink-0"
                     />
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs font-semibold leading-snug line-clamp-2">
+                      <div className="text-xs font-semibold leading-snug line-clamp-1">
                         {textPreview}
                       </div>
-                      {khmerTextPreview && (
-                        <div className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5">
-                          {khmerTextPreview}
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2 mt-1.5 flex-wrap text-muted-foreground">
+                      <div className="flex items-center gap-2 mt-0.5 flex-wrap text-muted-foreground">
                         <span className={`text-[10px] font-bold ${difficultyColor[diff] || 'text-muted-foreground'}`}>
                           {diff}
                         </span>
@@ -292,18 +416,13 @@ export function QuizPackageQuestionsDialog({
                         {q.category && (
                           <>
                             <span className="text-[10px]">•</span>
-                            <span className="text-[10px]">{q.category.name_en}</span>
+                            <span className="text-[10px]">
+                              {q.category.name_en}
+                            </span>
                           </>
                         )}
-                        <span className="text-[10px]">•</span>
-                        <span className="text-[10px] text-primary font-semibold">{q.xp_value} XP</span>
                       </div>
                     </div>
-                    {selected && (
-                      <span className="shrink-0 flex items-center justify-center h-5 w-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
-                        {order}
-                      </span>
-                    )}
                   </div>
                 )
               })
@@ -321,50 +440,45 @@ export function QuizPackageQuestionsDialog({
                 <p className="text-[10px] mt-1">Switch to "Select Questions" tab to add questions.</p>
               </div>
             ) : (
-              orderedQuestions.map((q, idx) => {
-                const diff = q.difficulty_level || (q as any).difficulty || 'EASY'
-                const textPreview = cleanText(q.question_text_en)
-                return (
-                  <div
-                    key={q.id}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, idx)}
-                    onDragOver={(e) => { e.preventDefault(); setDragOverIdx(idx) }}
-                    onDragLeave={() => setDragOverIdx(null)}
-                    onDrop={(e) => handleDrop(e, idx)}
-                    className={`flex items-center gap-3 p-3 rounded-xl border transition-all cursor-grab active:cursor-grabbing ${
-                      dragOverIdx === idx
-                        ? 'border-primary bg-primary/5 dark:bg-primary/10 scale-[1.01]'
-                        : 'border-border bg-card hover:bg-accent/40'
-                    }`}
-                  >
-                    <GripVertical className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 text-primary text-[10px] font-bold shrink-0">
-                      {idx + 1}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-semibold leading-snug line-clamp-1">
-                        {textPreview}
-                      </div>
-                      <div className="flex items-center gap-2 mt-0.5 flex-wrap text-muted-foreground">
-                        <span className={`text-[10px] font-bold ${difficultyColor[diff] || 'text-muted-foreground'}`}>
-                          {diff}
-                        </span>
-                        <span className="text-[10px]">•</span>
-                        <span className="text-[10px] uppercase font-medium">{q.question_type}</span>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveOrdered(q.id)}
-                      className="shrink-0 p-1.5 rounded-md text-muted-foreground hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
-                      title="Remove question"
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                modifiers={[restrictToVerticalAxis]}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={orderedQuestions.map((q) => q.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-2.5">
+                    {orderedQuestions.map((q, idx) => (
+                      <SortableQuestionRow
+                        key={q.id}
+                        question={q}
+                        index={idx}
+                        onRemove={handleRemoveOrdered}
+                        difficultyColor={difficultyColor}
+                      />
+                    ))}
                   </div>
-                )
-              })
+                </SortableContext>
+
+                <DragOverlay>
+                  {activeDragId ? (() => {
+                    const activeIndex = orderedQuestions.findIndex((q) => q.id === activeDragId)
+                    const activeQuestion = orderedQuestions[activeIndex]
+                    if (!activeQuestion) return null
+                    return (
+                      <QuestionDragOverlayItem
+                        question={activeQuestion}
+                        index={activeIndex}
+                        difficultyColor={difficultyColor}
+                      />
+                    )
+                  })() : null}
+                </DragOverlay>
+              </DndContext>
             )}
           </div>
         )}

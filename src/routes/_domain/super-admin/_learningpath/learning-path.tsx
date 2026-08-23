@@ -40,6 +40,7 @@ import {
 } from 'lucide-react'
 import { ActionButton } from '@/components/ui/action-button'
 import { DeleteModal } from '@/components/ui/delete-modal'
+import { SearchableSelect } from '@/components/ui/shared/SearchableSelect'
 import { useLearningPathsQuery, useDeleteLearningPathMutation } from './_hooks/useLearningPath'
 import { useCategoriesQuery } from '../_category/_hooks/useCategory'
 import { useGradesQuery } from '../_grade/_hooks/useGrade'
@@ -101,6 +102,24 @@ function LearningPathPage() {
 
   const categories = categoriesResponse?.data || []
   const grades = gradesResponse?.data || []
+
+  const categoryFilterOptions = [
+    { value: 'all', label: 'All Categories' },
+    ...categories.map((c) => ({
+      value: c.id,
+      label: c.name_en,
+      description: c.name_kh,
+    })),
+  ]
+
+  const gradeFilterOptions = [
+    { value: 'all', label: 'All Grades' },
+    ...grades.map((g) => ({
+      value: g.id,
+      label: g.name_en,
+      description: g.name_kh,
+    })),
+  ]
 
   const deleteMutation = useDeleteLearningPathMutation()
 
@@ -168,34 +187,32 @@ function LearningPathPage() {
             </div>
 
             {/* Category Filter */}
-            <Select value={selectedCategoryId} onValueChange={(val) => { setSelectedCategoryId(val); setPage(1); }}>
-              <SelectTrigger className="w-[180px] h-10 text-xs border border-input">
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name_en}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableSelect
+              options={categoryFilterOptions}
+              value={selectedCategoryId}
+              onChange={(val) => {
+                setSelectedCategoryId(val || 'all')
+                setPage(1)
+              }}
+              sortable="asc"
+              placeholder="All Categories"
+              searchPlaceholder="Search category..."
+              triggerClassName="w-[180px]"
+            />
 
             {/* Grade Filter */}
-            <Select value={selectedGradeId} onValueChange={(val) => { setSelectedGradeId(val); setPage(1); }}>
-              <SelectTrigger className="w-[150px] h-10 text-xs border border-input">
-                <SelectValue placeholder="All Grades" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Grades</SelectItem>
-                {grades.map((g) => (
-                  <SelectItem key={g.id} value={g.id}>
-                    {g.name_en}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableSelect
+              options={gradeFilterOptions}
+              value={selectedGradeId}
+              onChange={(val) => {
+                setSelectedGradeId(val || 'all')
+                setPage(1)
+              }}
+              sortable="asc"
+              placeholder="All Grades"
+              searchPlaceholder="Search grade..."
+              triggerClassName="w-[150px]"
+            />
           </div>
 
           <Button
@@ -357,15 +374,26 @@ function LearningPathPage() {
 
                       {/* Status Column */}
                       <TableCell>
-                        {l.is_active ? (
-                          <Badge variant="success">
-                            Active
-                          </Badge>
-                        ) : (
-                          <Badge variant="destructive">
-                            Inactive
-                          </Badge>
-                        )}
+                        <div className="flex flex-col gap-1 items-start">
+                          {l.is_active ? (
+                            <Badge variant="success" className="text-[10px]">
+                              Active
+                            </Badge>
+                          ) : (
+                            <Badge variant="destructive" className="text-[10px]">
+                              Inactive
+                            </Badge>
+                          )}
+                          {(l.is_published ?? l.isPublished) ? (
+                            <Badge variant="secondary" className="text-[9px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20">
+                              Published
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-[9px] text-neutral-400">
+                              Draft
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
 
                       {/* Actions Column */}

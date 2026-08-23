@@ -24,13 +24,6 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
   Search,
   RefreshCw,
   Plus,
@@ -40,6 +33,7 @@ import {
 } from 'lucide-react'
 import { ActionButton } from '@/components/ui/action-button'
 import { DeleteModal } from '@/components/ui/delete-modal'
+import { SearchableSelect } from '@/components/ui/shared/SearchableSelect'
 import { useQuestionsQuery, useDeleteQuestionMutation } from './_hooks/useQuestion'
 import { useCategoriesQuery } from '../_category/_hooks/useCategory'
 import { useGradesQuery } from '../_grade/_hooks/useGrade'
@@ -82,6 +76,7 @@ function QuestionsPage() {
 
   const [detailDialogOpen, setDetailDialogOpen] = useState(false)
   const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null)
+  const [questionForDetail, setQuestionForDetail] = useState<QuestionItem | null>(null)
 
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false)
   const [questionToDelete, setQuestionToDelete] = useState<QuestionItem | null>(null)
@@ -123,6 +118,41 @@ function QuestionsPage() {
     ? gradeCategoriesResponse.data
     : allCategories
 
+  const gradeFilterOptions = [
+    { value: 'all', label: 'All Grades' },
+    ...grades.map((g) => ({
+      value: g.id,
+      label: g.name_en,
+      description: g.name_kh,
+    })),
+  ]
+
+  const categoryFilterOptions = [
+    { value: 'all', label: 'All Categories' },
+    ...availableCategories.map((c) => ({
+      value: c.id,
+      label: c.name_en,
+      description: c.name_kh,
+    })),
+  ]
+
+  const typeFilterOptions = [
+    { value: 'all', label: 'All Types' },
+    { value: 'MCQ', label: 'MCQ' },
+    { value: 'MULTI_SELECT', label: 'Multi-Select' },
+    { value: 'TRUE_FALSE', label: 'True / False' },
+    { value: 'FILL_BLANK', label: 'Fill Blank' },
+    { value: 'MATCHING', label: 'Matching' },
+    { value: 'ORDER', label: 'Reordering' },
+  ]
+
+  const difficultyFilterOptions = [
+    { value: 'all', label: 'All Difficulties' },
+    { value: 'EASY', label: 'Easy' },
+    { value: 'MEDIUM', label: 'Medium' },
+    { value: 'HARD', label: 'Hard' },
+  ]
+
   const deleteMutation = useDeleteQuestionMutation()
 
   const questions = data?.data || []
@@ -140,6 +170,7 @@ function QuestionsPage() {
   }
 
   const handleViewDetail = (q: QuestionItem) => {
+    setQuestionForDetail(q)
     setActiveQuestionId(q.id)
     setDetailDialogOpen(true)
   }
@@ -272,6 +303,17 @@ function QuestionsPage() {
 
   return (
     <div className="text-slate-900 dark:text-slate-50 animate-fade-in">
+      <QuestionDialog open={dialogOpen} setOpen={setDialogOpen} question={activeQuestion} />
+      <QuestionDetailDialog open={detailDialogOpen} setOpen={setDetailDialogOpen} question={questionForDetail} />
+      <QuestionImportDialog open={importDialogOpen} setOpen={setImportDialogOpen} />
+      <DeleteModal
+        open={deleteAlertOpen}
+        setOpen={setDeleteAlertOpen}
+        title="Delete Question"
+        description="Are you sure you want to delete this question? This action cannot be undone."
+        onConfirm={handleDeleteConfirm}
+      />
+      
       {/* Page Header */}
       <PageHeader
         title="Questions"
@@ -303,67 +345,60 @@ function QuestionsPage() {
               />
             </div>
 
-            {/* Category Filter */}
             {/* Grade Filter */}
-            <Select value={selectedGradeId} onValueChange={(val) => { setSelectedGradeId(val); setSelectedCategoryId('all'); setPage(1); }}>
-              <SelectTrigger className="w-[140px] text-xs">
-                <SelectValue placeholder="All Grades" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Grades</SelectItem>
-                {grades.map((g) => (
-                  <SelectItem key={g.id} value={g.id}>
-                    {g.name_en}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableSelect
+              options={gradeFilterOptions}
+              value={selectedGradeId}
+              onChange={(val) => {
+                setSelectedGradeId(val || 'all')
+                setSelectedCategoryId('all')
+                setPage(1)
+              }}
+              sortable="asc"
+              placeholder="All Grades"
+              searchPlaceholder="Search grade..."
+              triggerClassName="w-[140px]"
+            />
 
             {/* Category Filter */}
-            <Select value={selectedCategoryId} onValueChange={(val) => { setSelectedCategoryId(val); setPage(1); }}>
-              <SelectTrigger className="w-[160px] text-xs">
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {availableCategories.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name_en}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            
+            <SearchableSelect
+              options={categoryFilterOptions}
+              value={selectedCategoryId}
+              onChange={(val) => {
+                setSelectedCategoryId(val || 'all')
+                setPage(1)
+              }}
+              sortable="asc"
+              placeholder="All Categories"
+              searchPlaceholder="Search category..."
+              triggerClassName="w-[160px]"
+            />
 
             {/* Type Filter */}
-            <Select value={selectedType} onValueChange={(val) => { setSelectedType(val); setPage(1); }}>
-              <SelectTrigger className="w-[140px] text-xs">
-                <SelectValue placeholder="All Types" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="MCQ">MCQ</SelectItem>
-                <SelectItem value="MULTI_SELECT">Multi-Select</SelectItem>
-                <SelectItem value="TRUE_FALSE">True / False</SelectItem>
-                <SelectItem value="FILL_BLANK">Fill Blank</SelectItem>
-                <SelectItem value="MATCHING">Matching</SelectItem>
-                <SelectItem value="ORDER">Reordering</SelectItem>
-              </SelectContent>
-            </Select>
+            <SearchableSelect
+              options={typeFilterOptions}
+              value={selectedType}
+              onChange={(val) => {
+                setSelectedType(val || 'all')
+                setPage(1)
+              }}
+              placeholder="All Types"
+              searchPlaceholder="Search type..."
+              triggerClassName="w-[140px]"
+            />
 
             {/* Difficulty Filter */}
-            <Select value={selectedDifficulty} onValueChange={(val) => { setSelectedDifficulty(val); setPage(1); }}>
-              <SelectTrigger className="w-[120px] text-xs">
-                <SelectValue placeholder="All Difficulties" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Difficulties</SelectItem>
-                <SelectItem value="EASY">Easy</SelectItem>
-                <SelectItem value="MEDIUM">Medium</SelectItem>
-                <SelectItem value="HARD">Hard</SelectItem>
-              </SelectContent>
-            </Select>
+            <SearchableSelect
+              options={difficultyFilterOptions}
+              value={selectedDifficulty}
+              onChange={(val) => {
+                setSelectedDifficulty(val || 'all')
+                setPage(1)
+              }}
+              placeholder="All Difficulties"
+              searchPlaceholder="Search difficulty..."
+              triggerClassName="w-[130px]"
+            />
 
             <Button
               variant="outline"

@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { SearchableSelect } from '@/components/ui/shared/SearchableSelect'
 import {
   useCreateQuestionMutation,
   useUpdateQuestionMutation,
@@ -43,13 +44,35 @@ const isQuillEmpty = (html: string) => {
   return clean === ''
 }
 
+const difficultySelectOptions = [
+  { value: 'EASY', label: 'Easy' },
+  { value: 'MEDIUM', label: 'Medium' },
+  { value: 'HARD', label: 'Hard' },
+]
+
+const questionTypeSelectOptions = [
+  { value: 'MCQ', label: 'Multiple Choice (MCQ)' },
+  { value: 'MULTI_SELECT', label: 'Multi-Select Checkbox' },
+  { value: 'TRUE_FALSE', label: 'True / False' },
+  { value: 'FILL_BLANK', label: 'Fill in the Blank' },
+  { value: 'MATCHING', label: 'Matching Items' },
+  { value: 'ORDER', label: 'Reordering Items' },
+]
+
 interface QuestionDialogProps {
   open: boolean
-  onOpenChange: (open: boolean) => void
+  onOpenChange?: (open: boolean) => void
+  setOpen?: (open: boolean) => void
   question: QuestionItem | null
 }
 
-export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogProps) {
+export function QuestionDialog({
+  open,
+  onOpenChange: propOnOpenChange,
+  setOpen: propSetOpen,
+  question,
+}: QuestionDialogProps) {
+  const onOpenChange = propOnOpenChange || propSetOpen || (() => {})
   const [validationError, setValidationError] = useState('')
 
   // TYPE-SPECIFIC EDITOR STATES (linked alongside TanStack Form)
@@ -92,7 +115,7 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
       gradeId: '',
       categoryId: '',
       questionType: 'MCQ' as QuestionTypeEnum,
-      difficulty: 'EASY' as DifficultyEnum,
+      difficulty: 'MEDIUM' as DifficultyEnum,
       questionTextEn: '',
       questionTextKh: '',
       explanationEn: '',
@@ -275,7 +298,6 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
     },
   })
 
-  // Synchronize dialog states when opening/changing questions
   useEffect(() => {
     if (open) {
       if (question) {
@@ -292,28 +314,15 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
         form.setFieldValue('timeLimitSeconds', question.time_limit_seconds || '')
         form.setFieldValue('isActive', question.is_active)
 
-        // Populate Type-Specific States
         const type = question.question_type
         const content = question.content || {}
         const validation = question.validation || {}
 
         if (type === 'MCQ') {
-          setOptions(
-            (content.options || []).map((o: any) => ({
-              id: o.id,
-              text_en: o.text_en || o.textEn || '',
-              text_kh: o.text_kh || o.textKh || '',
-            }))
-          )
+          setOptions((content.options || []).map((o: any) => ({ id: o.id, text_en: o.text_en || o.textEn || '', text_kh: o.text_kh || o.textKh || '' })))
           setCorrectOptionId(validation.correct_option_id || validation.correctOptionId || '')
         } else if (type === 'MULTI_SELECT') {
-          setOptions(
-            (content.options || []).map((o: any) => ({
-              id: o.id,
-              text_en: o.text_en || o.textEn || '',
-              text_kh: o.text_kh || o.textKh || '',
-            }))
-          )
+          setOptions((content.options || []).map((o: any) => ({ id: o.id, text_en: o.text_en || o.textEn || '', text_kh: o.text_kh || o.textKh || '' })))
           setCorrectOptionIds(validation.correct_option_ids || validation.correctOptionIds || [])
         } else if (type === 'TRUE_FALSE') {
           setCorrectAnswerTF(validation.correct_answer ?? validation.correctAnswer ?? true)
@@ -325,43 +334,16 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
           }))
           setBlanks(loadedBlanks.length ? loadedBlanks : [{ id: 'blank-1', is_case_sensitive: false, accepted_answers_raw: '' }])
         } else if (type === 'MATCHING') {
-          setLeftSide(
-            (content.left_side || content.leftSide || []).map((i: any) => ({
-              id: i.id,
-              text_en: i.text_en || i.textEn || '',
-              text_kh: i.text_kh || i.textKh || '',
-            }))
-          )
-          setRightSide(
-            (content.right_side || content.rightSide || []).map((i: any) => ({
-              id: i.id,
-              text_en: i.text_en || i.textEn || '',
-              text_kh: i.text_kh || i.textKh || '',
-            }))
-          )
-          setCorrectPairs(
-            (validation.correct_pairs || validation.correctPairs || []).map((p: any) => ({
-              left_id: p.left_id || p.leftId,
-              right_id: p.right_id || p.rightId,
-            }))
-          )
+          setLeftSide((content.left_side || content.leftSide || []).map((i: any) => ({ id: i.id, text_en: i.text_en || i.textEn || '', text_kh: i.text_kh || i.textKh || '' })))
+          setRightSide((content.right_side || content.rightSide || []).map((i: any) => ({ id: i.id, text_en: i.text_en || i.textEn || '', text_kh: i.text_kh || i.textKh || '' })))
+          setCorrectPairs((validation.correct_pairs || validation.correctPairs || []).map((p: any) => ({ left_id: p.left_id || p.leftId, right_id: p.right_id || p.rightId })))
         } else if (type === 'ORDER') {
-          setOrderItems(
-            (content.items || []).map((i: any) => ({
-              id: i.id,
-              text_en: i.text_en || i.textEn || '',
-              text_kh: i.text_kh || i.textKh || '',
-            }))
-          )
+          setOrderItems((content.items || []).map((i: any) => ({ id: i.id, text_en: i.text_en || i.textEn || '', text_kh: i.text_kh || i.textKh || '' })))
           setCorrectOrder(validation.correct_order || validation.correctOrder || [])
         }
       } else {
         form.reset()
-        // Reset type configs
-        setOptions([
-          { id: 'opt-1', text_en: '', text_kh: '' },
-          { id: 'opt-2', text_en: '', text_kh: '' },
-        ])
+        setOptions([{ id: 'opt-1', text_en: '', text_kh: '' }, { id: 'opt-2', text_en: '', text_kh: '' }])
         setCorrectOptionId('')
         setCorrectOptionIds([])
         setCorrectAnswerTF(true)
@@ -369,23 +351,20 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
         setLeftSide([{ id: 'left-1', text_en: '', text_kh: '' }])
         setRightSide([{ id: 'right-1', text_en: '', text_kh: '' }])
         setCorrectPairs([])
-        setOrderItems([
-          { id: 'ord-1', text_en: '', text_kh: '' },
-          { id: 'ord-2', text_en: '', text_kh: '' },
-        ])
+        setOrderItems([{ id: 'ord-1', text_en: '', text_kh: '' }, { id: 'ord-2', text_en: '', text_kh: '' }])
         setCorrectOrder([])
       }
       setValidationError('')
     }
   }, [open, question])
 
-  // Get reactive grade and category value from form field state
   const selectedGradeId = useStore(form.store, (s) => s.values.gradeId)
   const currentQuestionType = useStore(form.store, (s) => s.values.questionType)
-
-  // Query grade-specific categories
   const { data: gradeCategoriesResponse, isLoading: gradeCategoriesLoading } = useGradeCategoriesQuery(selectedGradeId, !!selectedGradeId)
   const availableCategories = selectedGradeId && gradeCategoriesResponse?.data ? gradeCategoriesResponse.data : allCategories
+  
+  const gradeSelectOptions = grades.map((g) => ({ value: g.id, label: `${g.name_en} (${g.name_kh})`, description: g.name_kh }))
+  const categorySelectOptions = availableCategories.map((c) => ({ value: c.id, label: c.name_en, description: c.name_kh }))
 
   const isEditing = !!question
   const isLoading = createMutation.isPending || updateMutation.isPending || gradesLoading || allCategoriesLoading || gradeCategoriesLoading
@@ -462,34 +441,18 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
     setOrderItems(orderItems.map((i) => (i.id === id ? { ...i, [field]: value } : i)))
   }
 
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[960px] md:max-w-[960px] w-[95vw] text-slate-900 dark:text-slate-50 border border-slate-100 dark:border-slate-800 shadow-xl max-h-[90vh] !flex !flex-col !p-0 !gap-0 overflow-hidden">
         <DialogHeader className="p-6 pb-2 space-y-1.5 shrink-0">
-          <DialogTitle className="text-lg font-bold">
-            {isEditing ? 'Modify Question Details' : 'Create New Question'}
-          </DialogTitle>
+          <DialogTitle className="text-lg font-bold">{isEditing ? 'Modify Question Details' : 'Create New Question'}</DialogTitle>
           <DialogDescription className="text-xs text-slate-500 dark:text-slate-400">
-            {isEditing
-              ? 'Update translations, parameters, grade, category, or formatting options.'
-              : 'Add a new educational gameplay question to the question bank.'}
+            {isEditing ? 'Update translations, parameters, grade, category, or formatting options.' : 'Add a new educational gameplay question to the question bank.'}
           </DialogDescription>
         </DialogHeader>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            form.handleSubmit()
-          }}
-          className="flex flex-col flex-1 overflow-hidden"
-        >
-          {/* Scrollable inputs viewport */}
+        <form onSubmit={(e) => { e.preventDefault(); e.stopPropagation(); form.handleSubmit() }} className="flex flex-col flex-1 overflow-hidden">
           <ScrollArea className="flex-1 min-h-0 w-full overflow-y-auto custom-scrollbar">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 p-6">
-
-              {/* Left Column: Metadata & Status */}
               <div className="md:col-span-4 space-y-4 md:border-r md:pr-6 border-slate-100 dark:border-slate-800">
                 <form.Field
                   name="gradeId"
@@ -498,29 +461,19 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
                       <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
                         Grade Level <span className="text-rose-500">*</span>
                       </Label>
-                      <Select
+                      <SearchableSelect
+                        options={gradeSelectOptions}
                         value={field.state.value}
-                        onValueChange={(val) => {
+                        onChange={(val) => {
                           field.handleChange(val)
                           form.setFieldValue('categoryId', '') // Reset category on grade change
                         }}
                         disabled={isLoading}
-                      >
-                        <SelectTrigger className="h-9.5 text-xs">
-                          <SelectValue placeholder="Select Grade" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {gradesLoading ? (
-                            <SelectItem value="loading" disabled>Loading...</SelectItem>
-                          ) : (
-                            grades.map((g) => (
-                              <SelectItem key={g.id} value={g.id}>
-                                {g.name_en} ({g.name_kh})
-                              </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
+                        sortable="asc"
+                        placeholder="Select Grade"
+                        searchPlaceholder="Search grade..."
+                        triggerClassName="w-full"
+                      />
                     </div>
                   )}
                 />
@@ -532,26 +485,16 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
                       <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
                         Category <span className="text-rose-500">*</span>
                       </Label>
-                      <Select
+                      <SearchableSelect
+                        options={categorySelectOptions}
                         value={field.state.value}
-                        onValueChange={field.handleChange}
+                        onChange={field.handleChange}
                         disabled={isEditing || isLoading || !selectedGradeId}
-                      >
-                        <SelectTrigger className="h-9.5 text-xs">
-                          <SelectValue placeholder={!selectedGradeId ? "Select Grade first" : "Select Category"} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {gradeCategoriesLoading ? (
-                            <SelectItem value="loading" disabled>Loading categories...</SelectItem>
-                          ) : (
-                            availableCategories.map((c) => (
-                              <SelectItem key={c.id} value={c.id}>
-                                {c.name_en}
-                              </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
+                        sortable="asc"
+                        placeholder={!selectedGradeId ? "Select Grade first" : "Select Category"}
+                        searchPlaceholder="Search category..."
+                        triggerClassName="w-full"
+                      />
                     </div>
                   )}
                 />
@@ -563,20 +506,14 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
                       <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
                         Difficulty <span className="text-rose-500">*</span>
                       </Label>
-                      <Select
+                      <SearchableSelect
+                        options={difficultySelectOptions}
                         value={field.state.value}
-                        onValueChange={(val: DifficultyEnum) => field.handleChange(val)}
+                        onChange={(val) => field.handleChange(val as DifficultyEnum)}
                         disabled={isLoading}
-                      >
-                        <SelectTrigger className="h-9.5 text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="EASY">Easy</SelectItem>
-                          <SelectItem value="MEDIUM">Medium</SelectItem>
-                          <SelectItem value="HARD">Hard</SelectItem>
-                        </SelectContent>
-                      </Select>
+                        placeholder="Select Difficulty"
+                        triggerClassName="w-full"
+                      />
                     </div>
                   )}
                 />
@@ -588,23 +525,14 @@ export function QuestionDialog({ open, onOpenChange, question }: QuestionDialogP
                       <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
                         Question Type <span className="text-rose-500">*</span>
                       </Label>
-                      <Select
+                      <SearchableSelect
+                        options={questionTypeSelectOptions}
                         value={field.state.value}
-                        onValueChange={(val: QuestionTypeEnum) => field.handleChange(val)}
+                        onChange={(val) => field.handleChange(val as QuestionTypeEnum)}
                         disabled={isLoading}
-                      >
-                        <SelectTrigger className="h-9.5 text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="MCQ">Multiple Choice (MCQ)</SelectItem>
-                          <SelectItem value="MULTI_SELECT">Multi-Select Checkbox</SelectItem>
-                          <SelectItem value="TRUE_FALSE">True / False</SelectItem>
-                          <SelectItem value="FILL_BLANK">Fill in the Blank</SelectItem>
-                          <SelectItem value="MATCHING">Matching Items</SelectItem>
-                          <SelectItem value="ORDER">Reordering Items</SelectItem>
-                        </SelectContent>
-                      </Select>
+                        placeholder="Select Question Type"
+                        triggerClassName="w-full"
+                      />
                     </div>
                   )}
                 />

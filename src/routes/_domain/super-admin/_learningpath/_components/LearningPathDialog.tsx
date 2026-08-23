@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { SearchableSelect } from '@/components/ui/shared/SearchableSelect'
 import {
   useCreateLearningPathMutation,
   useUpdateLearningPathMutation,
@@ -45,6 +46,7 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
   const [xpReward, setXpReward] = useState<number>(100)
   const [passScorePercentage, setPassScorePercentage] = useState<number>(70)
   const [allowSkip, setAllowSkip] = useState<boolean>(false)
+  const [isPublished, setIsPublished] = useState<boolean>(false)
 
   const [validationError, setValidationError] = useState('')
 
@@ -66,6 +68,18 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
   const allCategories = allCategoriesResponse?.data || []
   const availableCategories = gradeId && gradeCategoriesResponse?.data ? gradeCategoriesResponse.data : allCategories
 
+  const gradeSelectOptions = grades.map((g) => ({
+    value: g.id,
+    label: `${g.name_en} (${g.name_kh})`,
+    description: g.name_kh,
+  }))
+
+  const categorySelectOptions = availableCategories.map((c) => ({
+    value: c.id,
+    label: c.name_en,
+    description: c.name_kh,
+  }))
+
   const isEditing = !!learningPath
   const isLoading = createMutation.isPending || updateMutation.isPending || gradesLoading || allCategoriesLoading || gradeCategoriesLoading
 
@@ -81,6 +95,7 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
         setXpReward(learningPath.xp_reward ?? learningPath.xpReward ?? 100)
         setPassScorePercentage(learningPath.pass_score_percentage ?? learningPath.passScorePercentage ?? 70)
         setAllowSkip(learningPath.allow_skip ?? learningPath.allowSkip ?? false)
+        setIsPublished(learningPath.is_published ?? learningPath.isPublished ?? false)
       } else {
         setTitleEn('')
         setTitleKh('')
@@ -91,6 +106,7 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
         setXpReward(100)
         setPassScorePercentage(70)
         setAllowSkip(false)
+        setIsPublished(false)
       }
       setValidationError('')
     }
@@ -132,6 +148,8 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
       gradeId,
       categoryId,
       isActive,
+      isPublished,
+      is_published: isPublished,
       xpReward,
       passScorePercentage,
       allowSkip,
@@ -211,47 +229,35 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
               <Label htmlFor="path-grade">
                 Target Grade Level <span className="text-rose-500">*</span>
               </Label>
-              <Select
+              <SearchableSelect
+                options={gradeSelectOptions}
                 value={gradeId}
-                onValueChange={(val) => {
+                onChange={(val) => {
                   setGradeId(val)
                   setCategoryId('')
                 }}
                 disabled={isLoading}
-              >
-                <SelectTrigger id="path-grade" className="w-full h-9.5 text-xs border border-input">
-                  <SelectValue placeholder="Select Grade Level" />
-                </SelectTrigger>
-                <SelectContent>
-                  {grades.map((g) => (
-                    <SelectItem key={g.id} value={g.id}>
-                      {g.name_en} ({g.name_kh})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                sortable="asc"
+                placeholder="Select Grade Level"
+                searchPlaceholder="Search grade..."
+                triggerClassName="w-full"
+              />
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="path-category">
                 Aligned Category <span className="text-rose-500">*</span>
               </Label>
-              <Select
+              <SearchableSelect
+                options={categorySelectOptions}
                 value={categoryId}
-                onValueChange={setCategoryId}
+                onChange={setCategoryId}
                 disabled={isLoading || !gradeId}
-              >
-                <SelectTrigger id="path-category" className="w-full h-9.5 text-xs border border-input">
-                  <SelectValue placeholder={!gradeId ? "Select Grade first" : "Select Category"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableCategories.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name_en}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                sortable="asc"
+                placeholder={!gradeId ? "Select Grade first" : "Select Category"}
+                searchPlaceholder="Search category..."
+                triggerClassName="w-full"
+              />
             </div>
           </div>
 
@@ -297,11 +303,11 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 mt-2">
-            <div className="flex items-center justify-between p-3 rounded-lg bg-muted border">
+          <div className="grid grid-cols-3 gap-3 mt-2">
+            <div className="flex items-center justify-between p-2.5 rounded-lg bg-muted border">
               <div className="space-y-0.5">
                 <Label htmlFor="path-skip" className="text-xs font-semibold">Allow Skip</Label>
-                <p className="text-[10px] text-muted-foreground">Skip prerequisite check</p>
+                <p className="text-[10px] text-muted-foreground">Skip prereqs</p>
               </div>
               <Switch
                 id="path-skip"
@@ -311,15 +317,28 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
               />
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-lg bg-muted border">
+            <div className="flex items-center justify-between p-2.5 rounded-lg bg-muted border">
               <div className="space-y-0.5">
-                <Label htmlFor="path-status" className="text-xs font-semibold">Active Status</Label>
-                <p className="text-[10px] text-muted-foreground">Show in mobile feed</p>
+                <Label htmlFor="path-status" className="text-xs font-semibold">Active (Admin)</Label>
+                <p className="text-[10px] text-muted-foreground">Admin status</p>
               </div>
               <Switch
                 id="path-status"
                 checked={isActive}
                 onCheckedChange={setIsActive}
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className="flex items-center justify-between p-2.5 rounded-lg bg-muted border">
+              <div className="space-y-0.5">
+                <Label htmlFor="path-published" className="text-xs font-semibold">Published</Label>
+                <p className="text-[10px] text-muted-foreground">Mobile feed</p>
+              </div>
+              <Switch
+                id="path-published"
+                checked={isPublished}
+                onCheckedChange={setIsPublished}
                 disabled={isLoading}
               />
             </div>

@@ -23,14 +23,7 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from '@/components/ui/pagination'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { SearchableSelect } from '@/components/ui/searchable-select'
+import { SearchableSelect } from '@/components/ui/shared/SearchableSelect'
 import {
   Search,
   RefreshCw,
@@ -434,7 +427,7 @@ function QuizPackagesPage() {
         onOpenChange={setDeleteAlertOpen}
         description={
           <>
-            This will permanently delete the quiz package <span className="font-semibold text-destructive">"{quizpackToDelete?.title}"</span>. 
+            This will permanently delete the quiz package <span className="font-semibold text-destructive">"{quizpackToDelete?.title}"</span>.
             This operation cannot be undone.
           </>
         }
