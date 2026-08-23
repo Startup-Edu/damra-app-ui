@@ -34,9 +34,9 @@ import {
   Tag,
 } from 'lucide-react'
 import { ActionButton } from '@/components/ui/action-button'
-import { useCategoriesQuery, useDeleteCategoryMutation } from '../_hooks/useCategory'
-import type { CategoryItem } from '../_types/category.types'
-import { CategoryDialog } from '../_components/CategoryDialog'
+import { useCategoriesQuery, useDeleteCategoryMutation } from './_hooks/useCategory'
+import type { CategoryItem } from './_types/category.types'
+import { CategoryDialog } from './_components/CategoryDialog'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_domain/super-admin/_category/category')({
@@ -101,7 +101,7 @@ function CategoriesPage() {
   }
 
   return (
-    <div className="text-slate-900 dark:text-slate-50 animate-fade-in">
+    <div className="animate-fade-in">
       {/* Page Header */}
       <PageHeader
         title="Categories"
@@ -115,14 +115,14 @@ function CategoriesPage() {
       {/* Main Content Card */}
       <Card className="py-0">
         {/* Toolbar */}
-        <div className="flex items-center gap-3 p-6 pb-4">
+        <div className="flex items-center justify-between gap-3 p-5 pb-0">
           <div className="relative flex-1 max-w-md group">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4" />
             <Input
               placeholder="Search categories by English or Khmer name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 h-10 text-xs"
+              className="pl-10 h-9.5 text-xs"
             />
           </div>
 
@@ -135,7 +135,7 @@ function CategoriesPage() {
               })
             }}
             disabled={isFetching}
-            className="h-10 w-10"
+            className="h-9.5 w-9.5"
           >
             {isFetching ? (
               <Loader2 className="h-4.5 w-4.5 animate-spin" />
@@ -208,8 +208,8 @@ function CategoriesPage() {
                 // Empty State
                 <TableRow>
                   <TableCell colSpan={8} className="py-16 text-center">
-                    <div className="flex flex-col items-center gap-2 text-slate-400">
-                      <FolderTree className="h-8 w-8 text-slate-300 dark:text-slate-700" />
+                    <div className="flex flex-col items-center gap-2">
+                      <FolderTree className="h-8 w-8" />
                       <p className="text-xs font-semibold">No categories found matching your query</p>
                     </div>
                   </TableCell>
@@ -233,26 +233,26 @@ function CategoriesPage() {
 
                     {/* Name Column */}
                     <TableCell>
-                      <div className="font-semibold text-slate-900 dark:text-slate-100 text-xs">
+                      <div className="font-semibold text-xs">
                         {cat.name_en}
                       </div>
-                      <div className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                      <div className="text-[10px] font-medium">
                         {cat.name_kh}
                       </div>
                     </TableCell>
 
                     {/* Description Column */}
                     <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">
-                      {cat.description_en || <span className="text-slate-300 dark:text-slate-700">-</span>}
+                      {cat.description_en || <span className="">-</span>}
                       {cat.description_kh && (
-                        <div className="text-[10px] text-slate-400 dark:text-slate-500 font-medium truncate">
+                        <div className="text-[10px] font-medium truncate">
                           {cat.description_kh}
                         </div>
                       )}
                     </TableCell>
 
                     {/* Slug Column */}
-                    <TableCell className="text-xs font-mono text-slate-500 dark:text-slate-400">
+                    <TableCell className="text-xs font-mono">
                       {cat.slug}
                     </TableCell>
 
@@ -270,7 +270,7 @@ function CategoriesPage() {
                     </TableCell>
 
                     {/* Sort Order Column */}
-                    <TableCell className="text-xs text-slate-600 dark:text-slate-400 font-medium">
+                    <TableCell className="text-xs font-medium">
                       {cat.sort_order}
                     </TableCell>
 
@@ -310,13 +310,13 @@ function CategoriesPage() {
 
           {/* Pagination Footer */}
           {!isLoading && !isError && categories.length > 0 && (
-            <div className="flex items-center justify-between p-4 px-6 border-t bg-slate-50/30 dark:bg-slate-950/10">
-              <div className="text-[10px] text-slate-500 dark:text-slate-400">
-                Showing <span className="font-semibold text-slate-900 dark:text-slate-100">{((page - 1) * limit) + 1}</span> to{" "}
-                <span className="font-semibold text-slate-900 dark:text-slate-100">
+            <div className="flex items-center justify-between p-4 px-6 border-t">
+              <div className="text-[10px]">
+                Showing <span className="font-semibold">{((page - 1) * limit) + 1}</span> to{" "}
+                <span className="font-semibold">
                   {Math.min(page * limit, totalElements)}
                 </span>{" "}
-                of <span className="font-semibold text-slate-900 dark:text-slate-100">{totalElements}</span> categories
+                of <span className="font-semibold">{totalElements}</span> categories
               </div>
 
               <Pagination className="mx-0 w-auto">
@@ -393,7 +393,7 @@ function CategoriesPage() {
         onOpenChange={setDeleteAlertOpen}
         description={
           <>
-            This will permanently delete the category <span className="font-semibold text-slate-800 dark:text-slate-200">"{categoryToDelete?.name_en}"</span> ({categoryToDelete?.name_kh}).
+            This will permanently delete the category <span className="font-semibold">"{categoryToDelete?.name_en}"</span> ({categoryToDelete?.name_kh}).
             This category must not contain any subcategories, levels, or questions. This operation cannot be undone.
           </>
         }

@@ -10,7 +10,7 @@ const navigation = [
   { name: 'Roles & Permissions', href: '/super-admin/roles-permissions', icon: ShieldCheck },
   { name: 'Categories', href: '/super-admin/category', icon: FolderTree },
   { name: 'Grades', href: '/super-admin/grade', icon: GraduationCap },
-  { name: 'Levels', href: '/super-admin/level', icon: Layers },
+  { name: 'Learning Path', href: '/super-admin/learning-path', icon: Layers },
   { name: 'Quiz Packages', href: '/super-admin/quizepack', icon: BookOpen },
   { name: 'Question Types', href: '/super-admin/questiontype', icon: FileQuestion },
   { name: 'Questions', href: '/super-admin/question', icon: HelpCircle },
@@ -42,7 +42,7 @@ export function Sidebar() {
           isSidebarOpen ? "w-64 translate-x-0" : "-translate-x-full lg:w-20 lg:translate-x-0"
         )}
       >
-        <div className="flex h-16 shrink-0 items-center justify-between px-6T border-b border-neutral-200 dark:border-neutral-800">
+        <div className="flex h-16 shrink-0 items-center justify-between px-6 border-b border-border">
           <Link to="/" className="flex items-center gap-2 text-neutral-900 dark:text-white">
             <PanelsTopLeft className="h-6 w-6 text-neutral-700 dark:text-neutral-100" />
             {isSidebarOpen && <span className="font-semibold text-lg tracking-tight">System</span>}

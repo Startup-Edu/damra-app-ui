@@ -1,0 +1,207 @@
+[
+  {
+    "question_type": "MCQ",
+    "difficulty_level": "EASY",
+    "question_text_en": "What is the capital of France?",
+    "question_text_kh": "តើរដ្ឋធានីរបស់ប្រទេសបារាំងគឺជាអ្វី?",
+    "explanation_en": "Paris is the capital city and largest city of France.",
+    "explanation_kh": "ប៉ារីសគឺជាទីក្រុងរដ្ឋធានី និងជាទីក្រុងធំបំផុតរបស់ប្រទេសបារាំង។",
+    "xp_value": 10,
+    "time_limit_seconds": 30,
+    "content": {
+      "options": [
+        { "id": "opt-1", "text_en": "Paris", "text_kh": "ប៉ារីស" },
+        { "id": "opt-2", "text_en": "London", "text_kh": "ឡុងដ៍" },
+        { "id": "opt-3", "text_en": "Berlin", "text_kh": "ប៊ែរឡាំង" },
+        { "id": "opt-4", "text_en": "Madrid", "text_kh": "ម៉ាដ្រីដ" }
+      ]
+    },
+    "validation": {
+      "correct_option_id": "opt-1"
+    }
+  },
+  {
+    "question_type": "MCQ",
+    "difficulty_level": "EASY",
+    "question_text_en": "Which planet is known as the Red Planet?",
+    "question_text_kh": "តើភពណាមួយដែលត្រូវបានគេស្គាល់ថាជា ភពក្រហម?",
+    "explanation_en": "Mars is often called the Red Planet because of iron oxide on its surface.",
+    "explanation_kh": "ភពអង្គារ ត្រូវបានគេហៅថាជាភពក្រហមដោយសារតែជាតិដែកអុកស៊ីតនៅលើផ្ទៃរបស់វា។",
+    "xp_value": 10,
+    "time_limit_seconds": 25,
+    "content": {
+      "options": [
+        { "id": "opt-a", "text_en": "Venus", "text_kh": "ភពសុក្រ" },
+        { "id": "opt-b", "text_en": "Mars", "text_kh": "ភពអង្គារ" },
+        { "id": "opt-c", "text_en": "Jupiter", "text_kh": "ភពព្រហស្បតិ៍" },
+        { "id": "opt-d", "text_en": "Saturn", "text_kh": "ភពសៅរ៍" }
+      ]
+    },
+    "validation": {
+      "correct_option_id": "opt-b"
+    }
+  },
+  {
+    "question_type": "MULTI_SELECT",
+    "difficulty_level": "MEDIUM",
+    "question_text_en": "Which of the following are primary programming languages used for Web Frontend development?",
+    "question_text_kh": "តើភាសាកូដខាងក្រោមណាខ្លះដែលត្រូវបានប្រើសម្រាប់អភិវឌ្ឍ Web Frontend?",
+    "explanation_en": "HTML, CSS, and JavaScript are the core technologies of World Wide Web frontend development.",
+    "explanation_kh": "HTML, CSS និង JavaScript គឺជាបច្ចេកវិទ្យាស្នូលសម្រាប់ការអភិវឌ្ឍ Web Frontend។",
+    "xp_value": 15,
+    "time_limit_seconds": 45,
+    "content": {
+      "options": [
+        { "id": "lang-1", "text_en": "HTML", "text_kh": "HTML" },
+        { "id": "lang-2", "text_en": "JavaScript", "text_kh": "JavaScript" },
+        { "id": "lang-3", "text_en": "CSS", "text_kh": "CSS" },
+        { "id": "lang-4", "text_en": "C++ Assembly", "text_kh": "C++ Assembly" }
+      ]
+    },
+    "validation": {
+      "correct_option_ids": ["lang-1", "lang-2", "lang-3"]
+    }
+  },
+  {
+    "question_type": "TRUE_FALSE",
+    "difficulty_level": "EASY",
+    "question_text_en": "The sun rises in the east and sets in the west.",
+    "question_text_kh": "ព្រះអាទិត្យរះនៅទិសខាងកើត ហើយលិចទៅវិញនៅទិសខាងលិច។",
+    "explanation_en": "Earth rotates from west to east, creating the apparent daily motion of the sun.",
+    "explanation_kh": "ផែនដីវិលជុំវិញខ្លួនឯងពីទិសខាងលិចទៅកើត ធ្វើឱ្យព្រះអាទិត្យមើលទៅដូចជារះពីកើតទៅលិច។",
+    "xp_value": 10,
+    "time_limit_seconds": 20,
+    "content": {},
+    "validation": {
+      "correct_answer": true
+    }
+  },
+  {
+    "question_type": "TRUE_FALSE",
+    "difficulty_level": "EASY",
+    "question_text_en": "Water freezes at 100 degrees Celsius under standard conditions.",
+    "question_text_kh": "ទឹកកករឹងនៅសីតុណ្ហភាព ១០០ អង្សាសេ ក្រោមលក្ខខណ្ឌធម្មតា។",
+    "explanation_en": "Water freezes at 0 degrees Celsius and boils at 100 degrees Celsius.",
+    "explanation_kh": "ទឹកកកនៅសីតុណ្ហភាព ០ អង្សាសេ ហើយពុះនៅសីតុណ្ហភាព ១០០ អង្សាសេ។",
+    "xp_value": 10,
+    "time_limit_seconds": 20,
+    "content": {},
+    "validation": {
+      "correct_answer": false
+    }
+  },
+  {
+    "question_type": "FILL_BLANK",
+    "difficulty_level": "MEDIUM",
+    "question_text_en": "The gas that human beings breathe in for survival is ____.",
+    "question_text_kh": "ឧស្ម័នដែលមនុស្សដកដង្ហើមចូលដើម្បីរស់រានមានជីវិតគឺ ____។",
+    "explanation_en": "Humans inhale oxygen (O2) which is essential for cellular respiration.",
+    "explanation_kh": "មនុស្សដកដង្ហើមចូលឧស្ម័នអុកស៊ីសែន (O2) ដែលចាំបាច់សម្រាប់កោសិកា។",
+    "xp_value": 15,
+    "time_limit_seconds": 30,
+    "content": {
+      "blanks_count": 1
+    },
+    "validation": {
+      "correct_blanks": [
+        {
+          "id": "blank-1",
+          "is_case_sensitive": false,
+          "accepted_answers": ["Oxygen", "oxygen", "O2"]
+        }
+      ]
+    }
+  },
+  {
+    "question_type": "MATCHING",
+    "difficulty_level": "MEDIUM",
+    "question_text_en": "Match each country to its official capital city.",
+    "question_text_kh": "ផ្គូផ្គងប្រទេសនីមួយៗទៅនឹងរដ្ឋធានីផ្លូវការរបស់វា។",
+    "explanation_en": "Tokyo is the capital of Japan, Phnom Penh is the capital of Cambodia, and Canberra is the capital of Australia.",
+    "explanation_kh": "តូក្យូជារដ្ឋធានីជប៉ុន ភ្នំពេញជារដ្ឋធានីកម្ពុជា ហើយកង់បេរ៉ាជារដ្ឋធានីអូស្ត្រាលី។",
+    "xp_value": 20,
+    "time_limit_seconds": 60,
+    "content": {
+      "left_side": [
+        { "id": "country-1", "text_en": "Cambodia", "text_kh": "កម្ពុជា" },
+        { "id": "country-2", "text_en": "Japan", "text_kh": "ជប៉ុន" },
+        { "id": "country-3", "text_en": "Australia", "text_kh": "អូស្ត្រាលី" }
+      ],
+      "right_side": [
+        { "id": "city-1", "text_en": "Phnom Penh", "text_kh": "ភ្នំពេញ" },
+        { "id": "city-2", "text_en": "Tokyo", "text_kh": "តូក្យូ" },
+        { "id": "city-3", "text_en": "Canberra", "text_kh": "កង់បេរ៉ា" }
+      ]
+    },
+    "validation": {
+      "correct_pairs": [
+        { "left_id": "country-1", "right_id": "city-1" },
+        { "left_id": "country-2", "right_id": "city-2" },
+        { "left_id": "country-3", "right_id": "city-3" }
+      ]
+    }
+  },
+  {
+    "question_type": "ORDER",
+    "difficulty_level": "HARD",
+    "question_text_en": "Arrange the steps of the Software Development Life Cycle (SDLC) in the correct chronological order.",
+    "question_text_kh": "រៀបចំជំហាននៃវដ្តជីវិតអភិវឌ្ឍន៍សូហ្វវែរ (SDLC) តាមលំដាប់លំដោយត្រឹមត្រូវ។",
+    "explanation_en": "SDLC starts with Requirements, followed by Design, Development, and finally Testing.",
+    "explanation_kh": "SDLC ចាប់ផ្តើមពីការប្រមូលតម្រូវការ ការរចនា ការសរសេរកូដ និងចុងក្រោយការតេស្ត។",
+    "xp_value": 20,
+    "time_limit_seconds": 60,
+    "content": {
+      "items": [
+        { "id": "step-1", "text_en": "Requirements Analysis", "text_kh": "ការវិភាគតម្រូវការ" },
+        { "id": "step-2", "text_en": "System Design", "text_kh": "ការរចនាប្រព័ន្ធ" },
+        { "id": "step-3", "text_en": "Implementation & Coding", "text_kh": "ការសរសេរកូដអភិវឌ្ឍន៍" },
+        { "id": "step-4", "text_en": "Testing & QA", "text_kh": "ការធ្វើតេស្តគុណភាព" }
+      ]
+    },
+    "validation": {
+      "correct_order": ["step-1", "step-2", "step-3", "step-4"]
+    }
+  },
+  {
+    "question_type": "MCQ",
+    "difficulty_level": "MEDIUM",
+    "question_text_en": "What is the result of 15 multiplied by 4?",
+    "question_text_kh": "តើលទ្ធផលនៃ ១៥ គុណនឹង ៤ ស្មើនឹងប៉ុន្មាន?",
+    "explanation_en": "15 * 4 = 60.",
+    "explanation_kh": "១៥ * ៤ = ៦០។",
+    "xp_value": 10,
+    "time_limit_seconds": 30,
+    "content": {
+      "options": [
+        { "id": "calc-1", "text_en": "50", "text_kh": "៥០" },
+        { "id": "calc-2", "text_en": "60", "text_kh": "៦០" },
+        { "id": "calc-3", "text_en": "70", "text_kh": "៧០" },
+        { "id": "calc-4", "text_en": "45", "text_kh": "៤៥" }
+      ]
+    },
+    "validation": {
+      "correct_option_id": "calc-2"
+    }
+  },
+  {
+    "question_type": "MULTI_SELECT",
+    "difficulty_level": "EASY",
+    "question_text_en": "Which of the following numbers are even numbers?",
+    "question_text_kh": "តើលេខខាងក្រោមណាខ្លះជាលេខគូ?",
+    "explanation_en": "Even numbers are divisible by 2 without a remainder (2, 4, 8, 10).",
+    "explanation_kh": "លេខគូគឺជាលេខដែលចែកដាច់នឹង ២ (២, ៤, ៨, ១០)។",
+    "xp_value": 10,
+    "time_limit_seconds": 30,
+    "content": {
+      "options": [
+        { "id": "num-1", "text_en": "4", "text_kh": "៤" },
+        { "id": "num-2", "text_en": "7", "text_kh": "៧" },
+        { "id": "num-3", "text_en": "12", "text_kh": "១២" },
+        { "id": "num-4", "text_en": "15", "text_kh": "១៥" }
+      ]
+    },
+    "validation": {
+      "correct_option_ids": ["num-1", "num-3"]
+    }
+  }
+]

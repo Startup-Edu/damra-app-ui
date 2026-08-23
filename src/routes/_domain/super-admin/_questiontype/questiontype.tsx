@@ -32,9 +32,9 @@ import {
 } from 'lucide-react'
 import { ActionButton } from '@/components/ui/action-button'
 import { DeleteModal } from '@/components/ui/delete-modal'
-import { useQuestionTypesQuery, useDeleteQuestionTypeMutation } from '../_hooks/useQuestiontype'
-import type { QuestionTypeItem } from '../_types/questiontype.types'
-import { QuestiontypeDialog } from '../_components/QuestiontypeDialog'
+import { useQuestionTypesQuery, useDeleteQuestionTypeMutation } from './_hooks/useQuestiontype'
+import type { QuestionTypeConfigItem as QuestionTypeItem } from './_types/questiontype.types'
+import { QuestiontypeDialog } from './_components/QuestiontypeDialog'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_domain/super-admin/_questiontype/questiontype')({
@@ -99,7 +99,7 @@ function QuestionTypesPage() {
   }
 
   return (
-    <div className="text-slate-900 dark:text-slate-50 animate-fade-in">
+    <div className="animate-fade-in">
       {/* Page Header */}
       <PageHeader
         title="Question Types"
@@ -113,14 +113,14 @@ function QuestionTypesPage() {
       {/* Main Content Card */}
       <Card className="py-0">
         {/* Toolbar */}
-        <div className="flex items-center gap-3 p-6 pb-4">
+        <div className="flex items-center justify-between gap-3 p-5 pb-0">
           <div className="relative flex-1 max-w-md group">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4" />
             <Input
               placeholder="Search question types by code or name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 h-10 text-xs"
+              className="pl-10 h-9.5 text-xs"
             />
           </div>
 
@@ -133,7 +133,7 @@ function QuestionTypesPage() {
               })
             }}
             disabled={isFetching}
-            className="h-10 w-10"
+            className="h-9.5 w-9.5"
           >
             {isFetching ? (
               <Loader2 className="h-4.5 w-4.5 animate-spin" />
@@ -199,8 +199,8 @@ function QuestionTypesPage() {
                 // Empty State
                 <TableRow>
                   <TableCell colSpan={7} className="py-16 text-center">
-                    <div className="flex flex-col items-center gap-2 text-slate-400">
-                      <FileQuestion className="h-8 w-8 text-slate-300 dark:text-slate-700" />
+                    <div className="flex flex-col items-center gap-2">
+                      <FileQuestion className="h-8 w-8" />
                       <p className="text-xs font-semibold">No question types found matching search query</p>
                     </div>
                   </TableCell>
@@ -211,28 +211,28 @@ function QuestionTypesPage() {
                   <TableRow key={qt.id}>
                     {/* Code */}
                     <TableCell className="pl-6 py-3.5">
-                      <Badge variant="secondary" className="font-bold text-xs uppercase bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+                      <Badge variant="outline" className="font-semibold text-xs uppercase">
                         {qt.code}
                       </Badge>
                     </TableCell>
 
                     {/* English Name */}
-                    <TableCell className="font-semibold text-slate-900 dark:text-slate-100 text-xs">
+                    <TableCell className="text-xs">
                       {qt.name_en}
                     </TableCell>
 
                     {/* Khmer Name */}
-                    <TableCell className="text-xs text-slate-600 dark:text-slate-400">
+                    <TableCell className="text-xs">
                       {qt.name_kh}
                     </TableCell>
 
                     {/* Description */}
-                    <TableCell className="text-xs text-slate-500 dark:text-slate-400 max-w-[250px] truncate">
-                      {qt.description_en || <span className="text-slate-300 dark:text-slate-700">-</span>}
+                    <TableCell className="text-xs">
+                      {qt.description_en || <span>-</span>}
                     </TableCell>
 
                     {/* Sort Order */}
-                    <TableCell className="text-xs font-medium">
+                    <TableCell className="text-xs">
                       {qt.sort_order}
                     </TableCell>
 
@@ -273,12 +273,12 @@ function QuestionTypesPage() {
           {/* Pagination Footer */}
           {!isLoading && !isError && questionTypes.length > 0 && (
             <div className="flex items-center justify-between p-4 px-6 border-t bg-slate-50/30 dark:bg-slate-950/10">
-              <div className="text-[10px] text-slate-500 dark:text-slate-400">
-                Showing <span className="font-semibold text-slate-900 dark:text-slate-100">{((page - 1) * limit) + 1}</span> to{" "}
-                <span className="font-semibold text-slate-900 dark:text-slate-100">
+              <div className="text-[10px]">
+                Showing <span className="font-semibold">{((page - 1) * limit) + 1}</span> to{" "}
+                <span className="font-semibold">
                   {Math.min(page * limit, totalElements)}
                 </span>{" "}
-                of <span className="font-semibold text-slate-900 dark:text-slate-100">{totalElements}</span> question types
+                of <span className="font-semibold">{totalElements}</span> question types
               </div>
 
               <Pagination className="mx-0 w-auto">
@@ -355,7 +355,7 @@ function QuestionTypesPage() {
         onOpenChange={setDeleteAlertOpen}
         description={
           <>
-            This will permanently delete the question type <span className="font-semibold text-slate-800 dark:text-slate-200">"{questiontypeToDelete?.name_en}"</span> ({questiontypeToDelete?.code}).
+            This will permanently delete the question type <span className="font-semibold text-destructive">"{questiontypeToDelete?.name_en}"</span> ({questiontypeToDelete?.code}).
             All questions of this type will be affected. This operation cannot be undone.
           </>
         }

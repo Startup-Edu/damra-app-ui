@@ -39,6 +39,9 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+      --sb-track-color: #f1f1f100;
+      --sb-thumb-color: #cacaca;
+      --sb-thumb-hover: #555555;
 }
 
 .dark {
@@ -73,6 +76,9 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
+    --sb-track-color: #20202000;
+    --sb-thumb-color:oklch(1 0 0 / 15%);
+    --sb-thumb-hover: oklch(0.556 0 0);
 }
 
 @theme inline {
@@ -131,4 +137,102 @@
   html {
     @apply font-sans;
     }
+}
+
+
+
+/* 3. Standard Syntax (Firefox, Chrome, Edge, Safari) */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
+}
+
+
+/* 4. WebKit Legacy Syntax (Chrome, Safari, Edge) */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--sb-track-color);
+  border-radius: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb-color);
+  border-radius: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--sb-thumb-hover);
+}
+
+
+
+
+
+/* Quill custom overrides */
+.quill-editor-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.quill-editor-wrapper .ql-toolbar {
+  border-top-left-radius: var(--radius-md);
+  border-top-right-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background-color: var(--card);
+}
+
+.quill-editor-wrapper .ql-container {
+  border-bottom-left-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  border-top: none;
+  font-family: var(--font-sans);
+  font-size: 0.75rem; /* text-xs */
+  background-color: var(--background);
+}
+
+.text-editor-question .ql-container {
+  min-height: 100px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.text-editor-explanation .ql-container {
+  min-height: 80px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+/* Dark mode styling for Quill */
+.dark .quill-editor-wrapper .ql-toolbar {
+  background-color: var(--card);
+  border-color: var(--border);
+}
+
+.dark .quill-editor-wrapper .ql-container {
+  background-color: var(--background);
+  border-color: var(--border);
+  color: var(--foreground);
+}
+
+.dark .quill-editor-wrapper .ql-stroke {
+  stroke: var(--foreground);
+}
+
+.dark .quill-editor-wrapper .ql-fill {
+  fill: var(--foreground);
+}
+
+.dark .quill-editor-wrapper .ql-picker {
+  color: var(--foreground);
+}
+
+.dark .quill-editor-wrapper .ql-picker-options {
+  background-color: var(--card);
+  border-color: var(--border);
+  color: var(--foreground);
 }

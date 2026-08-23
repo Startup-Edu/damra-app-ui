@@ -1,5 +1,5 @@
 import { Link, useNavigate } from '@tanstack/react-router'
-import { Menu, Bell, UserCircle, LogOut, User } from 'lucide-react' 
+import { Bell, UserCircle, LogOut, User, PanelLeft } from 'lucide-react' 
 import { useLayoutStore } from '@/store/useLayoutStore'
 import { useAuthStore } from '@/store/useAuthStore'
 import { authApi } from '@/api/auth'
@@ -31,7 +31,7 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-x-4 border-b border-neutral-200 bg-white px-4 sm:gap-x-6 sm:px-6 lg:px-8 dark:bg-neutral-950 dark:border-neutral-800">
+    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-x-4 border-b border-border bg-white px-4 sm:gap-x-6 sm:px-6 dark:bg-neutral-950 ">
       
       {/* Sidebar Toggle */}
       <button 
@@ -39,7 +39,7 @@ export function Header() {
         className="p-2 -m-2 text-neutral-500 hover:text-neutral-900 transition-colors dark:text-neutral-400 dark:hover:text-neutral-100"
       >
         <span className="sr-only">Toggle sidebar</span>
-        <Menu className="h-5 w-5" />
+        <PanelLeft className="h-5 w-5" />
       </button>
 
       <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6 justify-end items-center">
