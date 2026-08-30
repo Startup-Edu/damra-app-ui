@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -31,13 +30,13 @@ import {
   AlertDialogAction,
 } from '@/components/ui/alert-dialog'
 import {
-  Search,
   RefreshCw,
   Plus,
   Loader2,
-  Shield,
 } from 'lucide-react'
 import { ActionButton } from '@/components/ui/action-button'
+import { TableEmptyStateRow, SearchInput } from '@/components/ui/shared'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { useRolesQuery, useDeleteRoleMutation } from '../_hooks/useRolesPermissions'
 import type { RoleItem } from '../_types/rolesPermissions.types'
 import { RoleDialog } from './RoleDialog'
@@ -47,7 +46,7 @@ export function RolesTab() {
   const [page, setPage] = useState(1)
   const [limit] = useState(10)
   const [search, setSearch] = useState('')
-  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const debouncedSearch = useDebouncedValue(search, 350)
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [activeRole, setActiveRole] = useState<RoleItem | null>(null)
@@ -57,14 +56,6 @@ export function RolesTab() {
 
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false)
   const [roleToDelete, setRoleToDelete] = useState<RoleItem | null>(null)
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search)
-      setPage(1)
-    }, 400)
-    return () => clearTimeout(handler)
-  }, [search])
 
   const { data, isLoading, isError, refetch } = useRolesQuery(page, limit, debouncedSearch)
   const deleteMutation = useDeleteRoleMutation()
@@ -108,16 +99,21 @@ export function RolesTab() {
   return (
     <div className="space-y-4">
       <Card className="py-0">
-        <div className="flex items-center gap-3 p-6 pb-4">
-          <div className="relative flex-1 max-w-md group">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <Input
-              placeholder="Search roles..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 h-9 text-xs"
-            />
-          </div>
+        <div className="flex items-center gap-3 p-5 pb-0">
+          <SearchInput
+            placeholder="Search roles..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
+            onClear={() => {
+              setSearch('')
+              setPage(1)
+            }}
+            containerClassName="flex-1 max-w-md"
+            sizeVariant="default"
+          />
 
           <div className="flex items-center gap-2">
             <Button
@@ -182,20 +178,36 @@ export function RolesTab() {
                     </TableRow>
                   ))
                 ) : isError ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="py-12 text-center text-rose-500 font-medium text-xs">
-                      Failed to fetch system roles. Please check connection.
-                    </TableCell>
-                  </TableRow>
+                  <TableEmptyStateRow
+                    colSpan={4}
+                    variant="error"
+                    onAction={() => refetch()}
+                  />
                 ) : roles.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="py-16 text-center">
-                      <div className="flex flex-col items-center gap-2 text-slate-400 dark:text-slate-600">
-                        <Shield className="h-8 w-8 opacity-60" />
-                        <p className="text-xs font-semibold">No system roles found</p>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                  debouncedSearch ? (
+                    <TableEmptyStateRow
+                      colSpan={4}
+                      variant="search"
+                      searchQuery={debouncedSearch}
+                      onClear={() => {
+                        setSearch('')
+                        setPage(1)
+                      }}
+                    />
+                  ) : (
+                    <TableEmptyStateRow
+                      colSpan={4}
+                      variant="empty"
+                      title="No roles created yet"
+                      description="Create a role to manage user permissions and access levels."
+                      actionLabel="Create Role"
+                      actionIcon={Plus}
+                      onAction={() => {
+                        setActiveRole(null)
+                        setDialogOpen(true)
+                      }}
+                    />
+                  )
                 ) : (
                   roles.map((role) => (
                     <TableRow key={role.id}>

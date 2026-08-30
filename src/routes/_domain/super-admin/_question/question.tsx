@@ -1,8 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/components/ui/page-header'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -24,16 +23,15 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination'
 import {
-  Search,
   RefreshCw,
   Plus,
   Loader2,
-  HelpCircle,
   UploadCloud,
 } from 'lucide-react'
 import { ActionButton } from '@/components/ui/action-button'
 import { DeleteModal } from '@/components/ui/delete-modal'
-import { SearchableSelect } from '@/components/ui/shared/SearchableSelect'
+import { SearchableSelect, TableEmptyStateRow, SearchInput } from '@/components/ui/shared'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { useQuestionsQuery, useDeleteQuestionMutation } from './_hooks/useQuestion'
 import { useCategoriesQuery } from '../_category/_hooks/useCategory'
 import { useGradesQuery } from '../_grade/_hooks/useGrade'
@@ -60,7 +58,7 @@ function QuestionsPage() {
   const [page, setPage] = useState(1)
   const [limit] = useState(10)
   const [search, setSearch] = useState('')
-  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const debouncedSearch = useDebouncedValue(search, 350)
 
   // Filter States
   const [selectedGradeId, setSelectedGradeId] = useState<string>('all')
@@ -80,16 +78,6 @@ function QuestionsPage() {
 
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false)
   const [questionToDelete, setQuestionToDelete] = useState<QuestionItem | null>(null)
-
-  // Debounce search query
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search)
-      setPage(1)
-    }, 400)
-
-    return () => clearTimeout(handler)
-  }, [search])
 
   const filterGrade = selectedGradeId === 'all' ? undefined : selectedGradeId
   const filterCategory = selectedCategoryId === 'all' ? undefined : selectedCategoryId
@@ -332,18 +320,22 @@ function QuestionsPage() {
       {/* Main Content Card */}
       <Card className="py-0">
         {/* Toolbar Filters */}
-        <div className="flex flex-col gap-3 p-5 pb-4">
+        <div className="flex flex-col gap-3 p-5 pb-0">
           <div className="flex flex-wrap items-center gap-3">
-            {/* Search Input */}
-            <div className="relative flex-1 max-w-xs min-w-[240px] group">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input
-                placeholder="Search questions by text..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 h-9.5 text-xs"
-              />
-            </div>
+            <SearchInput
+              placeholder="Search questions by text..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setPage(1)
+              }}
+              onClear={() => {
+                setSearch('')
+                setPage(1)
+              }}
+              containerClassName="flex-1 max-w-xs min-w-[240px]"
+              sizeVariant="default"
+            />
 
             {/* Grade Filter */}
             <SearchableSelect
@@ -483,22 +475,50 @@ function QuestionsPage() {
                   </TableRow>
                 ))
               ) : isError ? (
-                // Error State
-                <TableRow>
-                  <TableCell colSpan={8} className="py-12 text-center text-rose-500 font-medium text-xs">
-                    Failed to fetch questions. Please make sure the API server is online.
-                  </TableCell>
-                </TableRow>
+                <TableEmptyStateRow
+                  colSpan={8}
+                  variant="error"
+                  onAction={() => refetch()}
+                />
               ) : questions.length === 0 ? (
-                // Empty State
-                <TableRow>
-                  <TableCell colSpan={8} className="py-16 text-center">
-                    <div className="flex flex-col items-center gap-2 text-slate-400">
-                      <HelpCircle className="h-8 w-8 text-slate-300 dark:text-slate-700" />
-                      <p className="text-xs font-semibold">No questions found matching your filter options</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                debouncedSearch ? (
+                  <TableEmptyStateRow
+                    colSpan={8}
+                    variant="search"
+                    searchQuery={debouncedSearch}
+                    onClear={() => {
+                      setSearch('')
+                      setPage(1)
+                    }}
+                  />
+                ) : (selectedGradeId !== 'all' || selectedCategoryId !== 'all' || selectedType !== 'all' || selectedDifficulty !== 'all') ? (
+                  <TableEmptyStateRow
+                    colSpan={8}
+                    variant="filter"
+                    title="No questions match active filters"
+                    description="No questions were found with the selected filter criteria. Try adjusting or clearing your filters."
+                    onClear={() => {
+                      setSelectedGradeId('all')
+                      setSelectedCategoryId('all')
+                      setSelectedType('all')
+                      setSelectedDifficulty('all')
+                      setPage(1)
+                    }}
+                  />
+                ) : (
+                  <TableEmptyStateRow
+                    colSpan={8}
+                    variant="empty"
+                    title="No questions found"
+                    description="Get started by creating a question or importing questions in bulk."
+                    actionLabel="Create Question"
+                    actionIcon={Plus}
+                    onAction={() => {
+                      setActiveQuestion(null)
+                      setDialogOpen(true)
+                    }}
+                  />
+                )
               ) : (
                 // Data List rendered via TanStack Table
                 table.getRowModel().rows.map((row) => (

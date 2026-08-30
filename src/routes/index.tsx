@@ -218,30 +218,6 @@ function LandingPage() {
                 </li>
               </ul>
             </div>
-          
-            {/* Professional UI Mockup Right Column */}
-            {/* <div className="w-full lg:w-1/2">
-              <div className="relative rounded-xl bg-slate-900 p-2 shadow-2xl border border-slate-800 ring-1 ring-white/10 overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-8 bg-slate-900/50 border-b border-slate-800 flex items-center px-4 gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-700"></div>
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-700"></div>
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-700"></div>
-                </div>
-                <div className="mt-8 bg-black/50 rounded-lg border border-slate-800 p-4 font-mono text-xs text-slate-400 overflow-x-auto">
-                  <div className="flex gap-4 mb-2"><span className="text-amber-500">POST</span> <span>/api/v1/schools/tenant/verify</span></div>
-                  <div className="text-slate-500">{"{"}</div>
-                  <div className="pl-4"><span className="text-sky-400">"school_id"</span>: <span className="text-orange-300">1042</span>,</div>
-                  <div className="pl-4"><span className="text-sky-400">"grade_level"</span>: <span className="text-green-400">"Grade 10"</span>,</div>
-                  <div className="pl-4"><span className="text-sky-400">"student_token"</span>: <span className="text-green-400">"ey..."</span></div>
-                  <div className="text-slate-500">{"}"}</div>
-                  <div className="mt-4 flex gap-4 mb-2"><span className="text-green-500">200 OK</span> <span>12ms</span></div>
-                  <div className="text-slate-500">{"{"}</div>
-                  <div className="pl-4"><span className="text-sky-400">"status"</span>: <span className="text-green-400">"verified"</span>,</div>
-                  <div className="pl-4"><span className="text-sky-400">"permissions"</span>: [<span className="text-green-400">"READ_EXAM"</span>, <span className="text-green-400">"JOIN_ROOM"</span>]</div>
-                  <div className="text-slate-500">{"}"}</div>
-                </div>
-              </div>
-            </div> */}
           </div>
         </section>
       </main>

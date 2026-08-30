@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -10,14 +10,14 @@ import {
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
+import { SearchInput } from '@/components/ui/shared'
 import {
   useRolePermissionsQuery,
   useUpdateRolePermissionsMutation,
 } from '../_hooks/useRolesPermissions'
-import { Loader2, ShieldAlert, Search, CheckSquare, Square } from 'lucide-react'
+import { Loader2, ShieldAlert, CheckSquare, Square } from 'lucide-react'
 
 interface ManagePermissionsDialogProps {
   open: boolean
@@ -92,26 +92,32 @@ export function ManagePermissionsDialog({
     )
   }
 
-  const allPermissions = data?.data?.permissions || []
-  const filteredPermissions = allPermissions.filter((p) => {
-    const permName = (p.name || '').toLowerCase()
-    const permResource = (p.resource || (p.name?.includes(':') ? p.name.split(':')[0] : '')).toLowerCase()
-    const permAction = (p.action || (p.name?.includes(':') ? p.name.split(':')[1] : '')).toLowerCase()
-    const searchLower = (search || '').toLowerCase()
+  const allPermissions = useMemo(() => data?.data?.permissions || [], [data?.data?.permissions])
 
-    return (
-      permName.includes(searchLower) ||
-      permResource.includes(searchLower) ||
-      permAction.includes(searchLower)
-    )
-  })
+  const filteredPermissions = useMemo(() => {
+    if (!search.trim()) return allPermissions
+    const searchLower = search.toLowerCase()
+    return allPermissions.filter((p) => {
+      const permName = (p.name || '').toLowerCase()
+      const permResource = (p.resource || (p.name?.includes(':') ? p.name.split(':')[0] : '')).toLowerCase()
+      const permAction = (p.action || (p.name?.includes(':') ? p.name.split(':')[1] : '')).toLowerCase()
 
-  const groupedPermissions = filteredPermissions.reduce((acc, perm) => {
-    const resourceKey = perm.resource || (perm.name?.includes(':') ? perm.name.split(':')[0] : 'general')
-    if (!acc[resourceKey]) acc[resourceKey] = []
-    acc[resourceKey].push(perm)
-    return acc
-  }, {} as Record<string, typeof allPermissions>)
+      return (
+        permName.includes(searchLower) ||
+        permResource.includes(searchLower) ||
+        permAction.includes(searchLower)
+      )
+    })
+  }, [allPermissions, search])
+
+  const groupedPermissions = useMemo(() => {
+    return filteredPermissions.reduce((acc, perm) => {
+      const resourceKey = perm.resource || (perm.name?.includes(':') ? perm.name.split(':')[0] : 'general')
+      if (!acc[resourceKey]) acc[resourceKey] = []
+      acc[resourceKey].push(perm)
+      return acc
+    }, {} as Record<string, typeof allPermissions>)
+  }, [filteredPermissions, allPermissions])
 
   const isSaving = updateMutation.isPending
 
@@ -131,16 +137,15 @@ export function ManagePermissionsDialog({
         </DialogHeader>
 
         <div className="flex flex-col sm:flex-row items-center gap-3 py-3 border-b border-slate-100 dark:border-slate-800">
-          <div className="relative flex-1 w-full group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
-            <Input
-              placeholder="Search permissions..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 h-9 text-xs"
-              disabled={isLoading}
-            />
-          </div>
+          <SearchInput
+            placeholder="Search permissions..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onClear={() => setSearch('')}
+            disabled={isLoading}
+            containerClassName="flex-1 w-full"
+            sizeVariant="default"
+          />
           
           <div className="flex gap-2 w-full sm:w-auto">
             <Button

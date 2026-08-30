@@ -1,8 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/components/ui/page-header'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -23,13 +22,12 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from '@/components/ui/pagination'
-import { SearchableSelect } from '@/components/ui/shared/SearchableSelect'
+import { SearchableSelect, TableEmptyStateRow, SearchInput } from '@/components/ui/shared'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import {
-  Search,
   RefreshCw,
   Plus,
   Loader2,
-  BookOpen,
   Coins,
 } from 'lucide-react'
 import { ActionButton } from '@/components/ui/action-button'
@@ -49,7 +47,7 @@ function QuizPackagesPage() {
   const [page, setPage] = useState(1)
   const [limit] = useState(10)
   const [search, setSearch] = useState('')
-  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const debouncedSearch = useDebouncedValue(search, 350)
 
   // Filter States
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('all')
@@ -63,16 +61,6 @@ function QuizPackagesPage() {
 
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false)
   const [quizpackToDelete, setQuizpackToDelete] = useState<QuizPackageItem | null>(null)
-
-  // Debounce search query
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search)
-      setPage(1)
-    }, 400)
-
-    return () => clearTimeout(handler)
-  }, [search])
 
   const filterCategory = selectedCategoryId === 'all' ? undefined : selectedCategoryId
 
@@ -149,16 +137,20 @@ function QuizPackagesPage() {
         {/* Toolbar */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-5 pb-0">
           <div className="flex flex-1 items-center gap-3 max-w-2xl">
-            {/* Search Input */}
-            <div className="relative flex-1 group">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4" />
-              <Input
-                placeholder="Search packages by title..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 h-9.5 text-xs"
-              />
-            </div>
+            <SearchInput
+              placeholder="Search packages by title..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setPage(1)
+              }}
+              onClear={() => {
+                setSearch('')
+                setPage(1)
+              }}
+              containerClassName="flex-1"
+              sizeVariant="default"
+            />
 
             {/* Category Filter */}
             <SearchableSelect
@@ -237,20 +229,47 @@ function QuizPackagesPage() {
                   </TableRow>
                 ))
               ) : isError ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="py-12 text-center text-rose-500 font-medium text-xs">
-                    Failed to fetch quiz packages. Please make sure the API server is online.
-                  </TableCell>
-                </TableRow>
+                <TableEmptyStateRow
+                  colSpan={6}
+                  variant="error"
+                  onAction={() => refetch()}
+                />
               ) : packages.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="py-16 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <BookOpen className="h-8 w-8" />
-                      <p className="text-xs font-semibold">No quiz packages found matching filters</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                debouncedSearch ? (
+                  <TableEmptyStateRow
+                    colSpan={6}
+                    variant="search"
+                    searchQuery={debouncedSearch}
+                    onClear={() => {
+                      setSearch('')
+                      setPage(1)
+                    }}
+                  />
+                ) : selectedCategoryId !== 'all' ? (
+                  <TableEmptyStateRow
+                    colSpan={6}
+                    variant="filter"
+                    title="No quiz packages found in this category"
+                    description="No quiz packages match the selected category. Try selecting a different category or reset your filter."
+                    onClear={() => {
+                      setSelectedCategoryId('all')
+                      setPage(1)
+                    }}
+                  />
+                ) : (
+                  <TableEmptyStateRow
+                    colSpan={6}
+                    variant="empty"
+                    title="No quiz packages created yet"
+                    description="Get started by creating your first quiz package."
+                    actionLabel="Create Quiz Package"
+                    actionIcon={Plus}
+                    onAction={() => {
+                      setActiveQuizpack(null)
+                      setDialogOpen(true)
+                    }}
+                  />
+                )
               ) : (
                 packages.map((pkg) => (
                   <TableRow key={pkg.id}>

@@ -1,8 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/components/ui/page-header'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -24,12 +23,12 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination'
 import { DeleteModal } from '@/components/ui/delete-modal'
+import { TableEmptyStateRow, SearchInput } from '@/components/ui/shared'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import {
-  Search,
   RefreshCw,
   Plus,
   Loader2,
-  FolderTree,
   Folder,
   Tag,
 } from 'lucide-react'
@@ -47,7 +46,7 @@ function CategoriesPage() {
   const [page, setPage] = useState(1)
   const [limit] = useState(10)
   const [search, setSearch] = useState('')
-  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const debouncedSearch = useDebouncedValue(search, 350)
 
   // Dialog triggers
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -55,16 +54,6 @@ function CategoriesPage() {
 
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false)
   const [categoryToDelete, setCategoryToDelete] = useState<CategoryItem | null>(null)
-
-  // Debounce search query
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search)
-      setPage(1) // Reset to first page on search change
-    }, 400)
-
-    return () => clearTimeout(handler)
-  }, [search])
 
   // Fetch categories using React Query
   const { data, isLoading, isFetching, isError, refetch } = useCategoriesQuery(page, limit, debouncedSearch)
@@ -116,15 +105,20 @@ function CategoriesPage() {
       <Card className="py-0">
         {/* Toolbar */}
         <div className="flex items-center justify-between gap-3 p-5 pb-0">
-          <div className="relative flex-1 max-w-md group">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4" />
-            <Input
-              placeholder="Search categories by English or Khmer name..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 h-9.5 text-xs"
-            />
-          </div>
+          <SearchInput
+            placeholder="Search categories by English or Khmer name..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
+            onClear={() => {
+              setSearch('')
+              setPage(1)
+            }}
+            containerClassName="flex-1 max-w-md"
+            sizeVariant="default"
+          />
 
           <Button
             variant="outline"
@@ -198,22 +192,36 @@ function CategoriesPage() {
                   </TableRow>
                 ))
               ) : isError ? (
-                // Error State
-                <TableRow>
-                  <TableCell colSpan={8} className="py-12 text-center text-rose-500 font-medium text-xs">
-                    Failed to fetch categories. Please make sure the API server is online.
-                  </TableCell>
-                </TableRow>
+                <TableEmptyStateRow
+                  colSpan={8}
+                  variant="error"
+                  onAction={() => refetch()}
+                />
               ) : categories.length === 0 ? (
-                // Empty State
-                <TableRow>
-                  <TableCell colSpan={8} className="py-16 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <FolderTree className="h-8 w-8" />
-                      <p className="text-xs font-semibold">No categories found matching your query</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                debouncedSearch ? (
+                  <TableEmptyStateRow
+                    colSpan={8}
+                    variant="search"
+                    searchQuery={debouncedSearch}
+                    onClear={() => {
+                      setSearch('')
+                      setPage(1)
+                    }}
+                  />
+                ) : (
+                  <TableEmptyStateRow
+                    colSpan={8}
+                    variant="empty"
+                    title="No categories created yet"
+                    description="Create your first quiz category to organize your question bank."
+                    actionLabel="Create Category"
+                    actionIcon={Plus}
+                    onAction={() => {
+                      setActiveCategory(null)
+                      setDialogOpen(true)
+                    }}
+                  />
+                )
               ) : (
                 // Data List
                 categories.map((cat) => (

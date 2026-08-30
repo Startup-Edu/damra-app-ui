@@ -1,8 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/components/ui/page-header'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -24,14 +23,14 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination'
 import {
-  Search,
   RefreshCw,
   Plus,
   Loader2,
-  FileQuestion,
 } from 'lucide-react'
 import { ActionButton } from '@/components/ui/action-button'
 import { DeleteModal } from '@/components/ui/delete-modal'
+import { TableEmptyStateRow, SearchInput } from '@/components/ui/shared'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { useQuestionTypesQuery, useDeleteQuestionTypeMutation } from './_hooks/useQuestiontype'
 import type { QuestionTypeConfigItem as QuestionTypeItem } from './_types/questiontype.types'
 import { QuestiontypeDialog } from './_components/QuestiontypeDialog'
@@ -45,7 +44,7 @@ function QuestionTypesPage() {
   const [page, setPage] = useState(1)
   const [limit] = useState(10)
   const [search, setSearch] = useState('')
-  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const debouncedSearch = useDebouncedValue(search, 350)
 
   // Dialog triggers
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -53,16 +52,6 @@ function QuestionTypesPage() {
 
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false)
   const [questiontypeToDelete, setQuestiontypeToDelete] = useState<QuestionTypeItem | null>(null)
-
-  // Debounce search query
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search)
-      setPage(1)
-    }, 400)
-
-    return () => clearTimeout(handler)
-  }, [search])
 
   // Fetch question types
   const { data, isLoading, isFetching, isError, refetch } = useQuestionTypesQuery(page, limit, debouncedSearch)
@@ -114,15 +103,20 @@ function QuestionTypesPage() {
       <Card className="py-0">
         {/* Toolbar */}
         <div className="flex items-center justify-between gap-3 p-5 pb-0">
-          <div className="relative flex-1 max-w-md group">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4" />
-            <Input
-              placeholder="Search question types by code or name..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 h-9.5 text-xs"
-            />
-          </div>
+          <SearchInput
+            placeholder="Search question types by code or name..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
+            onClear={() => {
+              setSearch('')
+              setPage(1)
+            }}
+            containerClassName="flex-1 max-w-md"
+            sizeVariant="default"
+          />
 
           <Button
             variant="outline"
@@ -189,22 +183,36 @@ function QuestionTypesPage() {
                   </TableRow>
                 ))
               ) : isError ? (
-                // Error State
-                <TableRow>
-                  <TableCell colSpan={7} className="py-12 text-center text-rose-500 font-medium text-xs">
-                    Failed to fetch question types. Please make sure the API server is online.
-                  </TableCell>
-                </TableRow>
+                <TableEmptyStateRow
+                  colSpan={7}
+                  variant="error"
+                  onAction={() => refetch()}
+                />
               ) : questionTypes.length === 0 ? (
-                // Empty State
-                <TableRow>
-                  <TableCell colSpan={7} className="py-16 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <FileQuestion className="h-8 w-8" />
-                      <p className="text-xs font-semibold">No question types found matching search query</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                debouncedSearch ? (
+                  <TableEmptyStateRow
+                    colSpan={7}
+                    variant="search"
+                    searchQuery={debouncedSearch}
+                    onClear={() => {
+                      setSearch('')
+                      setPage(1)
+                    }}
+                  />
+                ) : (
+                  <TableEmptyStateRow
+                    colSpan={7}
+                    variant="empty"
+                    title="No question types configured"
+                    description="Configure your question types and validation schemas."
+                    actionLabel="Add Question Type"
+                    actionIcon={Plus}
+                    onAction={() => {
+                      setActiveQuestionType(null)
+                      setDialogOpen(true)
+                    }}
+                  />
+                )
               ) : (
                 // Data List
                 questionTypes.map((qt) => (
