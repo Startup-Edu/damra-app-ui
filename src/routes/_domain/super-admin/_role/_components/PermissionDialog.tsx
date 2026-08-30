@@ -39,9 +39,14 @@ export function PermissionDialog({ open, onOpenChange, permission }: PermissionD
   useEffect(() => {
     if (open) {
       if (permission) {
-        setAction(permission.action)
-        setResource(permission.resource)
-        setIsActive(permission.is_active)
+        const permName = permission.name || ''
+        const parts = permName.includes(':') ? permName.split(':') : []
+        const resName = permission.resource || (parts.length > 0 ? parts[0] : permName)
+        const actName = permission.action || (parts.length > 1 ? parts[1] : '')
+
+        setAction(actName || '')
+        setResource(resName || '')
+        setIsActive(permission.is_active ?? true)
       } else {
         setAction('')
         setResource('')
@@ -55,13 +60,16 @@ export function PermissionDialog({ open, onOpenChange, permission }: PermissionD
     e.preventDefault()
     setValidationError('')
 
-    if (!action.trim() || !resource.trim()) {
+    const actStr = (action || '').trim()
+    const resStr = (resource || '').trim()
+
+    if (!actStr || !resStr) {
       setValidationError('Both Action and Resource are required')
       return
     }
 
-    const cleanAction = action.trim().toLowerCase()
-    const cleanResource = resource.trim().toLowerCase()
+    const cleanAction = actStr.toLowerCase()
+    const cleanResource = resStr.toLowerCase()
     const name = `${cleanResource}:${cleanAction}`
 
     if (isEditing && permission) {
@@ -133,8 +141,8 @@ export function PermissionDialog({ open, onOpenChange, permission }: PermissionD
           <div className="text-[10px] text-slate-400 font-mono">
             Generated Permission Name:{' '}
             <span className="font-bold text-primary dark:text-primary-foreground">
-              {action.trim() && resource.trim()
-                ? `${resource.trim().toLowerCase()}:${action.trim().toLowerCase()}`
+              {(action || '').trim() && (resource || '').trim()
+                ? `${(resource || '').trim().toLowerCase()}:${(action || '').trim().toLowerCase()}`
                 : 'resource:action'}
             </span>
           </div>

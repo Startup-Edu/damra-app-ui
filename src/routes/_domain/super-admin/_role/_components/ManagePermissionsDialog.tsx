@@ -93,14 +93,21 @@ export function ManagePermissionsDialog({
   }
 
   const allPermissions = data?.data?.permissions || []
-  const filteredPermissions = allPermissions.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase()) ||
-    p.resource.toLowerCase().includes(search.toLowerCase()) ||
-    p.action.toLowerCase().includes(search.toLowerCase())
-  )
+  const filteredPermissions = allPermissions.filter((p) => {
+    const permName = (p.name || '').toLowerCase()
+    const permResource = (p.resource || (p.name?.includes(':') ? p.name.split(':')[0] : '')).toLowerCase()
+    const permAction = (p.action || (p.name?.includes(':') ? p.name.split(':')[1] : '')).toLowerCase()
+    const searchLower = (search || '').toLowerCase()
+
+    return (
+      permName.includes(searchLower) ||
+      permResource.includes(searchLower) ||
+      permAction.includes(searchLower)
+    )
+  })
 
   const groupedPermissions = filteredPermissions.reduce((acc, perm) => {
-    const resourceKey = perm.resource || 'general'
+    const resourceKey = perm.resource || (perm.name?.includes(':') ? perm.name.split(':')[0] : 'general')
     if (!acc[resourceKey]) acc[resourceKey] = []
     acc[resourceKey].push(perm)
     return acc
@@ -223,7 +230,7 @@ export function ManagePermissionsDialog({
                           >
                             <div className="flex flex-col gap-0.5">
                               <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 capitalize">
-                                {p.action}
+                                {p.action || (p.name?.includes(':') ? p.name.split(':')[1] : p.name)}
                               </span>
                               <span className="text-[9px] font-mono text-slate-400">
                                 {p.name}

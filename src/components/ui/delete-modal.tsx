@@ -13,7 +13,8 @@ import { Loader2 } from "lucide-react"
 
 export interface DeleteModalProps {
   open: boolean
-  onOpenChange: (open: boolean) => void
+  onOpenChange?: (open: boolean) => void
+  setOpen?: (open: boolean) => void
   title?: string
   description: React.ReactNode
   onConfirm: () => void
@@ -24,7 +25,8 @@ export interface DeleteModalProps {
 
 export function DeleteModal({
   open,
-  onOpenChange,
+  onOpenChange: propOnOpenChange,
+  setOpen: propSetOpen,
   title = "Are you absolutely sure?",
   description,
   onConfirm,
@@ -32,6 +34,7 @@ export function DeleteModal({
   confirmText = "Delete",
   cancelText = "Cancel",
 }: DeleteModalProps) {
+  const onOpenChange = propOnOpenChange || propSetOpen || (() => {})
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>

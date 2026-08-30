@@ -1,0 +1,15 @@
+import { createFileRoute } from '@tanstack/react-router'
+
+export const Route = createFileRoute(
+  '/_domain/super-admin/_question/components/QuestionImportDialog',
+)({
+  component: RouteComponent,
+})
+
+function RouteComponent() {
+  return (
+    <div>
+      Hello "/_domain/super-admin/_question/components/QuestionImportDialog"!
+    </div>
+  )
+}

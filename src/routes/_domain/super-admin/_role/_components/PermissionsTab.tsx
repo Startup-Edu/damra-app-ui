@@ -196,10 +196,10 @@ export function PermissionsTab() {
                   permissions.map((permission) => (
                     <TableRow key={permission.id}>
                       <TableCell className="pl-6 py-3 text-slate-800 dark:text-slate-200 capitalize font-medium text-xs">
-                        {permission.resource}
+                        {permission.resource || (permission.name?.includes(':') ? permission.name.split(':')[0] : permission.name || '-')}
                       </TableCell>
                       <TableCell className="text-slate-600 dark:text-slate-400 capitalize text-xs">
-                        {permission.action}
+                        {permission.action || (permission.name?.includes(':') ? permission.name.split(':')[1] : '-')}
                       </TableCell>
                       <TableCell className="py-3">
                         <Badge variant="outline" className="font-mono text-[9px] bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">

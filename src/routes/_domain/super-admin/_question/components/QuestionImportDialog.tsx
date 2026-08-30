@@ -25,10 +25,16 @@ import { ImportProgressResultView } from './import/ImportProgressResultView'
 
 interface QuestionImportDialogProps {
   open: boolean
-  onOpenChange: (open: boolean) => void
+  onOpenChange?: (open: boolean) => void
+  setOpen?: (open: boolean) => void
 }
 
-export function QuestionImportDialog({ open, onOpenChange }: QuestionImportDialogProps) {
+export function QuestionImportDialog({
+  open,
+  onOpenChange: propOnOpenChange,
+  setOpen: propSetOpen,
+}: QuestionImportDialogProps) {
+  const onOpenChange = propOnOpenChange || propSetOpen || (() => {})
   const fileInputId = useId()
   const [step, setStep] = useState<'configure' | 'importing' | 'result'>('configure')
   const [activeTab, setActiveTab] = useState<'file' | 'raw'>('file')
