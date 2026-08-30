@@ -1,8 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/components/ui/page-header'
 import { Avatar } from '@/components/ui/avatar'
@@ -25,12 +24,12 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination'
 import { DeleteModal } from '@/components/ui/delete-modal'
+import { TableEmptyStateRow, SearchInput } from '@/components/ui/shared'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import {
-  Search,
   RefreshCw,
   Plus,
   Loader2,
-  User as UserIcon,
 } from 'lucide-react'
 import { ActionButton } from '@/components/ui/action-button'
 import { useUsersQuery, useDeleteUserMutation } from './_user/_hooks/useUsers'
@@ -46,7 +45,7 @@ function UsersManagementPage() {
   const [page, setPage] = useState(1)
   const [limit] = useState(10)
   const [search, setSearch] = useState('')
-  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const debouncedSearch = useDebouncedValue(search, 350)
 
   // Dialog triggers
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -54,16 +53,6 @@ function UsersManagementPage() {
 
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState<UserItem | null>(null)
-
-  // Debounce search query to prevent excessive API calls
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search)
-      setPage(1) // Reset to first page on new search
-    }, 400)
-
-    return () => clearTimeout(handler)
-  }, [search])
 
   // Fetch users with React Query
   const { data, isLoading, isFetching, isError, refetch } = useUsersQuery(page, limit, debouncedSearch)
@@ -118,16 +107,21 @@ function UsersManagementPage() {
       <Card className="py-0">
         
         {/* Toolbar */}
-        <div className="flex items-center gap-3 p-6 pb-4">
-          <div className="relative flex-1 max-w-md group">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <Input
-              placeholder="Search users by name or email..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 h-10 text-xs"
-            />
-          </div>
+        <div className="flex items-center gap-3 p-5 pb-0">
+          <SearchInput
+            placeholder="Search users by name or email..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
+            onClear={() => {
+              setSearch('')
+              setPage(1)
+            }}
+            containerClassName="flex-1 max-w-md"
+            sizeVariant="lg"
+          />
           
           <Button
             variant="outline"
@@ -189,22 +183,33 @@ function UsersManagementPage() {
                     </TableRow>
                   ))
                 ) : isError ? (
-                  // Error state
-                  <TableRow>
-                    <TableCell colSpan={5} className="py-12 text-center text-rose-500 font-medium text-xs">
-                      Failed to fetch users. Please make sure the API server is online.
-                    </TableCell>
-                  </TableRow>
+                  <TableEmptyStateRow
+                    colSpan={5}
+                    variant="error"
+                    onAction={() => refetch()}
+                  />
                 ) : users.length === 0 ? (
-                  // Empty state
-                  <TableRow>
-                    <TableCell colSpan={5} className="py-16 text-center ">
-                      <div className="flex flex-col items-center gap-2">
-                        <UserIcon className="h-8 w-8 text-slate-300 dark:text-slate-700" />
-                        <p className="text-xs font-semibold">No users found matching your search</p>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                  debouncedSearch ? (
+                    <TableEmptyStateRow
+                      colSpan={5}
+                      variant="search"
+                      searchQuery={debouncedSearch}
+                      onClear={() => {
+                        setSearch('')
+                        setPage(1)
+                      }}
+                    />
+                  ) : (
+                    <TableEmptyStateRow
+                      colSpan={5}
+                      variant="empty"
+                      title="No users registered yet"
+                      description="Create your first administrative or system user to get started."
+                      actionLabel="Add User"
+                      actionIcon={Plus}
+                      onAction={handleAdd}
+                    />
+                  )
                 ) : (
                   // Data state
                   users.map((user) => (

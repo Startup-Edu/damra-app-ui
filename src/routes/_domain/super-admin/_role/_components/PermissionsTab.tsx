@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -31,13 +30,13 @@ import {
   AlertDialogAction,
 } from '@/components/ui/alert-dialog'
 import {
-  Search,
   RefreshCw,
   Plus,
   Loader2,
-  ShieldCheck,
 } from 'lucide-react'
 import { ActionButton } from '@/components/ui/action-button'
+import { TableEmptyStateRow, SearchInput } from '@/components/ui/shared'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { usePermissionsQuery, useDeletePermissionMutation } from '../_hooks/useRolesPermissions'
 import type { PermissionItem } from '../_types/rolesPermissions.types'
 import { PermissionDialog } from './PermissionDialog'
@@ -46,21 +45,13 @@ export function PermissionsTab() {
   const [page, setPage] = useState(1)
   const [limit] = useState(20)
   const [search, setSearch] = useState('')
-  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const debouncedSearch = useDebouncedValue(search, 350)
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [activePermission, setActivePermission] = useState<PermissionItem | null>(null)
 
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false)
   const [permissionToDelete, setPermissionToDelete] = useState<PermissionItem | null>(null)
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search)
-      setPage(1)
-    }, 400)
-    return () => clearTimeout(handler)
-  }, [search])
 
   const { data, isLoading, isError, refetch } = usePermissionsQuery(page, limit, debouncedSearch)
   const deleteMutation = useDeletePermissionMutation()
@@ -100,15 +91,20 @@ export function PermissionsTab() {
     <div className="space-y-4">
       <Card className="py-0">
         <div className="flex items-center gap-3 p-6 pb-4">
-          <div className="relative flex-1 max-w-md group">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <Input
-              placeholder="Search permissions..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 h-9 text-xs"
-            />
-          </div>
+          <SearchInput
+            placeholder="Search permissions..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
+            onClear={() => {
+              setSearch('')
+              setPage(1)
+            }}
+            containerClassName="flex-1 max-w-md"
+            sizeVariant="default"
+          />
 
           <div className="flex items-center gap-2">
             <Button
@@ -178,20 +174,36 @@ export function PermissionsTab() {
                     </TableRow>
                   ))
                 ) : isError ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="py-12 text-center text-rose-500 font-medium text-xs">
-                      Failed to fetch system permissions. Please check connection.
-                    </TableCell>
-                  </TableRow>
+                  <TableEmptyStateRow
+                    colSpan={5}
+                    variant="error"
+                    onAction={() => refetch()}
+                  />
                 ) : permissions.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="py-16 text-center">
-                      <div className="flex flex-col items-center gap-2 text-slate-400 dark:text-slate-600">
-                        <ShieldCheck className="h-8 w-8 opacity-60" />
-                        <p className="text-xs font-semibold">No permissions found</p>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                  debouncedSearch ? (
+                    <TableEmptyStateRow
+                      colSpan={5}
+                      variant="search"
+                      searchQuery={debouncedSearch}
+                      onClear={() => {
+                        setSearch('')
+                        setPage(1)
+                      }}
+                    />
+                  ) : (
+                    <TableEmptyStateRow
+                      colSpan={5}
+                      variant="empty"
+                      title="No permissions registered"
+                      description="Create system permissions for resource operations."
+                      actionLabel="Create Permission"
+                      actionIcon={Plus}
+                      onAction={() => {
+                        setActivePermission(null)
+                        setDialogOpen(true)
+                      }}
+                    />
+                  )
                 ) : (
                   permissions.map((permission) => (
                     <TableRow key={permission.id}>

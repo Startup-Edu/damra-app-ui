@@ -1,8 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/components/ui/page-header'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -24,23 +23,13 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
-  Search,
   RefreshCw,
   Plus,
   Loader2,
-  Layers,
-  Zap,
 } from 'lucide-react'
-import { ActionButton } from '@/components/ui/action-button'
 import { DeleteModal } from '@/components/ui/delete-modal'
-import { SearchableSelect } from '@/components/ui/shared/SearchableSelect'
+import { SearchableSelect, TableEmptyStateRow, SearchInput } from '@/components/ui/shared'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { useLearningPathsQuery, useDeleteLearningPathMutation } from './_hooks/useLearningPath'
 import { useCategoriesQuery } from '../_category/_hooks/useCategory'
 import { useGradesQuery } from '../_grade/_hooks/useGrade'
@@ -48,6 +37,7 @@ import type { LearningPathItem } from './_types/learningpath.types'
 import { LearningPathDialog } from './_components/LearningPathDialog'
 import { PathBuilderDialog } from './_components/PathBuilderDialog'
 import { toast } from 'sonner'
+import { ActionButton } from '@/components/ui/action-button'
 
 export const Route = createFileRoute('/_domain/super-admin/_learningpath/learning-path')({
   component: LearningPathPage,
@@ -57,7 +47,7 @@ function LearningPathPage() {
   const [page, setPage] = useState(1)
   const [limit] = useState(10)
   const [search, setSearch] = useState('')
-  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const debouncedSearch = useDebouncedValue(search, 350)
 
   // Filter States
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('all')
@@ -72,16 +62,6 @@ function LearningPathPage() {
 
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false)
   const [learningPathToDelete, setLearningPathToDelete] = useState<LearningPathItem | null>(null)
-
-  // Debounce search query
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search)
-      setPage(1) // Reset on search change
-    }, 400)
-
-    return () => clearTimeout(handler)
-  }, [search])
 
   // Filters mapping
   const filterCategory = selectedCategoryId === 'all' ? undefined : selectedCategoryId
@@ -175,16 +155,20 @@ function LearningPathPage() {
         {/* Toolbar */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-5 pb-0">
           <div className="flex flex-1 items-center gap-3 max-w-3xl">
-            {/* Search Input */}
-            <div className="relative flex-1 group">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4" />
-              <Input
-                placeholder="Search learning paths by English or Khmer title..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 h-9.5 text-xs"
-              />
-            </div>
+            <SearchInput
+              placeholder="Search learning paths by English or Khmer title..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setPage(1)
+              }}
+              onClear={() => {
+                setSearch('')
+                setPage(1)
+              }}
+              containerClassName="flex-1"
+              sizeVariant="default"
+            />
 
             {/* Category Filter */}
             <SearchableSelect
@@ -287,22 +271,48 @@ function LearningPathPage() {
                   </TableRow>
                 ))
               ) : isError ? (
-                // Error State
-                <TableRow>
-                  <TableCell colSpan={8} className="py-12 text-center text-rose-500 font-medium text-xs">
-                    Failed to fetch learning paths. Please make sure the API server is online.
-                  </TableCell>
-                </TableRow>
+                <TableEmptyStateRow
+                  colSpan={8}
+                  variant="error"
+                  onAction={() => refetch()}
+                />
               ) : learningPaths.length === 0 ? (
-                // Empty State
-                <TableRow>
-                  <TableCell colSpan={8} className="py-16 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <Layers className="h-8 w-8" />
-                      <p className="text-xs font-semibold">No learning paths found matching your filters</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                debouncedSearch ? (
+                  <TableEmptyStateRow
+                    colSpan={8}
+                    variant="search"
+                    searchQuery={debouncedSearch}
+                    onClear={() => {
+                      setSearch('')
+                      setPage(1)
+                    }}
+                  />
+                ) : (selectedCategoryId !== 'all' || selectedGradeId !== 'all') ? (
+                  <TableEmptyStateRow
+                    colSpan={8}
+                    variant="filter"
+                    title="No learning paths match active filters"
+                    description="No learning paths were found with the selected category or grade. Try adjusting or resetting your filters."
+                    onClear={() => {
+                      setSelectedCategoryId('all')
+                      setSelectedGradeId('all')
+                      setPage(1)
+                    }}
+                  />
+                ) : (
+                  <TableEmptyStateRow
+                    colSpan={8}
+                    variant="empty"
+                    title="No learning paths created yet"
+                    description="Create your first structured learning path with quiz packages."
+                    actionLabel="Create Learning Path"
+                    actionIcon={Plus}
+                    onAction={() => {
+                      setActiveLearningPath(null)
+                      setDialogOpen(true)
+                    }}
+                  />
+                )
               ) : (
                 // Data List
                 learningPaths.map((l) => {

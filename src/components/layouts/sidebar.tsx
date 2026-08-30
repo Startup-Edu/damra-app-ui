@@ -73,7 +73,7 @@ export function Sidebar() {
         <div className="flex h-16 shrink-0 items-center justify-between px-6 border-b border-border">
           <Link to="/" className="flex items-center gap-2 text-neutral-900 dark:text-white">
             <PanelsTopLeft className="h-6 w-6 text-neutral-700 dark:text-neutral-100" />
-            {isSidebarOpen && <span className="font-semibold text-lg tracking-tight">System</span>}
+            {isSidebarOpen && <span className="font-semibold text-lg tracking-tight">Damra App</span>}
           </Link>
           
           <button 
