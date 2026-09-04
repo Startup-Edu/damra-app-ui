@@ -50,7 +50,8 @@ export function PathBuilderDialog({ open, onOpenChange, learningPath }: PathBuil
     1,
     100,
     '',
-    fullPath?.category_id
+    fullPath?.category_id,
+    open && packageModalOpen
   )
   const allQuizPackages = quizPackagesResponse?.data || []
 

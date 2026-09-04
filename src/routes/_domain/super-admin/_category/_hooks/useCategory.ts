@@ -1,12 +1,14 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { superAdminCategoryService } from '../_services/category.service'
 import type { CreateCategoryDTO, UpdateCategoryDTO } from '../_types/category.types'
 import { toast } from 'sonner'
 
-export function useCategoriesQuery(page: number, limit: number, search: string, rootOnly = false) {
+export function useCategoriesQuery(page: number, limit: number, search: string, rootOnly = false, enabled = true) {
   return useQuery({
     queryKey: ['categories', page, limit, search, rootOnly],
     queryFn: () => superAdminCategoryService.listCategories(page, limit, search, rootOnly),
+    enabled,
+    placeholderData: keepPreviousData,
   })
 }
 

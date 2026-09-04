@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { superAdminLearningPathService } from '../_services/learningpath.service'
 import type {
   CreateLearningPathDTO,
@@ -8,10 +8,19 @@ import type {
 } from '../_types/learningpath.types'
 import { toast } from 'sonner'
 
-export function useLearningPathsQuery(page: number, limit: number, search: string, categoryId?: string, gradeId?: string) {
+export function useLearningPathsQuery(
+  page: number,
+  limit: number,
+  search: string,
+  categoryId?: string,
+  gradeId?: string,
+  enabled = true
+) {
   return useQuery({
     queryKey: ['learning-paths', page, limit, search, categoryId, gradeId],
     queryFn: () => superAdminLearningPathService.listLearningPaths(page, limit, search, categoryId, gradeId),
+    enabled,
+    placeholderData: keepPreviousData,
   })
 }
 

@@ -103,8 +103,8 @@ export function QuestionDialog({
   const updateMutation = useUpdateQuestionMutation()
 
   // Fetch grades and categories
-  const { data: gradesResponse, isLoading: gradesLoading } = useGradesQuery(1, 100, '')
-  const { data: allCategoriesResponse, isLoading: allCategoriesLoading } = useCategoriesQuery(1, 100, '', true)
+  const { data: gradesResponse, isLoading: gradesLoading } = useGradesQuery(1, 100, '', open)
+  const { data: allCategoriesResponse, isLoading: allCategoriesLoading } = useCategoriesQuery(1, 100, '', true, open)
 
   const grades = gradesResponse?.data || []
   const allCategories = allCategoriesResponse?.data || []

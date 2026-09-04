@@ -41,7 +41,11 @@ import { usePermissionsQuery, useDeletePermissionMutation } from '../_hooks/useR
 import type { PermissionItem } from '../_types/rolesPermissions.types'
 import { PermissionDialog } from './PermissionDialog'
 
-export function PermissionsTab() {
+interface PermissionsTabProps {
+  active?: boolean
+}
+
+export function PermissionsTab({ active = true }: PermissionsTabProps) {
   const [page, setPage] = useState(1)
   const [limit] = useState(20)
   const [search, setSearch] = useState('')
@@ -53,7 +57,7 @@ export function PermissionsTab() {
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false)
   const [permissionToDelete, setPermissionToDelete] = useState<PermissionItem | null>(null)
 
-  const { data, isLoading, isError, refetch } = usePermissionsQuery(page, limit, debouncedSearch)
+  const { data, isLoading, isError, refetch } = usePermissionsQuery(page, limit, debouncedSearch, active)
   const deleteMutation = useDeletePermissionMutation()
 
   const response = data

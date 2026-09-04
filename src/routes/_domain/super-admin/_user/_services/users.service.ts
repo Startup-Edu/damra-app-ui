@@ -30,7 +30,7 @@ export const superAdminUserService = {
   },
 
   listRolesDropdown: async () => {
-    return apiClient.get<{ success: boolean; data: { id: string; name: string }[] }>('/admin/roles')
+    return apiClient.get<{ success: boolean; data: { id: string; name: string }[] }>('/admin/roles/dropdownList')
   },
 }
 export const superAdminUsersService = superAdminUserService

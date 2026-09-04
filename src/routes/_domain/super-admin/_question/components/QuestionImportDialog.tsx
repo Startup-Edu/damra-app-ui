@@ -56,8 +56,8 @@ export function QuestionImportDialog({
   const [serverMessage, setServerMessage] = useState<string>('')
 
   // Queries & Mutations
-  const { data: gradesResponse, isLoading: gradesLoading } = useGradesQuery(1, 100, '')
-  const { data: allCategoriesResponse, isLoading: allCategoriesLoading } = useCategoriesQuery(1, 100, '', true)
+  const { data: gradesResponse, isLoading: gradesLoading } = useGradesQuery(1, 100, '', open)
+  const { data: allCategoriesResponse, isLoading: allCategoriesLoading } = useCategoriesQuery(1, 100, '', true, open)
   const { data: gradeCategoriesResponse, isLoading: gradeCategoriesLoading } = useGradeCategoriesQuery(presetGradeId, !!presetGradeId)
 
   const grades = gradesResponse?.data || []

@@ -6,7 +6,16 @@ import { routeTree } from './routeTree.gen'
 import { ThemeProvider } from '@/components/theme-provider' 
 import { Toaster } from '@/components/ui/sonner' // Import your new Toaster
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+})
 const router = createRouter({ routeTree })
 
 declare module '@tanstack/react-router' {

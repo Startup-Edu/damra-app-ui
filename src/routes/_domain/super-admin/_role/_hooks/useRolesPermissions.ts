@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { rolesPermissionsService } from '../_services/rolesPermissions.service'
 import type {
   CreateRoleDTO,
@@ -13,6 +13,7 @@ export function useRolesQuery(page: number, limit: number, search: string) {
   return useQuery({
     queryKey: ['roles', page, limit, search],
     queryFn: () => rolesPermissionsService.listRoles(page, limit, search),
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -65,10 +66,12 @@ export function useDeleteRoleMutation() {
   })
 }
 
-export function usePermissionsQuery(page: number, limit: number, search: string) {
+export function usePermissionsQuery(page: number, limit: number, search: string, enabled = true) {
   return useQuery({
     queryKey: ['permissions', page, limit, search],
     queryFn: () => rolesPermissionsService.listPermissions(page, limit, search),
+    enabled,
+    placeholderData: keepPreviousData,
   })
 }
 

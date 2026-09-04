@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { superAdminQuizPackageService } from '../_services/quizpack.service'
 import type {
   CreateQuizPackageDTO,
@@ -11,11 +11,14 @@ export function useQuizPackagesQuery(
   page: number,
   limit: number,
   search: string,
-  categoryId?: string
+  categoryId?: string,
+  enabled = true
 ) {
   return useQuery({
     queryKey: ['quiz-packages', page, limit, search, categoryId],
     queryFn: () => superAdminQuizPackageService.listQuizPackages(page, limit, search, categoryId),
+    enabled,
+    placeholderData: keepPreviousData,
   })
 }
 

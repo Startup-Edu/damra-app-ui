@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { superAdminQuestionTypeService } from '../_services/questiontype.service'
 import type {
   CreateQuestionTypeDTO,
@@ -10,6 +10,7 @@ export function useQuestionTypesQuery(page: number, limit: number, search: strin
   return useQuery({
     queryKey: ['question-types', page, limit, search],
     queryFn: () => superAdminQuestionTypeService.listQuestionTypes(page, limit, search),
+    placeholderData: keepPreviousData,
   })
 }
 

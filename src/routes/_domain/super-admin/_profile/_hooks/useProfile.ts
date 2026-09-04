@@ -7,7 +7,7 @@ export function useProfileQuery() {
   return useQuery({
     queryKey: ['admin-profile'],
     queryFn: async () => {
-      const res = await apiClient.get<{ success: boolean; data: AdminProfile }>('/admin/profile')
+      const res = await apiClient.get<{ success: boolean; data: AdminProfile }>('/admin/users/profile')
       return res.data
     },
   })
@@ -16,7 +16,7 @@ export function useProfileQuery() {
 export function useUpdateProfileMutation() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: UpdateProfileDTO) => apiClient.patch<{ success: boolean; message: string }>('/admin/profile', data),
+    mutationFn: (data: UpdateProfileDTO) => apiClient.post<{ success: boolean; message: string }>('/auth/profile', data),
     onSuccess: (res) => {
       if (res.success) {
         toast.success('Profile updated successfully')
@@ -31,7 +31,7 @@ export function useUpdateProfileMutation() {
 
 export function useChangePasswordMutation() {
   return useMutation({
-    mutationFn: (data: ChangePasswordDTO) => apiClient.post<{ success: boolean; message: string }>('/admin/profile/change-password', data),
+    mutationFn: (data: ChangePasswordDTO) => apiClient.post<{ success: boolean; message: string }>('/auth/profile', data),
     onSuccess: (res) => {
       if (res.success) {
         toast.success('Password changed successfully')

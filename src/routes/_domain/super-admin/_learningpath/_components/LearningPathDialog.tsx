@@ -54,15 +54,15 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
   const updateMutation = useUpdateLearningPathMutation()
 
   // Fetch grades for selection
-  const { data: gradesResponse, isLoading: gradesLoading } = useGradesQuery(1, 100, '')
+  const { data: gradesResponse, isLoading: gradesLoading } = useGradesQuery(1, 100, '', open)
   const grades = gradesResponse?.data || []
 
   // Fetch categories for all, or filter by grade
-  const { data: allCategoriesResponse, isLoading: allCategoriesLoading } = useCategoriesQuery(1, 100, '', true)
-  const { data: gradeCategoriesResponse, isLoading: gradeCategoriesLoading } = useGradeCategoriesQuery(gradeId, !!gradeId)
+  const { data: allCategoriesResponse, isLoading: allCategoriesLoading } = useCategoriesQuery(1, 100, '', true, open)
+  const { data: gradeCategoriesResponse, isLoading: gradeCategoriesLoading } = useGradeCategoriesQuery(gradeId, open && !!gradeId)
 
   // Fetch existing paths for the selected category & grade to suggest next sequence number
-  const { data: existingPathsResponse } = useLearningPathsQuery(1, 100, '', categoryId || undefined, gradeId || undefined)
+  const { data: existingPathsResponse } = useLearningPathsQuery(1, 100, '', categoryId || undefined, gradeId || undefined, open && !!(categoryId && gradeId))
   const existingPaths = existingPathsResponse?.data || []
 
   const allCategories = allCategoriesResponse?.data || []

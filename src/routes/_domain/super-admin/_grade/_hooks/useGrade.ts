@@ -1,12 +1,14 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { superAdminGradeService } from '../_services/grade.service'
 import type { CreateGradeDTO, UpdateGradeDTO } from '../_types/grade.types'
 import { toast } from 'sonner'
 
-export function useGradesQuery(page: number, limit: number, search: string) {
+export function useGradesQuery(page: number, limit: number, search: string, enabled = true) {
   return useQuery({
     queryKey: ['grades', page, limit, search],
     queryFn: () => superAdminGradeService.listGrades(page, limit, search),
+    enabled,
+    placeholderData: keepPreviousData,
   })
 }
 

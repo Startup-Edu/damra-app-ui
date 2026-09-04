@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { superAdminUserService } from '../_services/users.service'
 import type { CreateUserDTO, UpdateUserDTO } from '../_types/users.types'
 import { toast } from 'sonner'
@@ -7,6 +7,7 @@ export function useUsersQuery(page: number, limit: number, search: string) {
   return useQuery({
     queryKey: ['users', page, limit, search],
     queryFn: () => superAdminUserService.listUsers(page, limit, search),
+    placeholderData: keepPreviousData,
   })
 }
 

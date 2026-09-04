@@ -11,6 +11,6 @@ export interface UpdateProfileDTO {
 }
 
 export interface ChangePasswordDTO {
-  currentPassword?: string
-  newPassword?: string
+  password: string
+  confirmedPassword: string
 }

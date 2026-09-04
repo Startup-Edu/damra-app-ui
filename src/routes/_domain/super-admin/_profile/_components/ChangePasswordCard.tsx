@@ -43,7 +43,7 @@ export function ChangePasswordCard() {
     }
 
     passwordMutation.mutate(
-      { newPassword: password },
+      { password, confirmedPassword },
       {
         onSuccess: (res) => {
           if (res.success) {
