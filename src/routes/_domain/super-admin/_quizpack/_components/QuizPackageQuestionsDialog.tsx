@@ -22,6 +22,7 @@ import {
   ListOrdered,
   CheckSquare,
   Sparkles,
+  X,
 } from 'lucide-react'
 import { useQuizPackageQuery, useSyncQuizPackageQuestionsMutation } from '../_hooks/useQuizpack'
 import { useQuestionsQuery } from '../../_question/_hooks/useQuestion'

@@ -18,7 +18,7 @@ interface NavGroup {
 const navigationGroups: NavGroup[] = [
   {
     items: [
-      { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+      { name: 'Dashboard', href: '/super-admin', icon: LayoutDashboard },
     ]
   },
   {

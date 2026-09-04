@@ -99,7 +99,7 @@ function LoginPage() {
       })
       
       setAuth(data.data)
-      navigate({ to: '/super-admin/check-health' }) 
+      navigate({ to: '/super-admin' }) 
     },
     onError: (error) => {
       toast.error('Authentication Failed', {

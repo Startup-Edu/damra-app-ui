@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DomainSuperAdminRouteImport } from './routes/_domain/super-admin'
 import { Route as DomainAuthRouteImport } from './routes/_domain/auth'
+import { Route as DomainSuperAdminIndexRouteImport } from './routes/_domain/super-admin/index'
 import { Route as DomainSuperAdminUsersManagementRouteImport } from './routes/_domain/super-admin/users-management'
 import { Route as DomainSuperAdminRolesPermissionsRouteImport } from './routes/_domain/super-admin/roles-permissions'
 import { Route as DomainSuperAdminProfileRouteImport } from './routes/_domain/super-admin/profile'
@@ -40,6 +41,11 @@ const DomainAuthRoute = DomainAuthRouteImport.update({
   id: '/_domain/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DomainSuperAdminIndexRoute = DomainSuperAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DomainSuperAdminRoute,
 } as any)
 const DomainSuperAdminUsersManagementRoute =
   DomainSuperAdminUsersManagementRouteImport.update({
@@ -128,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/super-admin/profile': typeof DomainSuperAdminProfileRoute
   '/super-admin/roles-permissions': typeof DomainSuperAdminRolesPermissionsRoute
   '/super-admin/users-management': typeof DomainSuperAdminUsersManagementRoute
+  '/super-admin/': typeof DomainSuperAdminIndexRoute
   '/super-admin/category': typeof DomainSuperAdminCategoryCategoryRoute
   '/super-admin/grade': typeof DomainSuperAdminGradeGradeRoute
   '/super-admin/learning-path': typeof DomainSuperAdminLearningpathLearningPathRoute
@@ -138,7 +145,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof DomainAuthRouteWithChildren
-  '/super-admin': typeof DomainSuperAdminRouteWithChildren
   '/auth/forget-password': typeof DomainAuthForgetPasswordRoute
   '/auth/login': typeof DomainAuthLoginRoute
   '/auth/reset-password': typeof DomainAuthResetPasswordRoute
@@ -146,6 +152,7 @@ export interface FileRoutesByTo {
   '/super-admin/profile': typeof DomainSuperAdminProfileRoute
   '/super-admin/roles-permissions': typeof DomainSuperAdminRolesPermissionsRoute
   '/super-admin/users-management': typeof DomainSuperAdminUsersManagementRoute
+  '/super-admin': typeof DomainSuperAdminIndexRoute
   '/super-admin/category': typeof DomainSuperAdminCategoryCategoryRoute
   '/super-admin/grade': typeof DomainSuperAdminGradeGradeRoute
   '/super-admin/learning-path': typeof DomainSuperAdminLearningpathLearningPathRoute
@@ -165,6 +172,7 @@ export interface FileRoutesById {
   '/_domain/super-admin/profile': typeof DomainSuperAdminProfileRoute
   '/_domain/super-admin/roles-permissions': typeof DomainSuperAdminRolesPermissionsRoute
   '/_domain/super-admin/users-management': typeof DomainSuperAdminUsersManagementRoute
+  '/_domain/super-admin/': typeof DomainSuperAdminIndexRoute
   '/_domain/super-admin/_category/category': typeof DomainSuperAdminCategoryCategoryRoute
   '/_domain/super-admin/_grade/grade': typeof DomainSuperAdminGradeGradeRoute
   '/_domain/super-admin/_learningpath/learning-path': typeof DomainSuperAdminLearningpathLearningPathRoute
@@ -185,6 +193,7 @@ export interface FileRouteTypes {
     | '/super-admin/profile'
     | '/super-admin/roles-permissions'
     | '/super-admin/users-management'
+    | '/super-admin/'
     | '/super-admin/category'
     | '/super-admin/grade'
     | '/super-admin/learning-path'
@@ -195,7 +204,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
-    | '/super-admin'
     | '/auth/forget-password'
     | '/auth/login'
     | '/auth/reset-password'
@@ -203,6 +211,7 @@ export interface FileRouteTypes {
     | '/super-admin/profile'
     | '/super-admin/roles-permissions'
     | '/super-admin/users-management'
+    | '/super-admin'
     | '/super-admin/category'
     | '/super-admin/grade'
     | '/super-admin/learning-path'
@@ -221,6 +230,7 @@ export interface FileRouteTypes {
     | '/_domain/super-admin/profile'
     | '/_domain/super-admin/roles-permissions'
     | '/_domain/super-admin/users-management'
+    | '/_domain/super-admin/'
     | '/_domain/super-admin/_category/category'
     | '/_domain/super-admin/_grade/grade'
     | '/_domain/super-admin/_learningpath/learning-path'
@@ -257,6 +267,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof DomainAuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_domain/super-admin/': {
+      id: '/_domain/super-admin/'
+      path: '/'
+      fullPath: '/super-admin/'
+      preLoaderRoute: typeof DomainSuperAdminIndexRouteImport
+      parentRoute: typeof DomainSuperAdminRoute
     }
     '/_domain/super-admin/users-management': {
       id: '/_domain/super-admin/users-management'
@@ -373,6 +390,7 @@ interface DomainSuperAdminRouteChildren {
   DomainSuperAdminProfileRoute: typeof DomainSuperAdminProfileRoute
   DomainSuperAdminRolesPermissionsRoute: typeof DomainSuperAdminRolesPermissionsRoute
   DomainSuperAdminUsersManagementRoute: typeof DomainSuperAdminUsersManagementRoute
+  DomainSuperAdminIndexRoute: typeof DomainSuperAdminIndexRoute
   DomainSuperAdminCategoryCategoryRoute: typeof DomainSuperAdminCategoryCategoryRoute
   DomainSuperAdminGradeGradeRoute: typeof DomainSuperAdminGradeGradeRoute
   DomainSuperAdminLearningpathLearningPathRoute: typeof DomainSuperAdminLearningpathLearningPathRoute
@@ -386,6 +404,7 @@ const DomainSuperAdminRouteChildren: DomainSuperAdminRouteChildren = {
   DomainSuperAdminProfileRoute: DomainSuperAdminProfileRoute,
   DomainSuperAdminRolesPermissionsRoute: DomainSuperAdminRolesPermissionsRoute,
   DomainSuperAdminUsersManagementRoute: DomainSuperAdminUsersManagementRoute,
+  DomainSuperAdminIndexRoute: DomainSuperAdminIndexRoute,
   DomainSuperAdminCategoryCategoryRoute: DomainSuperAdminCategoryCategoryRoute,
   DomainSuperAdminGradeGradeRoute: DomainSuperAdminGradeGradeRoute,
   DomainSuperAdminLearningpathLearningPathRoute:
