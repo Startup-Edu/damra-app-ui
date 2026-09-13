@@ -228,13 +228,13 @@ function CategoriesPage() {
                   <TableRow key={cat.id}>
                     {/* Icon Column */}
                     <TableCell className="pl-6 py-3.5">
-                      <div className="h-8 w-8 rounded-md bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center overflow-hidden shrink-0">
+                      <div className="size-8 rounded-md bg-muted/40 border border-border flex items-center justify-center overflow-hidden shrink-0">
                         {cat.icon_url ? (
-                          <img src={cat.icon_url} alt={cat.name_en} className="h-5 w-5 object-contain" />
+                          <img src={cat.icon_url} alt={cat.name_en} className="size-5 object-contain" />
                         ) : cat.parent_id ? (
-                          <Tag className="h-4 w-4 text-emerald-500" />
+                          <Tag className="size-4 text-emerald-500" />
                         ) : (
-                          <Folder className="h-4 w-4 text-blue-500 fill-blue-500/10" />
+                          <Folder className="size-4 text-blue-500 fill-blue-500/10" />
                         )}
                       </div>
                     </TableCell>
@@ -267,7 +267,7 @@ function CategoriesPage() {
                     {/* Hierarchy Level Column */}
                     <TableCell>
                       {cat.parent ? (
-                        <Badge variant="outline" className="bg-slate-50 dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 border-emerald-500/10 text-[10px] px-2 py-0.5 rounded-sm font-medium">
+                        <Badge variant="outline" className="bg-muted/40 text-emerald-600 dark:text-emerald-400 border-emerald-500/10 text-[10px] px-2 py-0.5 rounded-sm font-medium">
                           Subcategory of {cat.parent.name_en}
                         </Badge>
                       ) : (

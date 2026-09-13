@@ -34,7 +34,7 @@ function CheckHealthPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center py-12 text-slate-900 dark:text-slate-50">
+    <div className="flex flex-col items-center justify-center py-12 text-foreground">
       <div className="flex w-full max-w-md flex-col gap-6">
         
         {/* Welcome Section */}
@@ -49,7 +49,7 @@ function CheckHealthPage() {
           <h1 className="text-3xl font-bold tracking-tight">
             Damra Admin App
           </h1>
-          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          <p className="text-sm text-muted-foreground">
             A state-of-the-art admin interface connected to your secure authentication services.
           </p>
         </div>
@@ -59,11 +59,11 @@ function CheckHealthPage() {
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-emerald-500 dark:text-emerald-400 animate-pulse" />
+                <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+                  <Activity className="size-5 text-emerald-500 dark:text-emerald-400 animate-pulse" />
                   API Health Status
                 </CardTitle>
-                <CardDescription className="text-slate-500 dark:text-slate-400">
+                <CardDescription className="text-muted-foreground">
                   Verify real-time status of the backend API
                 </CardDescription>
               </div>
@@ -79,7 +79,7 @@ function CheckHealthPage() {
                 </Badge>
               )}
               {status === "idle" && (
-                <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                <Badge className="bg-muted text-muted-foreground border border-border">
                   Unchecked
                 </Badge>
               )}
@@ -88,32 +88,32 @@ function CheckHealthPage() {
           
           <CardContent className="space-y-4">
             {/* Status Display */}
-            <div className="rounded-xl border border-slate-200/50 dark:border-slate-800/50 bg-slate-50/50 dark:bg-slate-900/20 p-4 transition-all duration-300">
+            <div className="rounded-xl border border-border bg-muted/30 p-4 transition-all duration-300">
               {status === "idle" && (
-                <div className="flex flex-col items-center justify-center py-6 text-center text-slate-500 dark:text-slate-400 space-y-2">
-                  <Activity className="h-8 w-8 text-slate-400 dark:text-slate-600" />
-                  <p className="text-xs text-slate-500 dark:text-slate-400">No status data available yet. Run a check to fetch.</p>
+                <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground space-y-2">
+                  <Activity className="size-8 text-muted-foreground" />
+                  <p className="text-xs text-muted-foreground">No status data available yet. Run a check to fetch.</p>
                 </div>
               )}
 
               {status === "loading" && (
                 <div className="flex flex-col items-center justify-center py-6 text-center space-y-3">
-                  <Loader2 className="h-8 w-8 text-emerald-500 dark:text-emerald-400 animate-spin" />
-                  <p className="text-xs text-slate-500 dark:text-slate-400 animate-pulse">Contacting backend services...</p>
+                  <Loader2 className="size-8 text-emerald-500 dark:text-emerald-400 animate-spin" />
+                  <p className="text-xs text-muted-foreground animate-pulse">Contacting backend services...</p>
                 </div>
               )}
 
               {status === "success" && response && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2.5 text-emerald-600 dark:text-emerald-400">
-                    <CheckCircle2 className="h-5 w-5 shrink-0" />
+                    <CheckCircle2 className="size-5 shrink-0" />
                     <span className="font-semibold text-sm">Connection Successful</span>
                   </div>
-                  <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300 font-mono bg-white/70 dark:bg-slate-900/30 p-3 rounded-lg border border-slate-200/50 dark:border-slate-800/50">
-                    <div><span className="text-slate-400 dark:text-slate-500">endpoint:</span> /api/health</div>
-                    <div><span className="text-slate-400 dark:text-slate-500">response:</span> {JSON.stringify(response)}</div>
+                  <div className="space-y-1.5 text-xs text-foreground font-mono bg-card p-3 rounded-lg border border-border">
+                    <div><span className="text-muted-foreground">endpoint:</span> /api/health</div>
+                    <div><span className="text-muted-foreground">response:</span> {JSON.stringify(response)}</div>
                     {lastChecked && (
-                      <div><span className="text-slate-400 dark:text-slate-500">timestamp:</span> {lastChecked}</div>
+                      <div><span className="text-muted-foreground">timestamp:</span> {lastChecked}</div>
                     )}
                   </div>
                 </div>
@@ -122,13 +122,13 @@ function CheckHealthPage() {
               {status === "error" && error && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2.5 text-rose-600 dark:text-rose-400">
-                    <AlertTriangle className="h-5 w-5 shrink-0" />
+                    <AlertTriangle className="size-5 shrink-0" />
                     <span className="font-semibold text-sm">Connection Error</span>
                   </div>
-                  <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300 font-mono bg-white/70 dark:bg-slate-900/30 p-3 rounded-lg border border-slate-200/50 dark:border-slate-800/50">
-                    <div className="text-rose-500 dark:text-rose-400/90"><span className="text-slate-400 dark:text-slate-500">error:</span> {error}</div>
+                  <div className="space-y-1.5 text-xs text-foreground font-mono bg-card p-3 rounded-lg border border-border">
+                    <div className="text-destructive"><span className="text-muted-foreground">error:</span> {error}</div>
                     {lastChecked && (
-                      <div><span className="text-slate-400 dark:text-slate-500">failed at:</span> {lastChecked}</div>
+                      <div><span className="text-muted-foreground">failed at:</span> {lastChecked}</div>
                     )}
                   </div>
                 </div>

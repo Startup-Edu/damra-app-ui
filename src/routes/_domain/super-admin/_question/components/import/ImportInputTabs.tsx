@@ -25,10 +25,10 @@ export function ImportInputTabs({
     <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
       <TabsList className="grid grid-cols-2 w-[320px] h-9 mb-4">
         <TabsTrigger value="file" className="text-xs gap-1.5">
-          <UploadCloud className="h-3.5 w-3.5" /> JSON File Upload
+          <UploadCloud className="size-3.5" /> JSON File Upload
         </TabsTrigger>
         <TabsTrigger value="raw" className="text-xs gap-1.5">
-          <Code2 className="h-3.5 w-3.5" /> Paste Raw JSON
+          <Code2 className="size-3.5" /> Paste Raw JSON
         </TabsTrigger>
       </TabsList>
 
@@ -36,13 +36,13 @@ export function ImportInputTabs({
       <TabsContent value="file" className="mt-0">
         <label
           htmlFor={fileInputId}
-          className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20 hover:bg-slate-100/50 dark:hover:bg-slate-900/40 cursor-pointer transition-colors"
+          className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-xl border-border bg-muted/20 hover:bg-muted/40 cursor-pointer transition-colors"
         >
-          <UploadCloud className="h-8 w-8 text-slate-400 mb-2" />
-          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+          <UploadCloud className="size-8 text-muted-foreground mb-2" />
+          <span className="text-xs font-semibold text-foreground">
             {selectedFileName ? selectedFileName : 'Drop your .json file here, or click to browse'}
           </span>
-          <span className="text-[10px] text-slate-400 mt-1">
+          <span className="text-[10px] text-muted-foreground mt-1">
             Supports JSON array of question objects
           </span>
           <input

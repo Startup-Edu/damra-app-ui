@@ -66,7 +66,7 @@ export function SearchableMultiSelect({
 }: SearchableMultiSelectProps) {
   const [open, setOpen] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState('')
-  const parentRef = React.useRef<HTMLDivElement>(null)
+  const [scrollElement, setScrollElement] = React.useState<HTMLDivElement | null>(null)
 
   const selectedValuesSet = React.useMemo(() => new Set(value), [value])
 
@@ -114,21 +114,44 @@ export function SearchableMultiSelect({
   // Virtualizer setup
   const rowVirtualizer = useVirtualizer({
     count: filteredOptions.length,
-    getScrollElement: () => parentRef.current,
+    getScrollElement: () => scrollElement,
     estimateSize: () => estimateSize,
     overscan: 5,
   })
 
   // Measure container immediately on layout mount & open
   React.useLayoutEffect(() => {
-    if (open) {
+    if (open && scrollElement) {
       rowVirtualizer.measure()
       const raf = requestAnimationFrame(() => {
         rowVirtualizer.measure()
       })
       return () => cancelAnimationFrame(raf)
     }
-  }, [open, searchQuery, filteredOptions.length])
+  }, [open, scrollElement, searchQuery, filteredOptions.length])
+
+  // Prevent Radix Dialog / parent scroll lock (e.g. react-remove-scroll) from suppressing wheel/touch scrolling
+  React.useEffect(() => {
+    if (!scrollElement) return
+
+    const handleWheel = (e: WheelEvent) => {
+      e.stopPropagation()
+      if (e.defaultPrevented) {
+        scrollElement.scrollTop += e.deltaY
+      }
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      e.stopPropagation()
+    }
+
+    scrollElement.addEventListener('wheel', handleWheel, { passive: false })
+    scrollElement.addEventListener('touchmove', handleTouchMove, { passive: true })
+    return () => {
+      scrollElement.removeEventListener('wheel', handleWheel)
+      scrollElement.removeEventListener('touchmove', handleTouchMove)
+    }
+  }, [scrollElement])
 
   // Get virtual items or fallback if initial measurement hasn't completed
   const rawVirtualItems = rowVirtualizer.getVirtualItems()
@@ -236,6 +259,7 @@ export function SearchableMultiSelect({
           contentClassName
         )}
         align="start"
+        onWheel={(e) => e.stopPropagation()}
       >
         <div className="flex flex-col">
           {/* Search Header */}
@@ -288,12 +312,12 @@ export function SearchableMultiSelect({
             </div>
           ) : (
             <div
-              ref={parentRef}
+              ref={setScrollElement}
               style={{
                 height: `${containerHeight}px`,
                 maxHeight: `${maxHeight}px`,
               }}
-              className="overflow-y-auto custom-scrollbar p-1 relative"
+              className="overflow-y-auto custom-scrollbar p-1 relative overscroll-contain"
             >
               <div
                 style={{

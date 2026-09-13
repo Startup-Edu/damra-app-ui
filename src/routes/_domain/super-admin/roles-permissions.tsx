@@ -15,7 +15,7 @@ function RolesPermissionsPage() {
   const [tab, setTab] = useState<'roles' | 'permissions'>('roles')
 
   return (
-    <div className="text-slate-900 dark:text-slate-50">
+    <div className="text-foreground">
       {/* Page Header */}
       <PageHeader
         title="Roles & Permissions"
@@ -24,7 +24,7 @@ function RolesPermissionsPage() {
 
       {/* Tabs Container */}
       <Tabs value={tab} onValueChange={(v) => setTab(v as 'roles' | 'permissions')} className="w-full">
-        <div className="border-b border-slate-100 dark:border-slate-800 pb-px mb-4">
+        <div className="border-b border-border pb-px mb-4">
           <TabsList variant="line" className="h-9 gap-4">
             <TabsTrigger value="roles" className="px-1.5 pb-2 pt-1 h-9 rounded-none text-xs font-semibold">
               <ShieldCheck className="mr-1.5 h-3.5 w-3.5" /> Roles Management

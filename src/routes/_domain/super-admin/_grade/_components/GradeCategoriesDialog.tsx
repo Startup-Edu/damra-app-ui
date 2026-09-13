@@ -75,7 +75,7 @@ export function GradeCategoriesDialog({ open, onOpenChange, grade }: GradeCatego
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 min-h-0 w-full p-4 overflow-y-auto">
+        <div className="flex-1 min-h-0 w-full p-4 overflow-y-auto custom-scrollbar">
           {isLoading ? (
             <div className="flex items-center justify-center py-12 text-xs">
               <Loader2 className="h-5 w-5 animate-spin mr-2" /> Loading assigned categories...

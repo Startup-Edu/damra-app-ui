@@ -140,16 +140,16 @@ export function RolesTab() {
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="pl-6 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  <TableHead className="pl-6 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                     Role Name
                   </TableHead>
-                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                     Created Date
                   </TableHead>
-                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                     Status
                   </TableHead>
-                  <TableHead className="pr-6 text-right text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  <TableHead className="pr-6 text-right text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                     Actions
                   </TableHead>
                 </TableRow>
@@ -212,11 +212,11 @@ export function RolesTab() {
                   roles.map((role) => (
                     <TableRow key={role.id}>
                       <TableCell className="pl-6 py-3.5">
-                        <span className="font-bold text-slate-800 dark:text-slate-200 tracking-wide text-xs">
+                        <span className="font-bold text-foreground tracking-wide text-xs">
                           {role.name}
                         </span>
                       </TableCell>
-                      <TableCell className="text-slate-500 text-xs">
+                      <TableCell className="text-muted-foreground text-xs">
                         {role.created_at}
                       </TableCell>
                       <TableCell>
@@ -257,13 +257,13 @@ export function RolesTab() {
           </div>
 
           {!isLoading && !isError && roles.length > 0 && (
-            <div className="flex items-center justify-between p-4 px-6 border-t bg-slate-50/30 dark:bg-slate-950/10">
-              <div className="text-xs text-slate-500 dark:text-slate-400">
-                Showing <span className="font-semibold text-slate-900 dark:text-slate-100">{((page - 1) * limit) + 1}</span> to{" "}
-                <span className="font-semibold text-slate-900 dark:text-slate-100">
+            <div className="flex items-center justify-between p-4 px-6 border-t bg-muted/30">
+              <div className="text-xs text-muted-foreground">
+                Showing <span className="font-semibold text-foreground">{((page - 1) * limit) + 1}</span> to{" "}
+                <span className="font-semibold text-foreground">
                   {Math.min(page * limit, totalElements)}
                 </span>{" "}
-                of <span className="font-semibold text-slate-900 dark:text-slate-100">{totalElements}</span> roles
+                of <span className="font-semibold text-foreground">{totalElements}</span> roles
               </div>
 
               <Pagination className="mx-0 w-auto">
@@ -301,14 +301,14 @@ export function RolesTab() {
                     if (pageNum === 2 && page > 3) {
                       return (
                         <PaginationItem key="ellipsis-start">
-                          <span className="px-2 text-slate-400 text-xs">...</span>
+                          <span className="px-2 text-muted-foreground text-xs">...</span>
                         </PaginationItem>
                       )
                     }
                     if (pageNum === totalPages - 1 && page < totalPages - 2) {
                       return (
                         <PaginationItem key="ellipsis-end">
-                          <span className="px-2 text-slate-400 text-xs">...</span>
+                          <span className="px-2 text-muted-foreground text-xs">...</span>
                         </PaginationItem>
                       )
                     }
@@ -344,11 +344,11 @@ export function RolesTab() {
       )}
 
       <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
-        <AlertDialogContent className="max-w-md p-6 text-slate-900 dark:text-slate-50 border border-slate-100 dark:border-slate-800">
+        <AlertDialogContent className="max-w-md p-6">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-base font-bold">Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription className="text-xs text-slate-500 dark:text-slate-400">
-              This will soft-delete the role <span className="font-semibold text-slate-800 dark:text-slate-200">"{roleToDelete?.name}"</span>. 
+            <AlertDialogDescription className="text-xs text-muted-foreground">
+              This will soft-delete the role <span className="font-semibold text-foreground">"{roleToDelete?.name}"</span>. 
               Users currently assigned to this role might experience authentication issues.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -360,9 +360,9 @@ export function RolesTab() {
                 handleDeleteConfirm()
               }}
               disabled={deleteMutation.isPending}
-              className="h-9 text-xs bg-rose-600 text-white hover:bg-rose-700 dark:bg-rose-600 dark:hover:bg-rose-700"
+              className="h-9 text-xs bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleteMutation.isPending && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
+              {deleteMutation.isPending && <Loader2 className="mr-2 size-3.5 animate-spin" />}
               Delete Role
             </AlertDialogAction>
           </AlertDialogFooter>

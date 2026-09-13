@@ -22,7 +22,7 @@ const actionConfig = {
   delete: {
     icon: Trash2,
     defaultTooltip: "Delete",
-    className: "text-slate-400 hover:text-rose-500 hover:bg-rose-500/5 dark:text-slate-500 dark:hover:text-rose-400 dark:hover:bg-rose-500/10",
+    className: "text-muted-foreground hover:text-destructive hover:bg-destructive/10",
   },
   view: {
     icon: Eye,
@@ -32,7 +32,7 @@ const actionConfig = {
   setting: {
     icon: Settings,
     defaultTooltip: "Settings",
-    className: "text-slate-500 hover:text-slate-700 hover:bg-slate-500/5 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-500/10",
+    className: "text-muted-foreground hover:text-foreground hover:bg-accent",
   },
   key: {
     icon: Key,

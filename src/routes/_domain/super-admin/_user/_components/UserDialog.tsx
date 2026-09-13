@@ -162,12 +162,12 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] text-slate-900 dark:text-slate-50 shadow-xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+      <DialogContent className="sm:max-w-[480px] shadow-xl max-h-[90vh] overflow-y-auto custom-scrollbar">
         <DialogHeader className="space-y-1.5">
           <DialogTitle className="text-lg font-bold">
             {isEditing ? 'Modify User Profile' : 'Register New User'}
           </DialogTitle>
-          <DialogDescription className="text-xs text-slate-500 dark:text-slate-400">
+          <DialogDescription className="text-xs">
             {isEditing
               ? 'Update account information, modify roles, or toggle access permissions.'
               : 'Add a new member to the admin system. Fill in their authentication details.'}
@@ -178,18 +178,18 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
           {isEditing && (
             <div className="flex flex-col items-center gap-2 pb-2">
               <div className="relative group cursor-pointer" onClick={triggerFileSelect}>
-                <div className="h-16 w-16 rounded-full overflow-hidden border-2 border-slate-200 dark:border-slate-800 flex items-center justify-center bg-slate-100 dark:bg-slate-900">
+                <div className="size-16 rounded-full overflow-hidden border-2 border-border flex items-center justify-center bg-muted">
                   {imagePreview ? (
                     <img src={imagePreview} alt="Avatar Preview" className="h-full w-full object-cover" />
                   ) : (
-                    <User className="h-8 w-8 text-slate-400" />
+                    <User className="size-8 text-muted-foreground" />
                   )}
                 </div>
                 <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Camera className="h-4 w-4 text-white" />
+                  <Camera className="size-4 text-white" />
                 </div>
               </div>
-              <span className="text-[10px] text-slate-400">Click to upload photo</span>
+              <span className="text-[10px] text-muted-foreground">Click to upload photo</span>
               <input
                 type="file"
                 ref={fileInputRef}
@@ -203,7 +203,7 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="user-name" className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+              <Label htmlFor="user-name" className="text-[11px] font-semibold">
                 Full Name
               </Label>
               <Input
@@ -217,7 +217,7 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="user-email" className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+              <Label htmlFor="user-email" className="text-[11px] font-semibold">
                 Email Address
               </Label>
               <Input
@@ -234,7 +234,7 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
 
           {!isEditing && (
             <div className="space-y-1.5">
-              <Label htmlFor="user-pass" className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+              <Label htmlFor="user-pass" className="text-[11px] font-semibold">
                 Temporary Password
               </Label>
               <Input
@@ -246,14 +246,14 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
                 disabled={isLoading}
                 className="h-9.5 text-xs"
               />
-              <p className="text-[9px] text-slate-400 dark:text-slate-500 leading-tight">
+              <p className="text-[9px] text-muted-foreground leading-tight">
                 Requires minimum 8 characters with at least one uppercase, lowercase, number, and symbol.
               </p>
             </div>
           )}
 
           <div className="space-y-1.5">
-            <Label htmlFor="user-role" className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+            <Label htmlFor="user-role" className="text-[11px] font-semibold">
               Assigned Role
             </Label>
             <Select value={roleId} onValueChange={setRoleId} disabled={isLoading}>
@@ -281,12 +281,12 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
           </div>
 
           <div className="flex flex-col gap-3.5 pt-1.5">
-            <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50/50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border">
               <div className="space-y-0.5">
-                <Label htmlFor="user-status" className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                <Label htmlFor="user-status" className="text-[11px] font-semibold">
                   Allow System Access
                 </Label>
-                <p className="text-[9px] text-slate-400">
+                <p className="text-[9px] text-muted-foreground">
                   Inactive users will be blocked from logging into the portal.
                 </p>
               </div>
@@ -300,13 +300,13 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
           </div>
 
           {validationError && (
-            <div className="flex items-start gap-2 p-3 rounded-lg border border-rose-500/10 bg-rose-500/5 text-rose-500">
-              <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2 p-3 rounded-lg border border-destructive/20 bg-destructive/10 text-destructive">
+              <AlertTriangle className="size-4 shrink-0 mt-0.5" />
               <p className="text-xs font-medium leading-tight">{validationError}</p>
             </div>
           )}
 
-          <DialogFooter className="pt-3 border-t border-slate-100 dark:border-slate-800">
+          <DialogFooter className="pt-3 border-t border-border">
             <Button
               type="button"
               variant="outline"

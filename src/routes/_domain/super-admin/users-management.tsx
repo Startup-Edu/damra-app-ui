@@ -90,7 +90,7 @@ function UsersManagementPage() {
   }
 
   return (
-    <div className="text-slate-900 dark:text-slate-50">
+    <div className="text-foreground">
       
       {/* Page Header */}
       <PageHeader
@@ -218,7 +218,7 @@ function UsersManagementPage() {
                       <TableCell className="pl-6 py-3.5">
                         <div className="flex items-center gap-3">
                           <Avatar name={user.name} />
-                          <div className="font-semibold text-slate-900 dark:text-slate-100 text-xs">
+                          <div className="font-semibold text-foreground text-xs">
                             {user.name}
                             {user.default_data && (
                               <Badge variant="outline" className="ml-1.5 font-medium text-[9px] px-1.5 py-0 h-4 rounded-sm">
@@ -281,13 +281,13 @@ function UsersManagementPage() {
             </Table>
           {/* Pagination Footer */}
           {!isLoading && !isError && users.length > 0 && (
-            <div className="flex items-center justify-between p-4 px-6 border-t bg-slate-50/30 dark:bg-slate-950/10">
-              <div className="text-xs text-slate-500 dark:text-slate-400">
-                Showing <span className="font-semibold text-slate-900 dark:text-slate-100">{((page - 1) * limit) + 1}</span> to{" "}
-                <span className="font-semibold text-slate-900 dark:text-slate-100">
+            <div className="flex items-center justify-between p-4 px-6 border-t bg-muted/20">
+              <div className="text-xs text-muted-foreground">
+                Showing <span className="font-semibold text-foreground">{((page - 1) * limit) + 1}</span> to{" "}
+                <span className="font-semibold text-foreground">
                   {Math.min(page * limit, totalElements)}
                 </span>{" "}
-                of <span className="font-semibold text-slate-900 dark:text-slate-100">{totalElements}</span> users
+                of <span className="font-semibold text-foreground">{totalElements}</span> users
               </div>
               
               <Pagination className="mx-0 w-auto">
@@ -364,7 +364,7 @@ function UsersManagementPage() {
         onOpenChange={setDeleteAlertOpen}
         description={
           <>
-            This will permanently delete the user <span className="font-semibold text-slate-800 dark:text-slate-200">"{userToDelete?.name}"</span> ({userToDelete?.email}). 
+            This will permanently delete the user <span className="font-semibold text-foreground">"{userToDelete?.name}"</span> ({userToDelete?.email}). 
             All their profile data will be removed and their active sessions invalidated. This operation cannot be undone.
           </>
         }

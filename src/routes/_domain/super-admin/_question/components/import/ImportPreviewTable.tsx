@@ -36,7 +36,7 @@ export function ImportPreviewTable({
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Pre-Import Validation & Preview
           </h4>
           {parsedItems.length > 0 && (
@@ -72,15 +72,15 @@ export function ImportPreviewTable({
       )}
 
       {parsedItems.length === 0 ? (
-        <div className="p-8 text-center border border-dashed rounded-xl border-slate-200 dark:border-slate-800 text-slate-400">
-          <FileText className="h-6 w-6 mx-auto mb-2 opacity-50" />
+        <div className="p-8 text-center border border-dashed rounded-xl border-border text-muted-foreground">
+          <FileText className="size-6 mx-auto mb-2 opacity-50" />
           <p className="text-xs">Upload a JSON file or paste code above to preview questions.</p>
         </div>
       ) : (
-        <div className="border rounded-xl border-slate-100 dark:border-slate-800 overflow-hidden">
+        <div className="border rounded-xl border-border overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow className="bg-slate-50/50 dark:bg-slate-900/50 hover:bg-transparent">
+              <TableRow className="bg-muted/40 hover:bg-transparent">
                 <TableHead className="w-[40px] text-center">#</TableHead>
                 <TableHead>Question Text Preview</TableHead>
                 <TableHead className="w-[100px]">Type</TableHead>
@@ -92,16 +92,16 @@ export function ImportPreviewTable({
             <TableBody>
               {parsedItems.map((item) => (
                 <TableRow key={item.index}>
-                  <TableCell className="text-center font-mono text-[10px] text-slate-400">
+                  <TableCell className="text-center font-mono text-[10px] text-muted-foreground">
                     {item.index}
                   </TableCell>
                   <TableCell>
                     {item.raw ? (
                       <div>
-                        <div className="font-semibold text-xs text-slate-800 dark:text-slate-200 max-w-[280px] truncate">
+                        <div className="font-semibold text-xs text-foreground max-w-[280px] truncate">
                           {stripHtml(item.raw.question_text_en || item.raw.questionTextEn || '(No EN Text)')}
                         </div>
-                        <div className="text-[10px] text-slate-400 max-w-[280px] truncate">
+                        <div className="text-[10px] text-muted-foreground max-w-[280px] truncate">
                           {stripHtml(item.raw.question_text_kh || item.raw.questionTextKh || '(No KH Text)')}
                         </div>
                       </div>

@@ -163,16 +163,16 @@ export function QuestionImportDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[960px] md:max-w-[960px] w-[95vw] text-slate-900 dark:text-slate-50 border border-slate-100 dark:border-slate-800 shadow-xl max-h-[90vh] !flex !flex-col !p-0 !gap-0 overflow-hidden">
+      <DialogContent className="sm:max-w-[960px] md:max-w-[960px] w-[95vw] shadow-xl max-h-[90vh] !flex !flex-col !p-0 !gap-0 overflow-hidden">
         {/* Header */}
         <DialogHeader className="p-6 pb-4 border-b border-border shrink-0">
           <div className="flex items-center justify-between">
             <div>
               <DialogTitle className="text-lg font-bold flex items-center gap-2">
-                <FileJson className="h-5 w-5 text-primary" />
+                <FileJson className="size-5 text-primary" />
                 Bulk Question Import
               </DialogTitle>
-              <DialogDescription className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              <DialogDescription className="text-xs text-muted-foreground mt-1">
                 Upload or paste JSON data to import questions into the database repository with live validation.
               </DialogDescription>
             </div>
@@ -247,7 +247,7 @@ export function QuestionImportDialog({
 
         {/* Footer (Only shown during configure step) */}
         {step === 'configure' && (
-          <DialogFooter className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 shrink-0 flex items-center justify-between">
+          <DialogFooter className="p-6 border-t border-border bg-muted/40 shrink-0 flex items-center justify-between">
             <Button
               type="button"
               variant="outline"
@@ -265,11 +265,11 @@ export function QuestionImportDialog({
             >
               {importMutation.isPending ? (
                 <>
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Importing Questions...
+                  <Loader2 className="size-3.5 animate-spin" /> Importing Questions...
                 </>
               ) : (
                 <>
-                  <UploadCloud className="h-3.5 w-3.5" /> Import {validCount} Valid Question{validCount === 1 ? '' : 's'}
+                  <UploadCloud className="size-3.5" /> Import {validCount} Valid Question{validCount === 1 ? '' : 's'}
                 </>
               )}
             </Button>

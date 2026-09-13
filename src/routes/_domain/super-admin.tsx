@@ -20,10 +20,10 @@ function SuperAdminLayout() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50">
+      <div className="flex h-screen w-full items-center justify-center bg-background text-foreground">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-8 w-8 text-primary animate-spin" />
-          <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">Verifying session...</p>
+          <Loader2 className="size-8 text-primary animate-spin" />
+          <p className="text-sm font-semibold text-muted-foreground">Verifying session...</p>
         </div>
       </div>
     )

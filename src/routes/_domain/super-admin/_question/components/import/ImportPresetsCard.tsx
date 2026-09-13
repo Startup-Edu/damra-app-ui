@@ -45,11 +45,11 @@ export function ImportPresetsCard({
   setOverrideExisting,
 }: ImportPresetsCardProps) {
   return (
-    <Card className="border-slate-100 dark:border-slate-800 shadow-none bg-slate-50/50 dark:bg-slate-900/30">
+    <Card className="border-border shadow-none bg-muted/30">
       <CardHeader className="p-4 pb-2">
-        <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+        <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
           <span>Batch Presets & Field Overrides</span>
-          <div className="flex items-center gap-2 font-normal text-xs text-slate-600 dark:text-slate-400 normal-case">
+          <div className="flex items-center gap-2 font-normal text-xs text-muted-foreground normal-case">
             <Switch
               checked={overrideExisting}
               onCheckedChange={setOverrideExisting}
@@ -64,7 +64,7 @@ export function ImportPresetsCard({
       <CardContent className="p-4 pt-0 grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Grade Preset */}
         <div className="space-y-1.5 md:col-span-2">
-          <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+          <Label className="text-[11px] font-semibold">
             Target Grade <span className="text-rose-500">*</span>
           </Label>
           <Select
@@ -90,7 +90,7 @@ export function ImportPresetsCard({
 
         {/* Category Preset */}
         <div className="space-y-1.5 md:col-span-2">
-          <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+          <Label className="text-[11px] font-semibold">
             Target Category <span className="text-rose-500">*</span>
           </Label>
           <Select
@@ -113,7 +113,7 @@ export function ImportPresetsCard({
 
         {/* Difficulty Preset */}
         <div className="space-y-1.5 md:col-span-2">
-          <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+          <Label className="text-[11px] font-semibold">
             Default Difficulty
           </Label>
           <Select
@@ -133,7 +133,7 @@ export function ImportPresetsCard({
 
         {/* XP Value Preset */}
         <div className="space-y-1.5">
-          <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+          <Label className="text-[11px] font-semibold">
             Default XP Points
           </Label>
           <Input
@@ -147,7 +147,7 @@ export function ImportPresetsCard({
 
         {/* Timer Limit Preset */}
         <div className="space-y-1.5">
-          <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+          <Label className="text-[11px] font-semibold">
             Default Timer (Sec)
           </Label>
           <Input

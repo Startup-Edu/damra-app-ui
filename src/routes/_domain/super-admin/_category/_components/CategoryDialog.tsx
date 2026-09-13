@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -11,13 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { SearchableSelect } from '@/components/ui/shared'
 import {
   useCreateCategoryMutation,
   useUpdateCategoryMutation,
@@ -132,9 +126,23 @@ export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogP
   }
 
   // Filter out the category itself when editing (a category cannot be its own parent)
-  const parentCandidates = isEditing && category
-    ? rootCategories.filter((c) => c.id !== category.id)
-    : rootCategories
+  const parentCandidates = useMemo(() => {
+    return isEditing && category
+      ? rootCategories.filter((c) => c.id !== category.id)
+      : rootCategories
+  }, [isEditing, category, rootCategories])
+
+  const parentOptions = useMemo(() => {
+    const sorted = [...parentCandidates].sort((a, b) => (a.name_en || '').localeCompare(b.name_en || ''))
+    return [
+      { value: 'none', label: 'None (Root Category)', description: 'Top-level category' },
+      ...sorted.map((c) => ({
+        value: c.id,
+        label: c.name_en,
+        description: c.name_kh || undefined,
+      })),
+    ]
+  }, [parentCandidates])
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -247,30 +255,20 @@ export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogP
               <Label htmlFor="category-parent" className="text-[11px] font-semibold">
                 Parent Category (Hierarchy)
               </Label>
-              <Select value={parentId} onValueChange={setParentId} disabled={isLoading}>
-                <SelectTrigger id="category-parent" className="w-full h-9.5 text-xs border border-input">
-                  <SelectValue placeholder="Select a parent..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">None (Root Category)</SelectItem>
-                  {rootsLoading ? (
-                    <SelectItem value="loading" disabled>
-                      Loading root categories...
-                    </SelectItem>
-                  ) : parentCandidates.length === 0 ? (
-                    <SelectItem value="no-options" disabled>
-                      No parent candidates available
-                    </SelectItem>
-                  ) : (
-                    parentCandidates.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.name_en} ({c.name_kh})
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-              <p className="text-[9px]">Maximum of 2 hierarchy levels allowed.</p>
+              <SearchableSelect
+                id="category-parent"
+                options={parentOptions}
+                value={parentId}
+                onChange={(val) => setParentId(val || 'none')}
+                placeholder="Select a parent..."
+                searchPlaceholder="Search parent category..."
+                emptyMessage={rootsLoading ? 'Loading root categories...' : 'No parent categories found.'}
+                disabled={isLoading}
+                clearable={true}
+                triggerClassName="w-full h-9.5 text-xs"
+                contentClassName="w-[var(--radix-popover-trigger-width)] min-w-[240px]"
+              />
+              <p className="text-[9px] text-muted-foreground">Maximum of 2 hierarchy levels allowed.</p>
             </div>
 
             <div className="space-y-1.5">

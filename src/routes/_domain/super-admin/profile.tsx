@@ -9,7 +9,7 @@ export const Route = createFileRoute('/_domain/super-admin/profile')({
 
 function ProfilePage() {
   return (
-    <div className="p-6 max-w-2xl mx-auto w-full text-slate-900 dark:text-slate-50 space-y-6">
+    <div className="p-6 max-w-2xl mx-auto w-full text-foreground space-y-6">
       {/* Page Header */}
       <PageHeader
         title="Account Settings"

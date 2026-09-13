@@ -64,18 +64,18 @@ export function ChangePasswordCard() {
         <CardTitle className="text-base font-bold flex items-center gap-2">
           <KeyRound className="h-4.5 w-4.5 text-primary" /> Update Password
         </CardTitle>
-        <CardDescription className="text-xs font-medium text-slate-500 dark:text-slate-400">
+        <CardDescription className="text-xs font-medium text-muted-foreground">
           Secure your administrative account by changing your login credentials.
         </CardDescription>
       </CardHeader>
       <CardContent className="px-6 pb-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="new-password" className="text-xs font-semibold leading-none text-slate-700 dark:text-slate-300">
+            <Label htmlFor="new-password" className="text-xs font-semibold leading-none text-foreground">
               New Password
             </Label>
             <div className="relative group">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors duration-300" />
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors duration-300" />
               <Input
                 id="new-password"
                 type="password"
@@ -90,11 +90,11 @@ export function ChangePasswordCard() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="confirm-password" className="text-xs font-semibold leading-none text-slate-700 dark:text-slate-300">
+            <Label htmlFor="confirm-password" className="text-xs font-semibold leading-none text-foreground">
               Confirm New Password
             </Label>
             <div className="relative group">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors duration-300" />
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors duration-300" />
               <Input
                 id="confirm-password"
                 type="password"
@@ -109,8 +109,8 @@ export function ChangePasswordCard() {
           </div>
 
           {password && (
-            <div className="p-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-950/10 space-y-1.5">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+            <div className="p-3 rounded-lg border border-border bg-muted/20 space-y-1.5">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                 Complexity Checklist
               </span>
               <div className="grid grid-cols-2 gap-x-4 gap-y-1">
@@ -124,8 +124,8 @@ export function ChangePasswordCard() {
           )}
 
           {validationError && (
-            <div className="flex items-start gap-2 p-2.5 rounded-lg border border-rose-500/15 bg-rose-500/5 text-rose-500">
-              <ShieldAlert className="h-4 w-4 shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2 p-2.5 rounded-lg border border-destructive/20 bg-destructive/10 text-destructive">
+              <ShieldAlert className="size-4 shrink-0 mt-0.5" />
               <p className="text-[11px] font-medium leading-normal">{validationError}</p>
             </div>
           )}
@@ -141,12 +141,12 @@ export function ChangePasswordCard() {
               <span className="relative flex items-center justify-center gap-1.5">
                 {isPending ? (
                   <>
-                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                    <Loader2 className="mr-1.5 size-3.5 animate-spin" />
                     Updating...
                   </>
                 ) : (
                   <>
-                    <KeyRound className="mr-1.5 h-3.5 w-3.5" />
+                    <KeyRound className="mr-1.5 size-3.5" />
                     Save Password
                   </>
                 )}
@@ -169,11 +169,11 @@ function ChecklistItem({ label, checked, className }: ChecklistItemProps) {
   return (
     <div className={`flex items-center gap-1.5 text-[10px] ${className || ''}`}>
       {checked ? (
-        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+        <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
       ) : (
-        <XCircle className="h-3.5 w-3.5 text-slate-300 dark:text-slate-700 shrink-0" />
+        <XCircle className="size-3.5 text-muted-foreground/40 shrink-0" />
       )}
-      <span className={checked ? 'text-slate-700 dark:text-slate-300 font-medium' : 'text-slate-400'}>
+      <span className={checked ? 'text-foreground font-medium' : 'text-muted-foreground'}>
         {label}
       </span>
     </div>

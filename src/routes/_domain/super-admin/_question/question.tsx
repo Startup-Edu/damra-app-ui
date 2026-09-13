@@ -201,10 +201,10 @@ function QuestionsPage() {
         const q = info.row.original
         return (
           <div className="space-y-1">
-            <div className="font-semibold text-slate-900 dark:text-slate-100 text-xs max-w-[320px] truncate">
+            <div className="font-semibold text-foreground text-xs max-w-[320px] truncate">
               {cleanText(q.question_text_en)}
             </div>
-            <div className="text-xs text-slate-400 dark:text-slate-500 max-w-[320px] truncate">
+            <div className="text-xs text-muted-foreground max-w-[320px] truncate">
               {cleanText(q.question_text_kh)}
             </div>
           </div>
@@ -216,11 +216,11 @@ function QuestionsPage() {
       cell: (info) => {
         const grade = info.getValue()
         return grade ? (
-          <Badge variant="outline" className="bg-slate-50 dark:bg-slate-900 border">
+          <Badge variant="outline" className="bg-muted/50 border">
             {grade.name_en}
           </Badge>
         ) : (
-          <span className="text-slate-300 dark:text-slate-700">-</span>
+          <span className="text-muted-foreground/60">-</span>
         )
       },
     }),
@@ -231,7 +231,7 @@ function QuestionsPage() {
     columnHelper.accessor('question_type', {
       header: 'Type',
       cell: (info) => (
-        <Badge variant="secondary" className="font-bold text-[10px] uppercase bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+        <Badge variant="secondary" className="font-bold text-[10px] uppercase">
           {info.getValue()}
         </Badge>
       ),
@@ -290,7 +290,7 @@ function QuestionsPage() {
   })
 
   return (
-    <div className="text-slate-900 dark:text-slate-50 animate-fade-in">
+    <div className="text-foreground animate-fade-in">
       <QuestionDialog open={dialogOpen} setOpen={setDialogOpen} question={activeQuestion} />
       <QuestionDetailDialog open={detailDialogOpen} setOpen={setDetailDialogOpen} question={questionForDetail} />
       <QuestionImportDialog open={importDialogOpen} setOpen={setImportDialogOpen} />
@@ -545,13 +545,13 @@ function QuestionsPage() {
 
           {/* Pagination Footer */}
           {!isLoading && !isError && questions.length > 0 && (
-            <div className="flex items-center justify-between p-4 px-6 border-t bg-slate-50/30 dark:bg-slate-950/10">
-              <div className="text-xs text-slate-500 dark:text-slate-400">
-                Showing <span className="font-semibold text-slate-900 dark:text-slate-100">{((page - 1) * limit) + 1}</span> to{" "}
-                <span className="font-semibold text-slate-900 dark:text-slate-100">
+            <div className="flex items-center justify-between p-4 px-6 border-t bg-muted/30">
+              <div className="text-xs text-muted-foreground">
+                Showing <span className="font-semibold text-foreground">{((page - 1) * limit) + 1}</span> to{" "}
+                <span className="font-semibold text-foreground">
                   {Math.min(page * limit, totalElements)}
                 </span>{" "}
-                of <span className="font-semibold text-slate-900 dark:text-slate-100">{totalElements}</span> questions
+                of <span className="font-semibold text-foreground">{totalElements}</span> questions
               </div>
 
               <Pagination className="mx-0 w-auto">
@@ -634,7 +634,7 @@ function QuestionsPage() {
         onOpenChange={setDeleteAlertOpen}
         description={
           <>
-            This will permanently delete the question <span className="font-semibold text-slate-800 dark:text-slate-200">"{questionToDelete?.question_text_en}"</span>.
+            This will permanently delete the question <span className="font-semibold text-foreground">"{questionToDelete?.question_text_en}"</span>.
             This action cannot be undone.
           </>
         }

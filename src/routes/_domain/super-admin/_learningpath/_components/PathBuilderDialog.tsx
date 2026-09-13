@@ -508,7 +508,7 @@ export function PathBuilderDialog({ open, onOpenChange, learningPath }: PathBuil
                 <p className="text-xs font-semibold text-muted-foreground">
                   No Quiz Packages attached to this learning path roadmap yet.
                 </p>
-                <Button type="button" onClick={handleOpenPackageSelector} variant="outline" size="sm" className="text-xs">
+                <Button type="button" onClick={handleOpenPackageSelector} variant="outline" size="lg" className="text-xs">
                   <Plus className="h-3.5 w-3.5 mr-1" /> Select Quiz Packages to Attach
                 </Button>
               </div>

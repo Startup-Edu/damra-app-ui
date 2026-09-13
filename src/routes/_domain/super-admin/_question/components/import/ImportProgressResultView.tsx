@@ -27,14 +27,14 @@ export function ImportProgressResultView({
     return (
       <div className="py-16 flex flex-col items-center justify-center space-y-4 text-center animate-fade-in">
         <div className="relative flex items-center justify-center">
-          <div className="h-16 w-16 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-          <Loader2 className="h-6 w-6 text-primary absolute animate-pulse" />
+          <div className="size-16 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+          <Loader2 className="size-6 text-primary absolute animate-pulse" />
         </div>
         <div className="space-y-1">
-          <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+          <h3 className="text-sm font-bold text-foreground">
             Importing Questions...
           </h3>
-          <p className="text-xs text-slate-500 max-w-sm">
+          <p className="text-xs text-muted-foreground max-w-sm">
             Verifying question hashes, checking database uniqueness, and creating records. Please wait.
           </p>
         </div>
@@ -51,16 +51,16 @@ export function ImportProgressResultView({
       {/* Hero Status Banner */}
       <div className="text-center space-y-2">
         {isAllDuplicates ? (
-          <div className="h-14 w-14 bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center mx-auto">
-            <AlertTriangle className="h-7 w-7" />
+          <div className="size-14 bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center mx-auto">
+            <AlertTriangle className="size-7" />
           </div>
         ) : (
-          <div className="h-14 w-14 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto">
-            <CheckCircle2 className="h-7 w-7" />
+          <div className="size-14 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto">
+            <CheckCircle2 className="size-7" />
           </div>
         )}
 
-        <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
+        <h3 className="text-base font-bold text-foreground">
           {isAllDuplicates
             ? 'No New Questions Imported'
             : isPartial
@@ -68,7 +68,7 @@ export function ImportProgressResultView({
               : 'Questions Imported Successfully!'}
         </h3>
 
-        <p className="text-xs text-slate-500 max-w-md mx-auto">
+        <p className="text-xs text-muted-foreground max-w-md mx-auto">
           {serverMessage ||
             (isAllDuplicates
               ? 'All submitted candidates already exist in the database or contain duplicate entries.'
@@ -79,12 +79,12 @@ export function ImportProgressResultView({
       {/* Metrics Summary Grid */}
       <div className="grid grid-cols-3 gap-4">
         {/* Total Submitted */}
-        <Card className="border-slate-100 dark:border-slate-800 shadow-none bg-slate-50/50 dark:bg-slate-900/40 text-center">
+        <Card className="border-border shadow-none bg-muted/40 text-center">
           <CardContent className="p-4">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
               Total Submitted
             </span>
-            <span className="text-xl font-extrabold text-slate-800 dark:text-slate-200">
+            <span className="text-xl font-extrabold text-foreground">
               {totalSubmitted}
             </span>
           </CardContent>
@@ -123,8 +123,8 @@ export function ImportProgressResultView({
 
       {/* API Feedback Banner */}
       <Alert variant="default" className="bg-background text-xs py-3">
-        <AlertDescription className="text-xs text-slate-600 dark:text-slate-400 flex items-center justify-between">
-          <span>Server Log: <span className="font-semibold text-slate-800 dark:text-slate-200">{serverMessage}</span></span>
+        <AlertDescription className="text-xs text-muted-foreground flex items-center justify-between">
+          <span>Server Log: <span className="font-semibold text-foreground">{serverMessage}</span></span>
           <Badge variant={importedCount > 0 ? "success" : "warning"} className="text-[10px]">
             Status 201
           </Badge>

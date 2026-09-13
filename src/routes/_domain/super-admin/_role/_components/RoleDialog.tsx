@@ -79,12 +79,12 @@ export function RoleDialog({ open, onOpenChange, role }: RoleDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] p-6 text-slate-900 dark:text-slate-50 border border-slate-100 dark:border-slate-800 shadow-lg">
+      <DialogContent className="sm:max-w-[425px] p-6 shadow-lg">
         <DialogHeader className="space-y-1.5">
           <DialogTitle className="text-lg font-bold">
             {isEditing ? 'Edit System Role' : 'Create New Role'}
           </DialogTitle>
-          <DialogDescription className="text-xs text-slate-500 dark:text-slate-400">
+          <DialogDescription className="text-xs">
             {isEditing
               ? 'Update the name or toggle the status of this system role.'
               : 'Add a new administrative or standard user role to the system.'}
@@ -93,7 +93,7 @@ export function RoleDialog({ open, onOpenChange, role }: RoleDialogProps) {
 
         <form onSubmit={handleSubmit} className="space-y-5 py-4">
           <div className="space-y-2">
-            <Label htmlFor="role-name" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+            <Label htmlFor="role-name" className="text-xs font-semibold">
               Role Name
             </Label>
             <Input
@@ -105,16 +105,16 @@ export function RoleDialog({ open, onOpenChange, role }: RoleDialogProps) {
               className="h-10 text-xs focus:ring-2 focus:ring-primary/20"
             />
             {validationError && (
-              <p className="text-xs text-rose-500 font-medium mt-1">{validationError}</p>
+              <p className="text-xs text-destructive font-medium mt-1">{validationError}</p>
             )}
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50/50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border">
             <div className="space-y-0.5">
-              <Label htmlFor="role-status" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              <Label htmlFor="role-status" className="text-xs font-semibold">
                 Active Status
               </Label>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400">
+              <p className="text-[10px] text-muted-foreground">
                 Inactive roles will prevent assigned users from authentication.
               </p>
             </div>

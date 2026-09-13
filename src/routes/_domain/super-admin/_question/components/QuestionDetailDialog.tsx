@@ -59,7 +59,7 @@ export function QuestionDetailDialog({
 
   const getQuestionTypeBadge = (type: string) => {
     return (
-      <Badge variant="secondary" className="font-bold text-[10px] uppercase bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+      <Badge variant="secondary" className="font-bold text-[10px] uppercase">
         {type}
       </Badge>
     )
@@ -67,7 +67,7 @@ export function QuestionDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[900px] md:max-w-[900px] w-[95vw] h-[88vh] max-h-[90vh] text-slate-900 dark:text-slate-50 !flex !flex-col !p-0 !gap-0 overflow-hidden">
+      <DialogContent className="sm:max-w-[900px] md:max-w-[900px] w-[95vw] h-[88vh] max-h-[90vh] !flex !flex-col !p-0 !gap-0 overflow-hidden">
         <DialogHeader className="p-6 pb-2 space-y-1.5 shrink-0 border-b">
           <div className="flex items-center gap-2">
             <DialogTitle className="text-base font-bold">
@@ -80,7 +80,7 @@ export function QuestionDetailDialog({
               </div>
             )}
           </div>
-          <DialogDescription className="text-xs text-slate-500 dark:text-slate-400">
+          <DialogDescription className="text-xs text-muted-foreground">
             Read-only metadata parameters, interactive rendering, and answer grading specifications.
           </DialogDescription>
         </DialogHeader>
@@ -90,7 +90,7 @@ export function QuestionDetailDialog({
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-12 h-full min-h-0">
               {/* Left Column Skeleton */}
-              <div className="md:col-span-4 p-6 space-y-5 md:border-r border-slate-100 dark:border-slate-800">
+              <div className="md:col-span-4 p-6 space-y-5 md:border-r border-border">
                 <div className="space-y-2"><Skeleton className="h-4 w-20" /><Skeleton className="h-9 w-full" /></div>
                 <div className="space-y-2"><Skeleton className="h-4 w-24" /><Skeleton className="h-9 w-full" /></div>
                 <div className="space-y-2"><Skeleton className="h-4 w-20" /><Skeleton className="h-9 w-full" /></div>
@@ -103,8 +103,8 @@ export function QuestionDetailDialog({
               </div>
             </div>
           ) : isError || !question ? (
-            <div className="p-12 text-center text-slate-500 space-y-4">
-              <AlertCircle className="h-8 w-8 text-rose-500 mx-auto" />
+            <div className="p-12 text-center text-muted-foreground space-y-4">
+              <AlertCircle className="size-8 text-rose-500 mx-auto" />
               <p className="text-xs font-semibold">Failed to fetch the question details from the server.</p>
               <Button variant="outline" size="sm" onClick={() => refetch()} className="text-xs">
                 Retry Connection
@@ -115,18 +115,18 @@ export function QuestionDetailDialog({
 
               {/* Left Column: Fixed Info parameters list */}
               <div className="md:col-span-4 p-6 space-y-4 md:border-r overflow-y-auto custom-scrollbar h-full">
-                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Question Parameters</h4>
+                <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Question Parameters</h4>
 
                 {/* Category */}
-                <div className="p-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/10 flex items-start gap-2.5">
-                  <Tag className="h-4 w-4 text-slate-400 mt-0.5" />
+                <div className="p-3 rounded-lg border border-border bg-muted/30 flex items-start gap-2.5">
+                  <Tag className="size-4 text-muted-foreground mt-0.5" />
                   <div>
-                    <span className="text-[10px] text-slate-400 font-semibold block">Category Link</span>
-                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    <span className="text-[10px] text-muted-foreground font-semibold block">Category Link</span>
+                    <span className="text-xs font-bold text-foreground">
                       {question.category?.name_en || (question.category as any)?.nameEn || '-'}
                     </span>
                     {(question.category?.name_kh || (question.category as any)?.nameKh) && (
-                      <span className="text-[10px] text-slate-400 font-normal block mt-0.5">
+                      <span className="text-[10px] text-muted-foreground font-normal block mt-0.5">
                         {question.category?.name_kh || (question.category as any)?.nameKh}
                       </span>
                     )}
@@ -134,15 +134,15 @@ export function QuestionDetailDialog({
                 </div>
 
                 {/* Grade linkage */}
-                <div className="p-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/10 flex items-start gap-2.5">
-                  <Gauge className="h-4 w-4 text-slate-400 mt-0.5" />
+                <div className="p-3 rounded-lg border border-border bg-muted/30 flex items-start gap-2.5">
+                  <Gauge className="size-4 text-muted-foreground mt-0.5" />
                   <div>
-                    <span className="text-[10px] text-slate-400 font-semibold block">Grade Level</span>
-                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    <span className="text-[10px] text-muted-foreground font-semibold block">Grade Level</span>
+                    <span className="text-xs font-bold text-foreground">
                       {question.grade?.name_en || (question.grade as any)?.nameEn || '-'}
                     </span>
                     {(question.grade?.name_kh || (question.grade as any)?.nameKh) && (
-                      <span className="text-[10px] text-slate-400 font-normal block mt-0.5">
+                      <span className="text-[10px] text-muted-foreground font-normal block mt-0.5">
                         {question.grade?.name_kh || (question.grade as any)?.nameKh}
                       </span>
                     )}
@@ -150,32 +150,32 @@ export function QuestionDetailDialog({
                 </div>
 
                 {/* XP Reward Value */}
-                <div className="p-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/10 flex items-start gap-2.5">
-                  <Award className="h-4 w-4 text-slate-400 mt-0.5" />
+                <div className="p-3 rounded-lg border border-border bg-muted/30 flex items-start gap-2.5">
+                  <Award className="size-4 text-muted-foreground mt-0.5" />
                   <div>
-                    <span className="text-[10px] text-slate-400 font-semibold block">XP Reward Value</span>
-                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    <span className="text-[10px] text-muted-foreground font-semibold block">XP Reward Value</span>
+                    <span className="text-xs font-bold text-foreground">
                       {question.xp_value} XP Points
                     </span>
                   </div>
                 </div>
 
                 {/* Time Limit */}
-                <div className="p-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/10 flex items-start gap-2.5">
-                  <Clock className="h-4 w-4 text-slate-400 mt-0.5" />
+                <div className="p-3 rounded-lg border border-border bg-muted/30 flex items-start gap-2.5">
+                  <Clock className="size-4 text-muted-foreground mt-0.5" />
                   <div>
-                    <span className="text-[10px] text-slate-400 font-semibold block">Timer Limit</span>
-                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    <span className="text-[10px] text-muted-foreground font-semibold block">Timer Limit</span>
+                    <span className="text-xs font-bold text-foreground">
                       {question.time_limit_seconds ? `${question.time_limit_seconds} Seconds` : 'No Timer Limit'}
                     </span>
                   </div>
                 </div>
 
                 {/* Active Status */}
-                <div className="p-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/10 flex items-start gap-2.5">
-                  <Activity className="h-4 w-4 text-slate-400 mt-0.5" />
+                <div className="p-3 rounded-lg border border-border bg-muted/30 flex items-start gap-2.5">
+                  <Activity className="size-4 text-muted-foreground mt-0.5" />
                   <div>
-                    <span className="text-[10px] text-slate-400 font-semibold block">Active Status</span>
+                    <span className="text-[10px] text-muted-foreground font-semibold block">Active Status</span>
                     <span className="mt-1 block">
                       {question.is_active ? (
                         <Badge className="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/10 border-0 h-5 text-[10px]">Active</Badge>
@@ -192,30 +192,30 @@ export function QuestionDetailDialog({
 
                 {/* Question Texts */}
                 <div className="space-y-3">
-                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Question Context</h4>
+                  <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Question Context</h4>
 
                   {/* English Question */}
-                  <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/10 dark:bg-slate-950/10">
-                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-2">English translation</div>
+                  <div className="p-4 rounded-xl border border-border bg-muted/20">
+                    <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-2">English translation</div>
                     <div
-                      className="text-xs leading-relaxed text-slate-800 dark:text-slate-200 prose dark:prose-invert"
+                      className="text-xs leading-relaxed text-foreground prose dark:prose-invert"
                       dangerouslySetInnerHTML={{ __html: question.question_text_en }}
                     />
                   </div>
 
                   {/* Khmer Question */}
-                  <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/10 dark:bg-slate-950/10">
-                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-2">Khmer translation</div>
+                  <div className="p-4 rounded-xl border border-border bg-muted/20">
+                    <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Khmer translation</div>
                     <div
-                      className="text-xs leading-relaxed text-slate-800 dark:text-slate-200"
+                      className="text-xs leading-relaxed text-foreground"
                       dangerouslySetInnerHTML={{ __html: question.question_text_kh }}
                     />
                   </div>
                 </div>
 
                 {/* Answer Keys & Options Configuration */}
-                <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/30 space-y-3">
-                  <h4 className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b pb-2">
+                <div className="p-4 rounded-xl border border-border bg-muted/30 space-y-3">
+                  <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider border-b pb-2">
                     Answers Validation Keys
                   </h4>
 
@@ -229,13 +229,13 @@ export function QuestionDetailDialog({
                             key={o.id}
                             className={`flex items-center gap-3 p-3 rounded-lg border text-xs transition-colors ${isCorrect
                                 ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
-                                : 'bg-background border-slate-100 dark:border-slate-800'
+                                : 'bg-background border-border'
                               }`}
                           >
-                            <span className="font-bold text-[10px] text-slate-400">Choice {idx + 1}</span>
+                            <span className="font-bold text-[10px] text-muted-foreground">Choice {idx + 1}</span>
                             <div className="flex-1">
                               <span className="font-medium">{o.text_en || o.textEn}</span>
-                              <span className="text-[10px] text-slate-400 dark:text-slate-500 block">{o.text_kh || o.textKh}</span>
+                              <span className="text-[10px] text-muted-foreground block">{o.text_kh || o.textKh}</span>
                             </div>
                             {isCorrect && <Check className="h-4 w-4 text-emerald-500 shrink-0" />}
                           </div>
@@ -255,13 +255,13 @@ export function QuestionDetailDialog({
                             key={o.id}
                             className={`flex items-center gap-3 p-3 rounded-lg border text-xs transition-colors ${isCorrect
                                 ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
-                                : 'bg-background border-slate-100 dark:border-slate-800'
+                                : 'bg-background border-border'
                               }`}
                           >
-                            <span className="font-bold text-[10px] text-slate-400">Choice {idx + 1}</span>
+                            <span className="font-bold text-[10px] text-muted-foreground">Choice {idx + 1}</span>
                             <div className="flex-1">
                               <span className="font-medium">{o.text_en || o.textEn}</span>
-                              <span className="text-[10px] text-slate-400 dark:text-slate-500 block">{o.text_kh || o.textKh}</span>
+                              <span className="text-[10px] text-muted-foreground block">{o.text_kh || o.textKh}</span>
                             </div>
                             {isCorrect && <Check className="h-4 w-4 text-emerald-500 shrink-0" />}
                           </div>
@@ -280,13 +280,13 @@ export function QuestionDetailDialog({
                             key={String(val)}
                             className={`p-3 rounded-lg border text-center font-semibold transition-colors ${isCorrect
                                 ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
-                                : 'bg-background border-slate-100 dark:border-slate-800'
+                                : 'bg-background border-border'
                               }`}
                           >
-                            <div className="text-[9px] text-slate-400 uppercase tracking-wider">Choice</div>
+                            <div className="text-[9px] text-muted-foreground uppercase tracking-wider">Choice</div>
                             <div className="mt-1 flex items-center justify-center gap-1.5">
                               {val ? 'True' : 'False'}
-                              {isCorrect && <Check className="h-3.5 w-3.5" />}
+                              {isCorrect && <Check className="size-3.5" />}
                             </div>
                           </div>
                         )
@@ -300,20 +300,20 @@ export function QuestionDetailDialog({
                       {(question.validation?.correct_blanks || []).map((b: any, idx: number) => (
                         <div
                           key={b.id}
-                          className="p-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-background text-xs space-y-2"
+                          className="p-3 rounded-lg border border-border bg-background text-xs space-y-2"
                         >
-                          <div className="flex items-center justify-between border-b pb-1.5 border-slate-50 dark:border-slate-900">
-                            <span className="font-bold text-[10px] text-slate-500 uppercase">Blank Target #{idx + 1}</span>
+                          <div className="flex items-center justify-between border-b pb-1.5 border-border">
+                            <span className="font-bold text-[10px] text-muted-foreground uppercase">Blank Target #{idx + 1}</span>
                             <Badge variant={b.is_case_sensitive ? 'default' : 'secondary'} className="text-[8px] h-4.5 px-1.5 uppercase font-semibold">
                               {b.is_case_sensitive ? 'Case Sensitive' : 'Insensitive'}
                             </Badge>
                           </div>
                           <div>
-                            <span className="text-[9px] text-slate-400 block mb-1">Accepted answers list:</span>
+                            <span className="text-[9px] text-muted-foreground block mb-1">Accepted answers list:</span>
                             <div className="flex flex-wrap gap-1.5">
                               {(b.accepted_answers || b.acceptedAnswers || []).map((ans: string, aidx: number) => (
                                 <Badge key={aidx} variant="outline" className="bg-emerald-500/5 border-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] py-0.5 px-2">
-                                  {ans}
+                                   {ans}
                                 </Badge>
                               ))}
                             </div>
@@ -326,7 +326,7 @@ export function QuestionDetailDialog({
                   {/* Matching Column Check */}
                   {question.question_type === 'MATCHING' && (
                     <div className="space-y-3 text-xs">
-                      <div className="text-[10px] text-slate-400 font-semibold mb-1">Correct Match Pairs Configuration:</div>
+                      <div className="text-[10px] text-muted-foreground font-semibold mb-1">Correct Match Pairs Configuration:</div>
                       <div className="flex flex-wrap gap-2">
                         {(question.validation?.correct_pairs || []).map((p: any, idx: number) => {
                           const leftItem = (question.content?.left_side || []).find((l: any) => l.id === p.left_id)
@@ -337,7 +337,7 @@ export function QuestionDetailDialog({
                               className="flex items-center gap-2 p-2 rounded-lg border border-emerald-500/15 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 font-semibold text-[10px]"
                             >
                               <span>{leftItem?.text_en || leftItem?.textEn || '(Left)'}</span>
-                              <ArrowRight className="h-3 w-3 shrink-0" />
+                              <ArrowRight className="size-3 shrink-0" />
                               <span>{rightItem?.text_en || rightItem?.textEn || '(Right)'}</span>
                             </div>
                           )
@@ -349,20 +349,20 @@ export function QuestionDetailDialog({
                   {/* Ordering Sequence Check */}
                   {question.question_type === 'ORDER' && (
                     <div className="space-y-2">
-                      <div className="text-[10px] text-slate-400 font-semibold mb-1">Items in Correct Grading Sequence:</div>
+                      <div className="text-[10px] text-muted-foreground font-semibold mb-1">Items in Correct Grading Sequence:</div>
                       {(question.validation?.correct_order || []).map((id: string, idx: number) => {
                         const item = (question.content?.items || []).find((i: any) => i.id === id)
                         return (
                           <div
                             key={id}
-                            className="flex items-center gap-3 p-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-background text-xs"
+                            className="flex items-center gap-3 p-3 rounded-lg border border-border bg-background text-xs"
                           >
-                            <Badge className="h-5 w-5 rounded-full flex items-center justify-center p-0 font-bold bg-emerald-500 text-white border-none shrink-0 text-[10px]">
+                            <Badge className="size-5 rounded-full flex items-center justify-center p-0 font-bold bg-emerald-500 text-white border-none shrink-0 text-[10px]">
                               {idx + 1}
                             </Badge>
                             <div className="flex-1">
                               <span className="font-semibold">{item?.text_en || item?.textEn}</span>
-                              <span className="text-[10px] text-slate-400 dark:text-slate-500 block">{item?.text_kh || item?.textKh}</span>
+                              <span className="text-[10px] text-muted-foreground block">{item?.text_kh || item?.textKh}</span>
                             </div>
                           </div>
                         )
@@ -374,23 +374,23 @@ export function QuestionDetailDialog({
                 {/* Explanations */}
                 {(question.explanation_en || question.explanation_kh) && (
                   <div className="space-y-3">
-                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Solution Explanation Hints</h4>
+                    <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Solution Explanation Hints</h4>
 
                     {question.explanation_en && (
-                      <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/10 dark:bg-slate-950/10">
-                        <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-2">English Explanation</div>
+                      <div className="p-4 rounded-xl border border-border bg-muted/20">
+                        <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-2">English Explanation</div>
                         <div
-                          className="text-xs leading-relaxed text-slate-800 dark:text-slate-200 prose dark:prose-invert"
+                          className="text-xs leading-relaxed text-foreground prose dark:prose-invert"
                           dangerouslySetInnerHTML={{ __html: question.explanation_en }}
                         />
                       </div>
                     )}
 
                     {question.explanation_kh && (
-                      <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/10 dark:bg-slate-950/10">
-                        <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-2">Khmer Explanation</div>
+                      <div className="p-4 rounded-xl border border-border bg-muted/20">
+                        <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Khmer Explanation</div>
                         <div
-                          className="text-xs leading-relaxed text-slate-800 dark:text-slate-200"
+                          className="text-xs leading-relaxed text-foreground"
                           dangerouslySetInnerHTML={{ __html: question.explanation_kh }}
                         />
                       </div>
@@ -402,7 +402,7 @@ export function QuestionDetailDialog({
           )}
         </div>
 
-        <DialogFooter className="p-6 pb-3 pt-3 border-t bg-slate-50/50 dark:bg-slate-900/50 shrink-0">
+        <DialogFooter className="p-6 pb-3 pt-3 border-t bg-muted/40 shrink-0">
           <Button
             type="button"
             variant="outline"

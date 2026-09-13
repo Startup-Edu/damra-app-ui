@@ -25,6 +25,7 @@ export type SortableOptionProp =
   | ((a: SearchableSelectOption, b: SearchableSelectOption) => number)
 
 export interface SearchableSelectProps {
+  id?: string
   options: SearchableSelectOption[]
   value?: string
   onChange: (value: string) => void
@@ -43,6 +44,7 @@ export interface SearchableSelectProps {
 }
 
 export function SearchableSelect({
+  id,
   options,
   value,
   onChange,
@@ -61,7 +63,7 @@ export function SearchableSelect({
 }: SearchableSelectProps) {
   const [open, setOpen] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState('')
-  const parentRef = React.useRef<HTMLDivElement>(null)
+  const [scrollElement, setScrollElement] = React.useState<HTMLDivElement | null>(null)
 
   const selectedOption = React.useMemo(
     () => options.find((opt) => opt.value === value),
@@ -97,21 +99,44 @@ export function SearchableSelect({
   // Virtualizer setup
   const rowVirtualizer = useVirtualizer({
     count: filteredOptions.length,
-    getScrollElement: () => parentRef.current,
+    getScrollElement: () => scrollElement,
     estimateSize: () => estimateSize,
     overscan: 5,
   })
 
   // Measure container immediately on layout mount & open
   React.useLayoutEffect(() => {
-    if (open) {
+    if (open && scrollElement) {
       rowVirtualizer.measure()
       const raf = requestAnimationFrame(() => {
         rowVirtualizer.measure()
       })
       return () => cancelAnimationFrame(raf)
     }
-  }, [open, searchQuery, filteredOptions.length])
+  }, [open, scrollElement, searchQuery, filteredOptions.length])
+
+  // Prevent Radix Dialog / parent scroll lock (e.g. react-remove-scroll) from suppressing wheel/touch scrolling
+  React.useEffect(() => {
+    if (!scrollElement) return
+
+    const handleWheel = (e: WheelEvent) => {
+      e.stopPropagation()
+      if (e.defaultPrevented) {
+        scrollElement.scrollTop += e.deltaY
+      }
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      e.stopPropagation()
+    }
+
+    scrollElement.addEventListener('wheel', handleWheel, { passive: false })
+    scrollElement.addEventListener('touchmove', handleTouchMove, { passive: true })
+    return () => {
+      scrollElement.removeEventListener('wheel', handleWheel)
+      scrollElement.removeEventListener('touchmove', handleTouchMove)
+    }
+  }, [scrollElement])
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -142,6 +167,7 @@ export function SearchableSelect({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          id={id}
           variant="outline"
           role="combobox"
           aria-expanded={open}
@@ -179,6 +205,7 @@ export function SearchableSelect({
           contentClassName
         )}
         align="start"
+        onWheel={(e) => e.stopPropagation()}
       >
         <div className="flex flex-col">
           {/* Search Header */}
@@ -209,12 +236,12 @@ export function SearchableSelect({
             </div>
           ) : (
             <div
-              ref={parentRef}
+              ref={setScrollElement}
               style={{
                 height: `${containerHeight}px`,
                 maxHeight: `${maxHeight}px`,
               }}
-              className="overflow-y-auto custom-scrollbar p-1 relative"
+              className="overflow-y-auto custom-scrollbar p-1 relative overscroll-contain"
             >
               <div
                 style={{

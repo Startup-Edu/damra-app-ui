@@ -43,11 +43,11 @@ export function ProfileDetailsCard() {
       <CardContent className="px-6 pb-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="name" className="text-xs font-semibold leading-none text-slate-700 dark:text-slate-300">
+            <Label htmlFor="name" className="text-xs font-semibold leading-none text-foreground">
               Full Name
             </Label>
             <div className="relative group">
-              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors duration-300" />
+              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors duration-300" />
               <Input
                 id="name"
                 type="text"
@@ -62,11 +62,11 @@ export function ProfileDetailsCard() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-xs font-semibold leading-none text-slate-700 dark:text-slate-300">
+            <Label htmlFor="email" className="text-xs font-semibold leading-none text-foreground">
               Email Address
             </Label>
             <div className="relative group">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors duration-300" />
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors duration-300" />
               <Input
                 id="email"
                 type="email"

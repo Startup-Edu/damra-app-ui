@@ -443,22 +443,22 @@ export function QuestionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[960px] md:max-w-[960px] w-[95vw] text-slate-900 dark:text-slate-50 border border-slate-100 dark:border-slate-800 shadow-xl max-h-[90vh] !flex !flex-col !p-0 !gap-0 overflow-hidden">
+      <DialogContent className="sm:max-w-[960px] md:max-w-[960px] w-[95vw] shadow-xl max-h-[90vh] !flex !flex-col !p-0 !gap-0 overflow-hidden">
         <DialogHeader className="p-6 pb-2 space-y-1.5 shrink-0">
           <DialogTitle className="text-lg font-bold">{isEditing ? 'Modify Question Details' : 'Create New Question'}</DialogTitle>
-          <DialogDescription className="text-xs text-slate-500 dark:text-slate-400">
+          <DialogDescription className="text-xs text-muted-foreground">
             {isEditing ? 'Update translations, parameters, grade, category, or formatting options.' : 'Add a new educational gameplay question to the question bank.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={(e) => { e.preventDefault(); e.stopPropagation(); form.handleSubmit() }} className="flex flex-col flex-1 overflow-hidden">
           <ScrollArea className="flex-1 min-h-0 w-full overflow-y-auto custom-scrollbar">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 p-6">
-              <div className="md:col-span-4 space-y-4 md:border-r md:pr-6 border-slate-100 dark:border-slate-800">
+              <div className="md:col-span-4 space-y-4 md:border-r md:pr-6 border-border">
                 <form.Field
                   name="gradeId"
                   children={(field) => (
                     <div className="space-y-1.5">
-                      <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                      <Label className="text-[11px] font-semibold">
                         Grade Level <span className="text-rose-500">*</span>
                       </Label>
                       <SearchableSelect
@@ -482,7 +482,7 @@ export function QuestionDialog({
                   name="categoryId"
                   children={(field) => (
                     <div className="space-y-1.5">
-                      <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                      <Label className="text-[11px] font-semibold">
                         Category <span className="text-rose-500">*</span>
                       </Label>
                       <SearchableSelect
@@ -503,7 +503,7 @@ export function QuestionDialog({
                   name="difficulty"
                   children={(field) => (
                     <div className="space-y-1.5">
-                      <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                      <Label className="text-[11px] font-semibold">
                         Difficulty <span className="text-rose-500">*</span>
                       </Label>
                       <SearchableSelect
@@ -522,7 +522,7 @@ export function QuestionDialog({
                   name="questionType"
                   children={(field) => (
                     <div className="space-y-1.5">
-                      <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                      <Label className="text-[11px] font-semibold">
                         Question Type <span className="text-rose-500">*</span>
                       </Label>
                       <SearchableSelect
@@ -541,7 +541,7 @@ export function QuestionDialog({
                   name="xpValue"
                   children={(field) => (
                     <div className="space-y-1.5">
-                      <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                      <Label className="text-[11px] font-semibold">
                         XP Reward Value
                       </Label>
                       <Input
@@ -560,7 +560,7 @@ export function QuestionDialog({
                   name="timeLimitSeconds"
                   children={(field) => (
                     <div className="space-y-1.5">
-                      <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                      <Label className="text-[11px] font-semibold">
                         Time Limit (Seconds)
                       </Label>
                       <Input
@@ -580,8 +580,8 @@ export function QuestionDialog({
                   name="isActive"
                   children={(field) => (
                     <div className="space-y-1.5 flex flex-col justify-end pt-2">
-                      <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50/50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 h-9.5">
-                        <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border h-9.5">
+                        <Label className="text-[11px] font-semibold cursor-pointer">
                           Active Status
                         </Label>
                         <Switch
@@ -601,7 +601,7 @@ export function QuestionDialog({
                   name="questionTextEn"
                   children={(field) => (
                     <div className="space-y-1.5 quill-editor-wrapper text-editor-question">
-                      <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                      <Label className="text-[11px] font-semibold">
                         Question Text (English) <span className="text-rose-500">*</span>
                       </Label>
                       <ReactQuill
@@ -626,7 +626,7 @@ export function QuestionDialog({
                   name="questionTextKh"
                   children={(field) => (
                     <div className="space-y-1.5 quill-editor-wrapper text-editor-question">
-                      <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                      <Label className="text-[11px] font-semibold">
                         Question Text (Khmer) <span className="text-rose-500">*</span>
                       </Label>
                       <ReactQuill
@@ -651,8 +651,8 @@ export function QuestionDialog({
                 <form.Field
                   name="explanationEn"
                   children={(field) => (
-                    <div className="space-y-1.5 quill-editor-wrapper text-editor-explanation pt-1.5 border-t border-slate-100 dark:border-slate-800/80">
-                      <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                    <div className="space-y-1.5 quill-editor-wrapper text-editor-explanation pt-1.5 border-t border-border">
+                      <Label className="text-[11px] font-semibold">
                         Explanation (English)
                       </Label>
                       <ReactQuill
@@ -677,7 +677,7 @@ export function QuestionDialog({
                   name="explanationKh"
                   children={(field) => (
                     <div className="space-y-1.5 quill-editor-wrapper text-editor-explanation">
-                      <Label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                      <Label className="text-[11px] font-semibold">
                         Explanation (Khmer)
                       </Label>
                       <ReactQuill
@@ -701,9 +701,9 @@ export function QuestionDialog({
 
 
                 {/* DYNAMIC ANSWER CONFIG PANELS */}
-                <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/30 space-y-4">
+                <div className="p-4 rounded-xl border border-border bg-muted/30 space-y-4">
                   <div className="flex items-center justify-between border-b pb-2">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                       Answer Validation & Options Config
                     </h3>
                   </div>
@@ -782,7 +782,7 @@ export function QuestionDialog({
                   {/* TRUE_FALSE PANEL */}
                   {currentQuestionType === 'TRUE_FALSE' && (
                     <div className="flex items-center gap-4">
-                      <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      <span className="text-xs font-semibold">
                         Correct Answer:
                       </span>
                       <div className="flex gap-4">
@@ -814,7 +814,7 @@ export function QuestionDialog({
                       <div className="space-y-2">
                         {blanks.map((b, idx) => (
                           <div key={b.id} className="flex gap-3 items-center">
-                            <span className="text-xs font-semibold text-slate-500 shrink-0 w-16">
+                            <span className="text-xs font-semibold text-muted-foreground shrink-0 w-16">
                               Blank {idx + 1}:
                             </span>
                             <Input
@@ -867,7 +867,7 @@ export function QuestionDialog({
                       <div className="grid grid-cols-2 gap-4">
                         {/* Left items */}
                         <div className="space-y-2">
-                          <Label className="text-[10px] font-bold text-slate-500 uppercase">Left Column Side</Label>
+                          <Label className="text-[10px] font-bold text-muted-foreground uppercase">Left Column Side</Label>
                           <div className="space-y-1.5">
                             {leftSide.map((i, idx) => (
                               <div key={i.id} className="flex gap-1.5 items-center">
@@ -904,7 +904,7 @@ export function QuestionDialog({
 
                         {/* Right items */}
                         <div className="space-y-2">
-                          <Label className="text-[10px] font-bold text-slate-500 uppercase">Right Column Side</Label>
+                          <Label className="text-[10px] font-bold text-muted-foreground uppercase">Right Column Side</Label>
                           <div className="space-y-1.5">
                             {rightSide.map((i, idx) => (
                               <div key={i.id} className="flex gap-1.5 items-center">
@@ -942,8 +942,8 @@ export function QuestionDialog({
 
                       {/* Match Connections Config */}
                       <div className="pt-2 border-t">
-                        <Label className="text-[10px] font-bold text-slate-500 uppercase block mb-2">Configure Correct Matches</Label>
-                        <p className="text-[9px] text-slate-400 mb-2">Click elements to link them together as correct pair matching targets.</p>
+                        <Label className="text-[10px] font-bold text-muted-foreground uppercase block mb-2">Configure Correct Matches</Label>
+                        <p className="text-[9px] text-muted-foreground mb-2">Click elements to link them together as correct pair matching targets.</p>
                         <div className="flex flex-wrap gap-2">
                           {leftSide.map((l) =>
                             rightSide.map((r) => {
@@ -969,11 +969,11 @@ export function QuestionDialog({
                   {/* ORDER PANEL */}
                   {currentQuestionType === 'ORDER' && (
                     <div className="space-y-3">
-                      <p className="text-[9px] text-slate-400">Order items sequence. Provide them in their correct sequence from top to bottom.</p>
+                      <p className="text-[9px] text-muted-foreground">Order items sequence. Provide them in their correct sequence from top to bottom.</p>
                       <div className="space-y-2">
                         {orderItems.map((item, idx) => (
                           <div key={item.id} className="flex gap-2 items-center">
-                            <span className="text-xs font-bold text-slate-400 shrink-0 w-6">#{idx + 1}</span>
+                            <span className="text-xs font-bold text-muted-foreground shrink-0 w-6">#{idx + 1}</span>
                             <Input
                               placeholder={`Item English text`}
                               value={item.text_en}
@@ -992,6 +992,7 @@ export function QuestionDialog({
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => removeOrderItem(item.id)}
+                                disabled={isLoading}
                                 className="h-8.5 w-8.5 text-rose-500 shrink-0"
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -1019,7 +1020,7 @@ export function QuestionDialog({
           </ScrollArea>
 
           {/* Fixed footer outside scrollarea */}
-          <DialogFooter className="p-6 pt-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 shrink-0">
+          <DialogFooter className="p-6 pt-3 border-t border-border bg-muted/40 shrink-0">
             <Button
               type="button"
               variant="outline"
@@ -1030,7 +1031,7 @@ export function QuestionDialog({
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading} className="!h-9 text-xs">
-              {isLoading && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
+              {isLoading && <Loader2 className="mr-2 size-3.5 animate-spin" />}
               {isEditing ? 'Save Changes' : 'Create Question'}
             </Button>
           </DialogFooter>

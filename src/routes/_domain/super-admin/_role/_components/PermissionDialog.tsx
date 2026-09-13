@@ -95,12 +95,12 @@ export function PermissionDialog({ open, onOpenChange, permission }: PermissionD
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] text-slate-900 dark:text-slate-50 border border-slate-100 dark:border-slate-800 shadow-lg">
+      <DialogContent className="sm:max-w-[425px] shadow-lg">
         <DialogHeader className="space-y-1.5">
           <DialogTitle className="text-lg font-bold">
             {isEditing ? 'Edit System Permission' : 'Create New Permission'}
           </DialogTitle>
-          <DialogDescription className="text-xs text-slate-500 dark:text-slate-400">
+          <DialogDescription className="text-xs text-muted-foreground">
             {isEditing
               ? 'Modify the action and resource mapping for this system permission.'
               : 'Add a new action-resource permission definition to the database.'}
@@ -110,7 +110,7 @@ export function PermissionDialog({ open, onOpenChange, permission }: PermissionD
         <form onSubmit={handleSubmit} className="space-y-5 py-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="perm-resource" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              <Label htmlFor="perm-resource" className="text-xs font-semibold">
                 Resource Name
               </Label>
               <Input
@@ -124,7 +124,7 @@ export function PermissionDialog({ open, onOpenChange, permission }: PermissionD
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="perm-action" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              <Label htmlFor="perm-action" className="text-xs font-semibold">
                 Action
               </Label>
               <Input
@@ -138,9 +138,9 @@ export function PermissionDialog({ open, onOpenChange, permission }: PermissionD
             </div>
           </div>
 
-          <div className="text-[10px] text-slate-400 font-mono">
+          <div className="text-[10px] text-muted-foreground font-mono">
             Generated Permission Name:{' '}
-            <span className="font-bold text-primary dark:text-primary-foreground">
+            <span className="font-bold text-primary">
               {(action || '').trim() && (resource || '').trim()
                 ? `${(resource || '').trim().toLowerCase()}:${(action || '').trim().toLowerCase()}`
                 : 'resource:action'}
@@ -148,16 +148,16 @@ export function PermissionDialog({ open, onOpenChange, permission }: PermissionD
           </div>
 
           {validationError && (
-            <p className="text-xs text-rose-500 font-medium">{validationError}</p>
+            <p className="text-xs text-destructive font-medium">{validationError}</p>
           )}
 
           {isEditing && (
-            <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50/50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border">
               <div className="space-y-0.5">
-                <Label htmlFor="perm-status" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                <Label htmlFor="perm-status" className="text-xs font-semibold">
                   Active Status
                 </Label>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                <p className="text-[10px] text-muted-foreground">
                   Toggling inactive will revoke access check bypass.
                 </p>
               </div>
@@ -181,7 +181,7 @@ export function PermissionDialog({ open, onOpenChange, permission }: PermissionD
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading} className="h-9 text-xs">
-              {isLoading && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
+              {isLoading && <Loader2 className="mr-2 size-3.5 animate-spin" />}
               {isEditing ? 'Save Changes' : 'Create Permission'}
             </Button>
           </DialogFooter>

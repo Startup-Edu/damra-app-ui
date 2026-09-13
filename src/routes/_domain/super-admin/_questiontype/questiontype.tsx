@@ -280,7 +280,7 @@ function QuestionTypesPage() {
 
           {/* Pagination Footer */}
           {!isLoading && !isError && questionTypes.length > 0 && (
-            <div className="flex items-center justify-between p-4 px-6 border-t bg-slate-50/30 dark:bg-slate-950/10">
+            <div className="flex items-center justify-between p-4 px-6 border-t bg-muted/30">
               <div className="text-xs">
                 Showing <span className="font-semibold">{((page - 1) * limit) + 1}</span> to{" "}
                 <span className="font-semibold">

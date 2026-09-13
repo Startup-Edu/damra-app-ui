@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -11,13 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { SearchableSelect } from '@/components/ui/shared'
 import {
   useCreateQuizPackageMutation,
   useUpdateQuizPackageMutation,
@@ -49,6 +43,18 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
   // Fetch categories for direct standalone assignment
   const { data: categoriesResponse, isLoading: categoriesLoading } = useCategoriesQuery(1, 100, '', true)
   const categories = categoriesResponse?.data || []
+
+  const categoryOptions = useMemo(() => {
+    const sorted = [...categories].sort((a, b) => (a.name_en || '').localeCompare(b.name_en || ''))
+    return [
+      { value: 'none', label: 'None (General Package)', description: 'General / Unassigned' },
+      ...sorted.map((c) => ({
+        value: c.id,
+        label: c.name_en,
+        description: c.name_kh || undefined,
+      })),
+    ]
+  }, [categories])
 
   const isEditing = !!quizpack
   const isLoading = createMutation.isPending || updateMutation.isPending || categoriesLoading
@@ -142,11 +148,11 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
           </DialogDescription>
         </DialogHeader>
 
-        <form id="quizpack-form" onSubmit={handleSubmit} className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-6 space-y-6">
+        <form id="quizpack-form" onSubmit={handleSubmit} className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-6 flex flex-col gap-6">
           {/* Title */}
-          <div className="space-y-1.5">
+          <div className="flex flex-col gap-1.5">
             <Label htmlFor="quizpack-title">
-              Package Title <span className="text-rose-500">*</span>
+              Package Title <span className="text-destructive">*</span>
             </Label>
             <Input
               id="quizpack-title"
@@ -159,7 +165,7 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
           </div>
 
           {/* Description */}
-          <div className="space-y-1.5">
+          <div className="flex flex-col gap-1.5">
             <Label htmlFor="quizpack-desc">
               Description
             </Label>
@@ -174,36 +180,30 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
           </div>
 
           {/* Category selection */}
-          <div className="space-y-1.5">
+          <div className="flex flex-col gap-1.5">
             <Label htmlFor="quizpack-category">
               Category Alignment (Optional)
             </Label>
-            <Select value={categoryId} onValueChange={setCategoryId} disabled={isLoading}>
-              <SelectTrigger id="quizpack-category" className="w-full h-9.5 text-xs border border-input">
-                <SelectValue placeholder="Select Category..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">None (General Package)</SelectItem>
-                {categoriesLoading ? (
-                  <SelectItem value="loading" disabled>
-                    Loading categories...
-                  </SelectItem>
-                ) : (
-                  categories.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name_en} ({c.name_kh})
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
+            <SearchableSelect
+              id="quizpack-category"
+              options={categoryOptions}
+              value={categoryId}
+              onChange={(val) => setCategoryId(val || 'none')}
+              placeholder="Select Category..."
+              searchPlaceholder="Search category..."
+              emptyMessage={categoriesLoading ? 'Loading categories...' : 'No categories found.'}
+              disabled={isLoading}
+              clearable={true}
+              triggerClassName="w-full h-9.5 text-xs"
+              contentClassName="w-[var(--radix-popover-trigger-width)] min-w-[280px]"
+            />
           </div>
 
           {/* Pricing & Session Size */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
+            <div className="flex flex-col gap-1.5">
               <Label htmlFor="quizpack-price">
-                Coin Price {!isFree && <span className="text-rose-500">*</span>}
+                Coin Price {!isFree && <span className="text-destructive">*</span>}
               </Label>
               <Input
                 id="quizpack-price"
@@ -217,7 +217,7 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
               />
             </div>
 
-            <div className="space-y-1.5">
+            <div className="flex flex-col gap-1.5">
               <Label htmlFor="quizpack-session">
                 Questions / Session
               </Label>
@@ -235,12 +235,12 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
           </div>
 
           {/* Is Free Toggle */}
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted border">
-            <div className="space-y-0.5">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-muted border border-border">
+            <div className="flex flex-col gap-0.5">
               <Label htmlFor="quizpack-free">
                 Free Package
               </Label>
-              <p className="text-[11px]">
+              <p className="text-[11px] text-muted-foreground">
                 Free packages require 0 coin unlock payment from students.
               </p>
             </div>
@@ -256,12 +256,12 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
           </div>
 
           {/* Active Status Toggle */}
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted border">
-            <div className="space-y-0.5">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-muted border border-border">
+            <div className="flex flex-col gap-0.5">
               <Label htmlFor="quizpack-status">
                 Active Status
               </Label>
-              <p className="text-[11px]">
+              <p className="text-[11px] text-muted-foreground">
                 Inactive quiz packages will be hidden from mobile package shop.
               </p>
             </div>
@@ -274,14 +274,14 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
           </div>
 
           {validationError && (
-            <div className="flex items-start gap-2 p-3 rounded-lg border border-rose-500/10 bg-rose-500/5 text-rose-500">
-              <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2 p-3 rounded-lg border border-destructive/10 bg-destructive/5 text-destructive">
+              <AlertTriangle className="size-4 shrink-0 mt-0.5" />
               <p className="text-xs font-medium leading-tight">{validationError}</p>
             </div>
           )}
         </form>
 
-        <DialogFooter className="p-6 pt-3 border-t shrink-0">
+        <DialogFooter className="p-6 pt-3 border-t border-border shrink-0">
           <Button
             type="button"
             variant="outline"
@@ -297,7 +297,7 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
             disabled={isLoading}
             className="!h-9 text-xs"
           >
-            {isLoading && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
+            {isLoading && <Loader2 className="mr-2 size-3.5 animate-spin" />}
             {isEditing ? 'Save Changes' : 'Create Package'}
           </Button>
         </DialogFooter>
