@@ -403,7 +403,6 @@ function QuizPackageQuestionsContent({
               onChange={(e) => setSearch(e.target.value)}
               onClear={() => setSearch('')}
               containerClassName="flex-1 min-w-[200px]"
-              sizeVariant="sm"
             />
 
             <SearchableSelect

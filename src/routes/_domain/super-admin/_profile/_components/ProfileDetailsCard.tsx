@@ -31,12 +31,12 @@ export function ProfileDetailsCard() {
   const isUnchanged = name === user?.name && email === user?.email
 
   return (
-    <Card className="border-slate-200/50 dark:border-slate-800/50 bg-white/70 dark:bg-slate-900/30 backdrop-blur-2xl shadow-[0_8px_40px_rgb(0,0,0,0.08)] dark:shadow-[0_8px_40px_rgb(0,0,0,0.2)] rounded-2xl overflow-hidden transition-all duration-300">
+    <Card className="overflow-hidden transition-all duration-300">
       <CardHeader className="px-6 pt-6 pb-4">
-        <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-100">
+        <CardTitle className="text-base font-bold">
           Profile Details
         </CardTitle>
-        <CardDescription className="text-xs font-medium text-slate-500 dark:text-slate-400">
+        <CardDescription className="text-xs font-medium">
           Update your personal name and email mapping across the platform.
         </CardDescription>
       </CardHeader>
@@ -56,7 +56,7 @@ export function ProfileDetailsCard() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 disabled={isPending}
-                className="h-10 rounded-lg pl-10 bg-slate-50/50 dark:bg-slate-900/20 text-xs transition-all shadow-inner border border-slate-200/50 dark:border-slate-800/50 focus-visible:ring-1 focus-visible:ring-primary"
+                className="h-10 rounded-lg pl-10"
               />
             </div>
           </div>
@@ -75,7 +75,7 @@ export function ProfileDetailsCard() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={isPending}
-                className="h-10 rounded-lg pl-10 bg-slate-50/50 dark:bg-slate-900/20 text-xs transition-all shadow-inner border border-slate-200/50 dark:border-slate-800/50 focus-visible:ring-1 focus-visible:ring-primary"
+                className="h-10 rounded-lg pl-10"
               />
             </div>
           </div>

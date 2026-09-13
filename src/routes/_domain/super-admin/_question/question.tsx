@@ -200,11 +200,11 @@ function QuestionsPage() {
       cell: (info) => {
         const q = info.row.original
         return (
-          <div>
+          <div className="space-y-1">
             <div className="font-semibold text-slate-900 dark:text-slate-100 text-xs max-w-[320px] truncate">
               {cleanText(q.question_text_en)}
             </div>
-            <div className="text-[10px] text-slate-400 dark:text-slate-500 max-w-[320px] truncate">
+            <div className="text-xs text-slate-400 dark:text-slate-500 max-w-[320px] truncate">
               {cleanText(q.question_text_kh)}
             </div>
           </div>
@@ -546,7 +546,7 @@ function QuestionsPage() {
           {/* Pagination Footer */}
           {!isLoading && !isError && questions.length > 0 && (
             <div className="flex items-center justify-between p-4 px-6 border-t bg-slate-50/30 dark:bg-slate-950/10">
-              <div className="text-[10px] text-slate-500 dark:text-slate-400">
+              <div className="text-xs text-slate-500 dark:text-slate-400">
                 Showing <span className="font-semibold text-slate-900 dark:text-slate-100">{((page - 1) * limit) + 1}</span> to{" "}
                 <span className="font-semibold text-slate-900 dark:text-slate-100">
                   {Math.min(page * limit, totalElements)}

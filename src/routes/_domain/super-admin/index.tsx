@@ -71,14 +71,15 @@ function DashboardPage() {
           {/* Quick Action Controls */}
           <div className="flex items-center gap-2 shrink-0">
             {lastRefreshed && (
-              <Badge variant="outline" className="hidden sm:inline-flex gap-1.5 font-mono text-xs py-1.5 px-3">
-                <Clock className="size-3 text-muted-foreground" />
+              <Badge variant="outline" className="hidden rounded-md h-7! sm:inline-flex gap-1.5 font-mono text-xs py-2! px-3">
+                <Clock className="size-4 text-muted-foreground" />
                 Updated {lastRefreshed}
               </Badge>
             )}
             <Button
               variant="outline"
               size="sm"
+              className="h-7!"
               onClick={handleRefresh}
               disabled={isFetching}
             >

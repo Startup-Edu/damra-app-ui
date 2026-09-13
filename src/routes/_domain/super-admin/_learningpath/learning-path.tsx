@@ -329,11 +329,11 @@ function LearningPathPage() {
                       </TableCell>
 
                       {/* Learning Path Title */}
-                      <TableCell>
+                      <TableCell className="space-y-1" >
                         <div className="font-semibold text-xs">
                           {l.title_en}
                         </div>
-                        <div className="text-[10px] font-medium text-muted-foreground">
+                        <div className="text-xs font-medium text-muted-foreground">
                           {l.title_kh}
                         </div>
                       </TableCell>
@@ -436,7 +436,7 @@ function LearningPathPage() {
           {/* Pagination Footer */}
           {!isLoading && !isError && learningPaths.length > 0 && (
             <div className="flex items-center justify-between p-4 px-6 border-t">
-              <div className="text-[10px]">
+              <div className="text-xs">
                 Showing <span className="font-semibold">{((page - 1) * limit) + 1}</span> to{" "}
                 <span className="font-semibold">
                   {Math.min(page * limit, totalElements)}

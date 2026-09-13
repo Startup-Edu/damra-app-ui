@@ -123,7 +123,7 @@ export function ManagePermissionsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl h-[85vh] flex flex-col p-6 text-slate-900 dark:text-slate-50 border border-slate-100 dark:border-slate-800 shadow-xl">
+      <DialogContent className="max-w-4xl h-[85vh] flex flex-col p-6">
         <DialogHeader className="space-y-1">
           <div className="flex items-center gap-2">
             <DialogTitle className="text-lg font-bold">Configure Role Permissions</DialogTitle>

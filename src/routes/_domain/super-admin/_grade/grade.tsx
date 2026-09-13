@@ -284,7 +284,7 @@ function GradesPage() {
           {/* Pagination Footer */}
           {!isLoading && !isError && grades.length > 0 && (
             <div className="flex items-center justify-between p-4 px-6 border-t">
-              <div className="text-[10px]">
+              <div className="text-xs">
                 Showing <span className="font-semibold">{((page - 1) * limit) + 1}</span> to{" "}
                 <span className="font-semibold">
                   {Math.min(page * limit, totalElements)}

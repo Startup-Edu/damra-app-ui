@@ -94,7 +94,7 @@ export function PermissionsTab({ active = true }: PermissionsTabProps) {
   return (
     <div className="space-y-4">
       <Card className="py-0">
-        <div className="flex items-center gap-3 p-6 pb-4">
+        <div className="flex items-center gap-3 p-5 pb-4">
           <SearchInput
             placeholder="Search permissions..."
             value={search}
@@ -256,7 +256,7 @@ export function PermissionsTab({ active = true }: PermissionsTabProps) {
 
           {!isLoading && !isError && permissions.length > 0 && (
             <div className="flex items-center justify-between p-4 px-6 border-t bg-slate-50/30 dark:bg-slate-950/10">
-              <div className="text-[10px] text-slate-500 dark:text-slate-400">
+              <div className="text-xs text-slate-500 dark:text-slate-400">
                 Showing <span className="font-semibold text-slate-900 dark:text-slate-100">{((page - 1) * limit) + 1}</span> to{" "}
                 <span className="font-semibold text-slate-900 dark:text-slate-100">
                   {Math.min(page * limit, totalElements)}

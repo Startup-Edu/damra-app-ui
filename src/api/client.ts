@@ -27,7 +27,15 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 
   const data = await response.json()
   if (!response.ok) {
-    throw new Error(data.message || `Request failed with status ${response.status}`)
+    const errorDetailMsg =
+      (Array.isArray(data.error) && data.error[0]?.message) ||
+      data.error?.details?.[0]?.message ||
+      data.details?.[0]?.message ||
+      data.message ||
+      `Request failed with status ${response.status}`
+    const error = new Error(errorDetailMsg)
+    ;(error as any).data = data
+    throw error
   }
 
   return data

@@ -46,16 +46,16 @@ function CheckHealthPage() {
             </span>
             Project Ready
           </div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-neutral-900 to-neutral-500 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold tracking-tight">
             Damra Admin App
           </h1>
-          <p className="text-sm text-neutral-500 dark:text-slate-400">
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">
             A state-of-the-art admin interface connected to your secure authentication services.
           </p>
         </div>
 
         {/* Health Checker Card */}
-        <Card className="border-slate-200/50 dark:border-slate-800/50 bg-white/70 dark:bg-slate-900/30 backdrop-blur-2xl shadow-[0_8px_40px_rgb(0,0,0,0.08)] dark:shadow-[0_8px_40px_rgb(0,0,0,0.2)] rounded-2xl overflow-hidden transition-all duration-300">
+        <Card className="overflow-hidden transition-all duration-300">
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
