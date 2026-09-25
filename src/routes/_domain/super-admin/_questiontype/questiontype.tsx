@@ -208,7 +208,7 @@ function QuestionTypesPage() {
                     actionLabel="Add Question Type"
                     actionIcon={Plus}
                     onAction={() => {
-                      setActiveQuestionType(null)
+                      setActiveQuestiontype(null)
                       setDialogOpen(true)
                     }}
                   />

@@ -19,7 +19,7 @@ export interface SearchableOption {
   [key: string]: any
 }
 
-export type SortableOptionProp =
+export type MultiSortableOptionProp =
   | boolean
   | 'asc'
   | 'desc'
@@ -34,7 +34,7 @@ export interface SearchableMultiSelectProps {
   emptyMessage?: string
   disabled?: boolean
   maxCount?: number
-  sortable?: SortableOptionProp
+  sortable?: MultiSortableOptionProp
   sortSelectedFirst?: boolean
   showSelectAll?: boolean
   className?: string

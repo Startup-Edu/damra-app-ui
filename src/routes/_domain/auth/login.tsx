@@ -14,20 +14,6 @@ export const Route = createFileRoute('/_domain/auth/login')({
   component: LoginPage,
 })
 
-interface LoginResponse {
-  success: boolean
-  status_code: number
-  message: string
-  message_kh: string
-  data: {
-    id: string
-    email: string
-    name: string
-    role: string
-    permissions: string[]
-  }
-}
-
 function LoginPage() {
   const navigate = useNavigate()
   const setAuth = useAuthStore((state) => state.setAuth)

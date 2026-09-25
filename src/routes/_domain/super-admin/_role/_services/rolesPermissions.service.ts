@@ -7,7 +7,6 @@ import type {
   CreatePermissionDTO,
   UpdatePermissionDTO,
   RoleItem,
-  PermissionItem,
   GetRolePermissionsResponse,
   RolePermissionStatus,
 } from '../_types/rolesPermissions.types'

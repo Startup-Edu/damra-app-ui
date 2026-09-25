@@ -13,7 +13,6 @@ import {
   RefreshCw,
   AlertCircle,
   Clock,
-  Sparkles,
 } from 'lucide-react'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useDashboardStatsQuery } from './_dashboard/_hooks/useDashboard'

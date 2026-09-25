@@ -20,8 +20,7 @@ import {
 } from '@/components/ui/select'
 import { useCreateUserMutation, useUpdateUserMutation, useRolesDropdownQuery } from '../_hooks/useUsers'
 import type { UserItem } from '../_types/users.types'
-import { Loader2, Camera, User, KeyRound, AlertTriangle } from 'lucide-react'
-import { Checkbox } from '@/components/ui/checkbox'
+import { Loader2, Camera, User, AlertTriangle } from 'lucide-react'
 
 interface UserDialogProps {
   open: boolean
@@ -35,8 +34,6 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
   const [password, setPassword] = useState('')
   const [roleId, setRoleId] = useState('')
   const [isActive, setIsActive] = useState(true)
-  const [resetPassword, setResetPassword] = useState(false)
-  const [avatarBase64, setAvatarBase64] = useState<string | undefined>(undefined)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   
   const [validationError, setValidationError] = useState('')
@@ -60,8 +57,6 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
         setPassword('')
         setRoleId(user.roles?.[0]?.id || '')
         setIsActive(user.is_active)
-        setResetPassword(false)
-        setAvatarBase64(undefined)
         setImagePreview(null)
       } else {
         setEmail('')
@@ -69,8 +64,6 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
         setPassword('')
         setRoleId('')
         setIsActive(true)
-        setResetPassword(false)
-        setAvatarBase64(undefined)
         setImagePreview(null)
       }
       setValidationError('')
@@ -89,7 +82,6 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
     const reader = new FileReader()
     reader.onloadend = () => {
       const base64String = reader.result as string
-      setAvatarBase64(base64String)
       setImagePreview(base64String)
     }
     reader.readAsDataURL(file)

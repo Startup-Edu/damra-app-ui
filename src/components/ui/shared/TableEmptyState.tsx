@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils'
 export type TableEmptyStateVariant = 'empty' | 'search' | 'filter' | 'error'
 export type TableEmptyStateSize = 'sm' | 'default' | 'lg'
 
-export interface TableEmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface TableEmptyStateProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   /**
    * The semantic scenario for the empty state.
    * - 'empty': The dataset is genuinely empty.

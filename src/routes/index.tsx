@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
-import { Map, Swords, Coins, Check, Gamepad2, ChevronRight, ShieldCheck, BarChart3, Sun, Moon } from 'lucide-react'
+import { Map, Swords, Coins, Check, ChevronRight, ShieldCheck, BarChart3, Sun, Moon } from 'lucide-react'
 
 // Define the root route
 export const Route = createFileRoute('/')({

@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { LayoutDashboard, Users, GraduationCap, Shield, ShieldCheck, X, PanelsTopLeft, FolderTree, Layers, BookOpen, FileQuestion, HelpCircle, BarChart3, type LucideIcon } from 'lucide-react'
+import { LayoutDashboard, Users, GraduationCap, Shield, ShieldCheck, X, PanelsTopLeft, FolderTree, Layers, BookOpen, FileQuestion, HelpCircle, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLayoutStore } from '@/store/useLayoutStore'
 import { ScrollArea } from '@/components/ui/scroll-area'

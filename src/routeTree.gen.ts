@@ -18,6 +18,7 @@ import { Route as DomainSuperAdminRolesPermissionsRouteImport } from './routes/_
 import { Route as DomainSuperAdminProfileRouteImport } from './routes/_domain/super-admin/profile'
 import { Route as DomainSuperAdminCheckHealthRouteImport } from './routes/_domain/super-admin/check-health'
 import { Route as DomainAuthResetPasswordRouteImport } from './routes/_domain/auth/reset-password'
+import { Route as DomainAuthRegisterRouteImport } from './routes/_domain/auth/register'
 import { Route as DomainAuthLoginRouteImport } from './routes/_domain/auth/login'
 import { Route as DomainAuthForgetPasswordRouteImport } from './routes/_domain/auth/forget-password'
 import { Route as DomainSuperAdminQuizpackQuizepackRouteImport } from './routes/_domain/super-admin/_quizpack/quizepack'
@@ -75,6 +76,11 @@ const DomainAuthResetPasswordRoute = DomainAuthResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => DomainAuthRoute,
 } as any)
+const DomainAuthRegisterRoute = DomainAuthRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => DomainAuthRoute,
+} as any)
 const DomainAuthLoginRoute = DomainAuthLoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -129,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/super-admin': typeof DomainSuperAdminRouteWithChildren
   '/auth/forget-password': typeof DomainAuthForgetPasswordRoute
   '/auth/login': typeof DomainAuthLoginRoute
+  '/auth/register': typeof DomainAuthRegisterRoute
   '/auth/reset-password': typeof DomainAuthResetPasswordRoute
   '/super-admin/check-health': typeof DomainSuperAdminCheckHealthRoute
   '/super-admin/profile': typeof DomainSuperAdminProfileRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/auth': typeof DomainAuthRouteWithChildren
   '/auth/forget-password': typeof DomainAuthForgetPasswordRoute
   '/auth/login': typeof DomainAuthLoginRoute
+  '/auth/register': typeof DomainAuthRegisterRoute
   '/auth/reset-password': typeof DomainAuthResetPasswordRoute
   '/super-admin/check-health': typeof DomainSuperAdminCheckHealthRoute
   '/super-admin/profile': typeof DomainSuperAdminProfileRoute
@@ -167,6 +175,7 @@ export interface FileRoutesById {
   '/_domain/super-admin': typeof DomainSuperAdminRouteWithChildren
   '/_domain/auth/forget-password': typeof DomainAuthForgetPasswordRoute
   '/_domain/auth/login': typeof DomainAuthLoginRoute
+  '/_domain/auth/register': typeof DomainAuthRegisterRoute
   '/_domain/auth/reset-password': typeof DomainAuthResetPasswordRoute
   '/_domain/super-admin/check-health': typeof DomainSuperAdminCheckHealthRoute
   '/_domain/super-admin/profile': typeof DomainSuperAdminProfileRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/super-admin'
     | '/auth/forget-password'
     | '/auth/login'
+    | '/auth/register'
     | '/auth/reset-password'
     | '/super-admin/check-health'
     | '/super-admin/profile'
@@ -206,6 +216,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/auth/forget-password'
     | '/auth/login'
+    | '/auth/register'
     | '/auth/reset-password'
     | '/super-admin/check-health'
     | '/super-admin/profile'
@@ -225,6 +236,7 @@ export interface FileRouteTypes {
     | '/_domain/super-admin'
     | '/_domain/auth/forget-password'
     | '/_domain/auth/login'
+    | '/_domain/auth/register'
     | '/_domain/auth/reset-password'
     | '/_domain/super-admin/check-health'
     | '/_domain/super-admin/profile'
@@ -310,6 +322,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DomainAuthResetPasswordRouteImport
       parentRoute: typeof DomainAuthRoute
     }
+    '/_domain/auth/register': {
+      id: '/_domain/auth/register'
+      path: '/register'
+      fullPath: '/auth/register'
+      preLoaderRoute: typeof DomainAuthRegisterRouteImport
+      parentRoute: typeof DomainAuthRoute
+    }
     '/_domain/auth/login': {
       id: '/_domain/auth/login'
       path: '/login'
@@ -372,12 +391,14 @@ declare module '@tanstack/react-router' {
 interface DomainAuthRouteChildren {
   DomainAuthForgetPasswordRoute: typeof DomainAuthForgetPasswordRoute
   DomainAuthLoginRoute: typeof DomainAuthLoginRoute
+  DomainAuthRegisterRoute: typeof DomainAuthRegisterRoute
   DomainAuthResetPasswordRoute: typeof DomainAuthResetPasswordRoute
 }
 
 const DomainAuthRouteChildren: DomainAuthRouteChildren = {
   DomainAuthForgetPasswordRoute: DomainAuthForgetPasswordRoute,
   DomainAuthLoginRoute: DomainAuthLoginRoute,
+  DomainAuthRegisterRoute: DomainAuthRegisterRoute,
   DomainAuthResetPasswordRoute: DomainAuthResetPasswordRoute,
 }
 

@@ -580,7 +580,6 @@ export function PathBuilderDialog({ open, onOpenChange, learningPath }: PathBuil
                 <Button
                   type="button"
                   variant="ghost"
-                  size="sm"
                   onClick={handleResetOrder}
                   disabled={syncPackagesMutation.isPending}
                   className="h-8 text-xs text-muted-foreground hover:text-foreground gap-1.5"

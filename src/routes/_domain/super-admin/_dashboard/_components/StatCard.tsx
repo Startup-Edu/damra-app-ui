@@ -3,7 +3,6 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/componen
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ArrowUpRight, type LucideIcon } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 interface StatCardProps {
   title: string
@@ -51,6 +50,7 @@ export function StatCard({
 
   return (
     <Card className="group transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40">
+
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           {title}
@@ -98,6 +98,7 @@ export function StatCard({
           Total {total}
         </span>
       </CardFooter>
+      
     </Card>
   )
 }
