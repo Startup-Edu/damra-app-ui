@@ -9,6 +9,7 @@ import { Loader2, Mail, Lock, Sun, Moon, ArrowLeft } from 'lucide-react'
 import { useAuthStore } from '@/store/useAuthStore'
 import { Label } from '@/components/ui/label'
 import { authApi } from '@/api/auth'
+import { useTheme } from '@/components/theme-provider'
 
 export const Route = createFileRoute('/_domain/auth/login')({
   component: LoginPage,
@@ -17,10 +18,11 @@ export const Route = createFileRoute('/_domain/auth/login')({
 function LoginPage() {
   const navigate = useNavigate()
   const setAuth = useAuthStore((state) => state.setAuth)
+  const { theme, setTheme } = useTheme()
+  const isDark = theme === 'dark'
   
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [isDark, setIsDark] = useState(false);
   const [greeting, setGreeting] = useState('Welcome back');
 
   // Dynamic Greeting Logic
@@ -37,43 +39,7 @@ function LoginPage() {
     }
   }, []);
 
-  // Match Landing Page Theme Logic
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-      document.documentElement.classList.add('dark');
-      setIsDark(true);
-    } else {
-      document.documentElement.classList.remove('dark');
-      setIsDark(false);
-    }
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLElement && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
-      if (e.key === 'd' || e.key === 'D') {
-        toggleTheme();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  const toggleTheme = () => {
-    setIsDark((prev) => {
-      const nextTheme = !prev;
-      if (nextTheme) {
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-      }
-      return nextTheme;
-    });
-  };
+  const toggleTheme = () => setTheme(isDark ? 'light' : 'dark')
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: { email: string; password: string }) => {

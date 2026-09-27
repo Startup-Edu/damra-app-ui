@@ -21,7 +21,8 @@ export interface RoleItem {
 export interface PermissionItem {
   id: string
   name: string
-  resource: string
+  resource?: string
+  module?: string
   action: string
   description: string | null
   is_active: boolean
@@ -73,8 +74,9 @@ export interface UpdateRoleDTO {
 }
 
 export interface CreatePermissionDTO {
-  name: string
-  resource: string
+  name?: string
+  module?: string
+  resource?: string
   action: string
   description?: string | null
   isActive?: boolean
@@ -82,6 +84,7 @@ export interface CreatePermissionDTO {
 
 export interface UpdatePermissionDTO {
   name?: string
+  module?: string
   resource?: string
   action?: string
   description?: string | null
@@ -89,22 +92,28 @@ export interface UpdatePermissionDTO {
 }
 
 export interface RolePermissionStatus {
-  permissionId: string
-  isAssigned: boolean
+  id: string
+  status: boolean
+  name?: string
 }
 
 export interface GetRolePermissionsResponse {
   success: boolean
   data: {
-    roleId: string
-    roleName: string
+    id?: string
+    roleId?: string
+    role_name?: string
+    roleName?: string
     permissions: Array<{
       id: string
       name: string
-      resource: string
-      action: string
-      description: string | null
-      is_assigned: boolean
+      resource?: string
+      action?: string
+      module?: string
+      description?: string | null
+      status?: boolean
+      is_assigned?: boolean
     }>
   }
 }
+

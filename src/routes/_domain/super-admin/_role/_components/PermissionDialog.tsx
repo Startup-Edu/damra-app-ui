@@ -41,8 +41,8 @@ export function PermissionDialog({ open, onOpenChange, permission }: PermissionD
       if (permission) {
         const permName = permission.name || ''
         const parts = permName.includes(':') ? permName.split(':') : []
-        const resName = permission.resource || (parts.length > 0 ? parts[0] : permName)
-        const actName = permission.action || (parts.length > 1 ? parts[1] : '')
+        const actName = permission.action || (parts.length > 0 ? parts[0] : '')
+        const resName = permission.module || permission.resource || (parts.length > 1 ? parts[1] : permName)
 
         setAction(actName || '')
         setResource(resName || '')
@@ -70,13 +70,13 @@ export function PermissionDialog({ open, onOpenChange, permission }: PermissionD
 
     const cleanAction = actStr.toLowerCase()
     const cleanResource = resStr.toLowerCase()
-    const name = `${cleanResource}:${cleanAction}`
+    const name = `${cleanAction}:${cleanResource}`
 
     if (isEditing && permission) {
       updateMutation.mutate(
         {
           id: permission.id,
-          data: { name, action: cleanAction, resource: cleanResource, isActive },
+          data: { name, action: cleanAction, module: cleanResource, resource: cleanResource, isActive },
         },
         {
           onSuccess: (res) => {
@@ -85,7 +85,7 @@ export function PermissionDialog({ open, onOpenChange, permission }: PermissionD
         }
       )
     } else {
-      createMutation.mutate([{ name, action: cleanAction, resource: cleanResource }], {
+      createMutation.mutate([{ name, action: cleanAction, module: cleanResource, resource: cleanResource }], {
         onSuccess: (res) => {
           if (res.success) onOpenChange(false)
         },

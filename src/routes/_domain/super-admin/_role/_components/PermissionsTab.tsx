@@ -212,10 +212,10 @@ export function PermissionsTab({ active = true }: PermissionsTabProps) {
                   permissions.map((permission) => (
                     <TableRow key={permission.id}>
                       <TableCell className="pl-6 py-3 text-foreground capitalize font-medium text-xs">
-                        {permission.resource || (permission.name?.includes(':') ? permission.name.split(':')[0] : permission.name || '-')}
+                        {permission.module || permission.resource || (permission.name?.includes(':') ? permission.name.split(':')[1] : permission.name || '-')}
                       </TableCell>
                       <TableCell className="text-muted-foreground capitalize text-xs">
-                        {permission.action || (permission.name?.includes(':') ? permission.name.split(':')[1] : '-')}
+                        {permission.action || (permission.name?.includes(':') ? permission.name.split(':')[0] : '-')}
                       </TableCell>
                       <TableCell className="py-3">
                         <Badge variant="outline" className="font-mono text-[9px] bg-muted/50 border-border">

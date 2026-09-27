@@ -33,7 +33,7 @@ export function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light" storageKey="damra-theme">
+      <ThemeProvider defaultTheme="light" storageKey="theme">
         <RouterProvider router={router} />
         {/* Mount Toaster globally here */}
         <Toaster position='top-center' /> 

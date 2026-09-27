@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useTheme } from '@/components/theme-provider'
 import { Map, Swords, Coins, Check, ChevronRight, ShieldCheck, BarChart3, Sun, Moon } from 'lucide-react'
 
 // Define the root route
@@ -8,47 +8,9 @@ export const Route = createFileRoute('/')({
 })
 
 function LandingPage() {
-  const [isDark, setIsDark] = useState(false);
-
-  // Initialize theme and setup 'd' keyboard shortcut
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-      document.documentElement.classList.add('dark');
-      setIsDark(true);
-    } else {
-      document.documentElement.classList.remove('dark');
-      setIsDark(false);
-    }
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if user is typing in an input or textarea
-      if (e.target instanceof HTMLElement && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
-      
-      if (e.key === 'd' || e.key === 'D') {
-        toggleTheme();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  const toggleTheme = () => {
-    setIsDark((prev) => {
-      const nextTheme = !prev;
-      if (nextTheme) {
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-      }
-      return nextTheme;
-    });
-  };
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === 'dark';
+  const toggleTheme = () => setTheme(isDark ? 'light' : 'dark');
 
   return (
     <div className="relative bg-background text-foreground transition-colors duration-300 font-sans min-h-screen flex flex-col selection:bg-amber-500/30">

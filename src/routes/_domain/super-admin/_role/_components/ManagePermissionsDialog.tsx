@@ -43,7 +43,8 @@ export function ManagePermissionsDialog({
     if (data?.success && data?.data?.permissions) {
       const initialMap = new Map<string, boolean>()
       data.data.permissions.forEach((p) => {
-        initialMap.set(p.id, p.is_assigned)
+        const assigned = Boolean(p.status ?? p.is_assigned ?? false)
+        initialMap.set(p.id, assigned)
       })
       setPermissionStates(initialMap)
     } else {
@@ -79,10 +80,14 @@ export function ManagePermissionsDialog({
 
   const handleSave = () => {
     if (!data?.data?.permissions) return
-    const payload = Array.from(permissionStates.entries()).map(([permissionId, isAssigned]) => ({
-      permissionId,
-      isAssigned,
-    }))
+    const payload = Array.from(permissionStates.entries()).map(([id, status]) => {
+      const perm = allPermissions.find((p) => p.id === id)
+      return {
+        id,
+        status,
+        name: perm?.name || '',
+      }
+    })
 
     updateMutation.mutate(
       { roleId, permissions: payload },
@@ -100,9 +105,10 @@ export function ManagePermissionsDialog({
     if (!search.trim()) return allPermissions
     const searchLower = search.toLowerCase()
     return allPermissions.filter((p) => {
+      const parts = p.name?.includes(':') ? p.name.split(':') : []
+      const permAction = (p.action || (parts.length > 0 ? parts[0] : '')).toLowerCase()
+      const permResource = (p.resource || p.module || (parts.length > 1 ? parts[1] : 'general')).toLowerCase()
       const permName = (p.name || '').toLowerCase()
-      const permResource = (p.resource || (p.name?.includes(':') ? p.name.split(':')[0] : '')).toLowerCase()
-      const permAction = (p.action || (p.name?.includes(':') ? p.name.split(':')[1] : '')).toLowerCase()
 
       return (
         permName.includes(searchLower) ||
@@ -114,7 +120,8 @@ export function ManagePermissionsDialog({
 
   const groupedPermissions = useMemo(() => {
     return filteredPermissions.reduce((acc, perm) => {
-      const resourceKey = perm.resource || (perm.name?.includes(':') ? perm.name.split(':')[0] : 'general')
+      const parts = perm.name?.includes(':') ? perm.name.split(':') : []
+      const resourceKey = perm.resource || perm.module || (parts.length > 1 ? parts[1] : 'general')
       if (!acc[resourceKey]) acc[resourceKey] = []
       acc[resourceKey].push(perm)
       return acc
@@ -131,7 +138,10 @@ export function ManagePermissionsDialog({
 
   const isDirty = useMemo(() => {
     if (!data?.data?.permissions) return false
-    return data.data.permissions.some((p) => p.is_assigned !== !!permissionStates.get(p.id))
+    return data.data.permissions.some((p) => {
+      const originalStatus = Boolean(p.status ?? p.is_assigned ?? false)
+      return originalStatus !== !!permissionStates.get(p.id)
+    })
   }, [data?.data?.permissions, permissionStates])
 
   const isSaving = updateMutation.isPending
@@ -264,7 +274,7 @@ export function ManagePermissionsDialog({
                                   className="text-xs font-semibold text-foreground capitalize cursor-pointer truncate"
                                   onClick={(e) => e.stopPropagation()}
                                 >
-                                  {p.action || (p.name?.includes(':') ? p.name.split(':')[1] : p.name)}
+                                  {p.action || (p.name?.includes(':') ? p.name.split(':')[0] : p.name)}
                                 </Label>
                                 <span className="text-[10px] font-mono text-muted-foreground truncate">
                                   {p.name}
