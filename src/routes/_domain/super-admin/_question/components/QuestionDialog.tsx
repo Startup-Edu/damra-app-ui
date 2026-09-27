@@ -25,6 +25,7 @@ import type {
   QuestionItem,
   QuestionTypeEnum,
   DifficultyEnum,
+  CreateQuestionDTO,
 } from '../_types/question.types'
 import { Loader2, AlertTriangle, Plus, Trash2 } from 'lucide-react'
 import ReactQuill from 'react-quill-new'
@@ -241,8 +242,8 @@ export function QuestionDialog({
         validationPayload = { correct_order: order }
       }
 
-      const payload = {
-        gradeId: value.gradeId,
+      const payload: CreateQuestionDTO = {
+        gradeId: value.gradeId || null,
         categoryId: value.categoryId,
         questionType: value.questionType,
         difficulty: value.difficulty,
@@ -259,7 +260,6 @@ export function QuestionDialog({
 
       if (isEditing && question) {
         const updatePayload: any = { ...payload }
-        delete updatePayload.categoryId
         updatePayload.isActive = value.isActive
 
         updateMutation.mutate(
@@ -353,7 +353,10 @@ export function QuestionDialog({
   const selectedGradeId = useStore(form.store, (s) => s.values.gradeId)
   const currentQuestionType = useStore(form.store, (s) => s.values.questionType)
   const { data: gradeCategoriesResponse, isLoading: gradeCategoriesLoading } = useGradeCategoriesQuery(selectedGradeId, !!selectedGradeId)
-  const availableCategories = selectedGradeId && gradeCategoriesResponse?.data ? gradeCategoriesResponse.data : allCategories
+  const availableCategories =
+    selectedGradeId && gradeCategoriesResponse?.data && gradeCategoriesResponse.data.length > 0
+      ? gradeCategoriesResponse.data
+      : allCategories
   
   const gradeSelectOptions = grades.map((g) => ({ value: g.id, label: `${g.name_en} (${g.name_kh})`, description: g.name_kh }))
   const categorySelectOptions = availableCategories.map((c) => ({ value: c.id, label: c.name_en, description: c.name_kh }))
@@ -458,7 +461,6 @@ export function QuestionDialog({
                         value={field.state.value}
                         onChange={(val) => {
                           field.handleChange(val)
-                          form.setFieldValue('categoryId', '') // Reset category on grade change
                         }}
                         disabled={isLoading}
                         sortable="asc"
@@ -481,9 +483,9 @@ export function QuestionDialog({
                         options={categorySelectOptions}
                         value={field.state.value}
                         onChange={field.handleChange}
-                        disabled={isEditing || isLoading || !selectedGradeId}
+                        disabled={isLoading}
                         sortable="asc"
-                        placeholder={!selectedGradeId ? "Select Grade first" : "Select Category"}
+                        placeholder="Select Category"
                         searchPlaceholder="Search category..."
                         triggerClassName="w-full"
                       />

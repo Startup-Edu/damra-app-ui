@@ -62,7 +62,7 @@ export function ChangePasswordCard() {
     <Card className="overflow-hidden transition-all duration-300">
       <CardHeader className="px-6 pt-6 pb-4">
         <CardTitle className="text-base font-bold flex items-center gap-2">
-          <KeyRound className="h-4.5 w-4.5 text-primary" /> Update Password
+          <KeyRound className="size-4 text-primary" /> Update Password
         </CardTitle>
         <CardDescription className="text-xs font-medium text-muted-foreground">
           Secure your administrative account by changing your login credentials.
@@ -75,7 +75,7 @@ export function ChangePasswordCard() {
               New Password
             </Label>
             <div className="relative group">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors duration-300" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors duration-160" />
               <Input
                 id="new-password"
                 type="password"
@@ -84,7 +84,7 @@ export function ChangePasswordCard() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={isPending}
-                className="h-10 rounded-lg pl-10"
+                className="pl-9"
               />
             </div>
           </div>
@@ -94,7 +94,7 @@ export function ChangePasswordCard() {
               Confirm New Password
             </Label>
             <div className="relative group">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors duration-300" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors duration-160" />
               <Input
                 id="confirm-password"
                 type="password"
@@ -103,7 +103,7 @@ export function ChangePasswordCard() {
                 onChange={(e) => setConfirmedPassword(e.target.value)}
                 required
                 disabled={isPending}
-                className="h-10 rounded-lg pl-10"
+                className="pl-9"
               />
             </div>
           </div>
@@ -134,19 +134,19 @@ export function ChangePasswordCard() {
             <Button
               type="submit"
               disabled={isPending || !password || !confirmedPassword || !isPasswordValid || password !== confirmedPassword}
-              className="relative overflow-hidden bg-primary hover:bg-primary/90 text-white rounded-lg h-9 px-6 text-xs font-semibold transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none group"
+              className="relative overflow-hidden group"
             >
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
 
               <span className="relative flex items-center justify-center gap-1.5">
                 {isPending ? (
                   <>
-                    <Loader2 className="mr-1.5 size-3.5 animate-spin" />
+                    <Loader2 className="size-3.5 animate-spin" />
                     Updating...
                   </>
                 ) : (
                   <>
-                    <KeyRound className="mr-1.5 size-3.5" />
+                    <KeyRound className="size-3.5" />
                     Save Password
                   </>
                 )}

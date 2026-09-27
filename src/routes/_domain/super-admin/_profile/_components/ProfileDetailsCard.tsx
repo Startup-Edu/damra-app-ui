@@ -47,7 +47,7 @@ export function ProfileDetailsCard() {
               Full Name
             </Label>
             <div className="relative group">
-              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors duration-300" />
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors duration-160" />
               <Input
                 id="name"
                 type="text"
@@ -56,7 +56,7 @@ export function ProfileDetailsCard() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 disabled={isPending}
-                className="h-10 rounded-lg pl-10"
+                className="pl-9"
               />
             </div>
           </div>
@@ -66,7 +66,7 @@ export function ProfileDetailsCard() {
               Email Address
             </Label>
             <div className="relative group">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors duration-300" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors duration-160" />
               <Input
                 id="email"
                 type="email"
@@ -75,7 +75,7 @@ export function ProfileDetailsCard() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={isPending}
-                className="h-10 rounded-lg pl-10"
+                className="pl-9"
               />
             </div>
           </div>
@@ -84,19 +84,19 @@ export function ProfileDetailsCard() {
             <Button
               type="submit"
               disabled={isPending || isUnchanged}
-              className="relative overflow-hidden bg-primary hover:bg-primary/90 text-white rounded-lg h-9 px-6 text-xs font-semibold transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none group"
+              className="relative overflow-hidden group"
             >
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
 
               <span className="relative flex items-center justify-center gap-1.5">
                 {isPending ? (
                   <>
-                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                    <Loader2 className="size-3.5 animate-spin" />
                     Saving...
                   </>
                 ) : (
                   <>
-                    <Save className="mr-1.5 h-3.5 w-3.5" />
+                    <Save className="size-3.5" />
                     Save Changes
                   </>
                 )}

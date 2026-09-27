@@ -56,7 +56,7 @@ function DashboardPage() {
   return (
     <div className="flex flex-col gap-6 text-foreground pb-8">
       {/* Header Banner */}
-      <Card>
+      <Card className="py-0">
         <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 sm:p-8">
           <div className="flex flex-col gap-2">
             <CardTitle className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">

@@ -62,7 +62,10 @@ export function QuestionImportDialog({
 
   const grades = gradesResponse?.data || []
   const allCategories = allCategoriesResponse?.data || []
-  const availableCategories = presetGradeId && gradeCategoriesResponse?.data ? gradeCategoriesResponse.data : allCategories
+  const availableCategories =
+    presetGradeId && gradeCategoriesResponse?.data && gradeCategoriesResponse.data.length > 0
+      ? gradeCategoriesResponse.data
+      : allCategories
 
   const importMutation = useImportQuestionsMutation()
 

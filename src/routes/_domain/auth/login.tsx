@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input' 
-import { Loader2, Mail, Lock, Sun, Moon, ArrowLeft } from 'lucide-react'
+import { Loader2, Mail, Lock, Sun, Moon, ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import { useAuthStore } from '@/store/useAuthStore'
 import { Label } from '@/components/ui/label'
 import { authApi } from '@/api/auth'
@@ -23,21 +23,22 @@ function LoginPage() {
   
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [greeting, setGreeting] = useState('Welcome back');
+  const [showPassword, setShowPassword] = useState(false)
+  const [greeting, setGreeting] = useState('Welcome back')
 
   // Dynamic Greeting Logic
   useEffect(() => {
-    const hour = new Date().getHours();
+    const hour = new Date().getHours()
     if (hour >= 5 && hour < 12) {
-      setGreeting('Good morning');
+      setGreeting('Good morning')
     } else if (hour >= 12 && hour < 17) {
-      setGreeting('Good afternoon');
+      setGreeting('Good afternoon')
     } else if (hour >= 17 && hour < 22) {
-      setGreeting('Good evening');
+      setGreeting('Good evening')
     } else {
-      setGreeting('Welcome back'); // Late night fallback
+      setGreeting('Welcome back') // Late night fallback
     }
-  }, []);
+  }, [])
 
   const toggleTheme = () => setTheme(isDark ? 'light' : 'dark')
 
@@ -66,29 +67,29 @@ function LoginPage() {
   }
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-background text-foreground transition-colors duration-300 font-sans p-4 sm:p-8 selection:bg-amber-500/30">
+    <div className="relative min-h-screen flex items-center justify-center bg-background text-foreground transition-colors duration-300 font-sans p-4 sm:p-8 selection:bg-primary/20">
       
-      {/* Subtle Grid Background (From the Center) */}
-      <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_30%,transparent_100%)]"></div>
+      {/* Subtle Grid Background */}
+      <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_30%,transparent_100%)]" />
       
       {/* PARENT CARD WRAPPER */}
-      <Card className="w-full max-w-[460px] relative z-10  overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <Card className="w-full max-w-[460px] relative z-10 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
 
         <div className="p-6 sm:p-8 flex flex-col gap-8">
           
-          {/* Action Buttons (Integrated into the card) */}
+          {/* Action Buttons */}
           <div className="flex justify-between items-center w-full">
             <Link 
               to="/" 
-              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-accent"
+              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-accent active:scale-[0.97]"
             >
               <ArrowLeft className="size-4" /> Home
             </Link>
             <button 
               onClick={toggleTheme}
-              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-              aria-label="Toggle theme (Press D)"
-              title="Toggle theme (Press 'd')"
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-all active:scale-[0.95]"
+              aria-label="Toggle theme"
+              title="Toggle theme"
             >
               {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
             </button>
@@ -117,7 +118,7 @@ function LoginPage() {
                     Email Address
                   </Label>
                   <div className="relative group">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground group-focus-within:text-amber-500 transition-colors duration-300" />
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4.5 text-muted-foreground group-focus-within:text-primary transition-colors duration-200" />
                     <Input
                       id="email"
                       type="email"
@@ -126,7 +127,7 @@ function LoginPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       required
                       disabled={loginMutation.isPending}
-                      className="h-12 rounded-lg pl-11 transition-all"
+                      className="h-11 rounded-lg pl-10.5 pr-4 transition-all"
                     />
                   </div>
                 </div>
@@ -137,22 +138,30 @@ function LoginPage() {
                     <Label htmlFor="password" className="text-sm font-semibold text-foreground">
                       Password
                     </Label>
-                    <Link to="/auth/forget-password" className="text-sm font-semibold text-primary dark:text-primary hover:text-primary/80 dark:hover:text-primary/80 transition-colors">
+                    <Link to="/auth/forget-password" className="text-sm font-medium text-primary hover:text-primary/80 transition-colors">
                       Forgot password?
                     </Link>
                   </div>
                   <div className="relative group">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground group-focus-within:text-amber-500 transition-colors duration-300" />
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4.5 text-muted-foreground group-focus-within:text-primary transition-colors duration-200" />
                     <Input
                       id="password"
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       disabled={loginMutation.isPending}
-                      className="h-12 rounded-lg pl-11 transition-all"
+                      className="h-11 rounded-lg pl-10.5 pr-11 transition-all"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground active:scale-[0.92] transition-transform p-0.5"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                    </button>
                   </div>
                 </div>
 
@@ -160,9 +169,9 @@ function LoginPage() {
                 <Button 
                   type="submit" 
                   disabled={loginMutation.isPending}
-                  className="w-full mt-2 relative overflow-hidden bg-primary hover:bg-primary/90 text-white rounded-lg !h-12 text-base font-semibold transition-all active:scale-[0.98] group"
+                  className="w-full mt-2 relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-11 text-base font-semibold group"
                 >
-                  <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+                  <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
                   
                   {loginMutation.isPending ? (
                     <>
@@ -181,7 +190,7 @@ function LoginPage() {
             <div className="text-center mt-2">
               <p className="text-sm text-muted-foreground">
                 Don't have an account?{' '}
-                <Link to="/auth/register" className="font-semibold text-amber-600 dark:text-amber-500 hover:text-amber-700 dark:hover:text-amber-400 transition-colors">
+                <Link to="/auth/register" className="font-semibold text-primary hover:text-primary/80 hover:underline transition-colors">
                   Sign up
                 </Link>
               </p>
@@ -190,14 +199,6 @@ function LoginPage() {
           </div>
         </div>
       </Card>
-
-      {/* Global styles for the button shimmer effect */}
-      <style>{`
-        @keyframes shimmer {
-          100% { transform: translateX(100%); }
-        }
-      `}</style>
-
     </div>
   )
 }

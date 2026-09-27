@@ -204,7 +204,6 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
 
@@ -219,7 +218,6 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
           </div>
@@ -236,7 +234,6 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
               <p className="text-[9px] text-muted-foreground leading-tight">
                 Requires minimum 8 characters with at least one uppercase, lowercase, number, and symbol.
@@ -249,7 +246,7 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
               Assigned Role
             </Label>
             <Select value={roleId} onValueChange={setRoleId} disabled={isLoading}>
-              <SelectTrigger id="user-role" className="w-full h-9.5 text-xs border border-input">
+              <SelectTrigger id="user-role" className="w-full">
                 <SelectValue placeholder="Select a role..." />
               </SelectTrigger>
               <SelectContent>
@@ -304,12 +301,11 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
-              className="!h-9 text-xs"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading} className="!h-9 text-xs">
-              {isLoading && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 size-3.5 animate-spin" />}
               {isEditing ? 'Save Profile' : 'Register User'}
             </Button>
           </DialogFooter>

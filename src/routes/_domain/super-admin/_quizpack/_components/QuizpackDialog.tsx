@@ -151,7 +151,7 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
         <form id="quizpack-form" onSubmit={handleSubmit} className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-6 flex flex-col gap-6">
           {/* Title */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="quizpack-title">
+            <Label htmlFor="quizpack-title" className="text-xs">
               Package Title <span className="text-destructive">*</span>
             </Label>
             <Input
@@ -160,13 +160,12 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               disabled={isLoading}
-              className="h-9.5 text-xs"
             />
           </div>
 
           {/* Description */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="quizpack-desc">
+            <Label htmlFor="quizpack-desc" className="text-xs">
               Description
             </Label>
             <Input
@@ -175,13 +174,12 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               disabled={isLoading}
-              className="h-9.5 text-xs"
             />
           </div>
 
           {/* Category selection */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="quizpack-category">
+            <Label htmlFor="quizpack-category" className="text-xs">
               Category Alignment (Optional)
             </Label>
             <SearchableSelect
@@ -194,7 +192,7 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
               emptyMessage={categoriesLoading ? 'Loading categories...' : 'No categories found.'}
               disabled={isLoading}
               clearable={true}
-              triggerClassName="w-full h-9.5 text-xs"
+              triggerClassName="w-full"
               contentClassName="w-[var(--radix-popover-trigger-width)] min-w-[280px]"
             />
           </div>
@@ -202,7 +200,7 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
           {/* Pricing & Session Size */}
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="quizpack-price">
+              <Label htmlFor="quizpack-price" className="text-xs">
                 Coin Price {!isFree && <span className="text-destructive">*</span>}
               </Label>
               <Input
@@ -213,12 +211,11 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
                 value={isFree ? 0 : priceCoins}
                 onChange={(e) => setPriceCoins(e.target.value ? Number(e.target.value) : '')}
                 disabled={isLoading || isFree}
-                className="h-9.5 text-xs"
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="quizpack-session">
+              <Label htmlFor="quizpack-session" className="text-xs">
                 Questions / Session
               </Label>
               <Input
@@ -229,15 +226,14 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
                 value={questionsPerSession}
                 onChange={(e) => setQuestionsPerSession(e.target.value ? Number(e.target.value) : '')}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
           </div>
 
           {/* Is Free Toggle */}
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted border border-border">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border">
             <div className="flex flex-col gap-0.5">
-              <Label htmlFor="quizpack-free">
+              <Label htmlFor="quizpack-free" className="text-xs">
                 Free Package
               </Label>
               <p className="text-[11px] text-muted-foreground">
@@ -256,9 +252,9 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
           </div>
 
           {/* Active Status Toggle */}
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted border border-border">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border">
             <div className="flex flex-col gap-0.5">
-              <Label htmlFor="quizpack-status">
+              <Label htmlFor="quizpack-status" className="text-xs">
                 Active Status
               </Label>
               <p className="text-[11px] text-muted-foreground">
@@ -274,7 +270,7 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
           </div>
 
           {validationError && (
-            <div className="flex items-start gap-2 p-3 rounded-lg border border-destructive/10 bg-destructive/5 text-destructive">
+            <div className="flex items-start gap-2 p-3 rounded-lg border border-destructive/20 bg-destructive/10 text-destructive">
               <AlertTriangle className="size-4 shrink-0 mt-0.5" />
               <p className="text-xs font-medium leading-tight">{validationError}</p>
             </div>
@@ -287,7 +283,6 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
-            className="!h-9 text-xs"
           >
             Cancel
           </Button>
@@ -295,7 +290,6 @@ export function QuizpackDialog({ open, onOpenChange, quizpack }: QuizpackDialogP
             type="submit"
             form="quizpack-form"
             disabled={isLoading}
-            className="!h-9 text-xs"
           >
             {isLoading && <Loader2 className="mr-2 size-3.5 animate-spin" />}
             {isEditing ? 'Save Changes' : 'Create Package'}

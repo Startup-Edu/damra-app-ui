@@ -26,8 +26,8 @@ const sizeConfig = {
     clearBtnSize: 'p-0.5',
   },
   default: {
-    inputHeight: 'h-9.5 text-xs',
-    padding: 'pl-8.5 pr-8',
+    inputHeight: 'h-9 text-xs',
+    padding: 'pl-9 pr-8',
     iconSize: 'h-3.5 w-3.5',
     iconLeft: 'left-3',
     clearRight: 'right-2.5',

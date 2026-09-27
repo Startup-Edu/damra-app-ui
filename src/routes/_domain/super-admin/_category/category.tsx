@@ -13,22 +13,11 @@ import {
   TableHead,
   TableCell,
 } from '@/components/ui/table'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationEllipsis,
-} from '@/components/ui/pagination'
 import { DeleteModal } from '@/components/ui/delete-modal'
-import { TableEmptyStateRow, SearchInput } from '@/components/ui/shared'
+import { TableEmptyStateRow, TableToolbar, DataTablePagination } from '@/components/ui/shared'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import {
-  RefreshCw,
   Plus,
-  Loader2,
   Folder,
   Tag,
 } from 'lucide-react'
@@ -96,298 +85,218 @@ function CategoriesPage() {
         title="Categories"
         description="Organize content and quizzes into structured, 2-level taxonomy configurations."
       >
-        <Button onClick={handleAdd} className="text-xs !h-9">
-          <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Category
+        <Button onClick={handleAdd}>
+          <Plus className="mr-1.5 size-4" /> Add Category
         </Button>
       </PageHeader>
 
       {/* Main Content Card */}
       <Card className="py-0">
         {/* Toolbar */}
-        <div className="flex items-center justify-between gap-3 p-5 pb-0">
-          <SearchInput
-            placeholder="Search categories by English or Khmer name..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value)
-              setPage(1)
-            }}
-            onClear={() => {
-              setSearch('')
-              setPage(1)
-            }}
-            containerClassName="flex-1 max-w-md"
-            sizeVariant="default"
-          />
-
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => {
-              refetch().then(() => {
-                toast.success('Categories list refreshed successfully')
-              })
-            }}
-            disabled={isFetching}
-            className="h-9.5 w-9.5"
-          >
-            {isFetching ? (
-              <Loader2 className="h-4.5 w-4.5 animate-spin" />
-            ) : (
-              <RefreshCw className="h-4.5 w-4.5" />
-            )}
-          </Button>
-        </div>
+        <TableToolbar
+          searchPlaceholder="Search categories by English or Khmer name..."
+          searchValue={search}
+          onSearchChange={(val) => {
+            setSearch(val)
+            setPage(1)
+          }}
+          onRefresh={() => {
+            refetch().then(() => {
+              toast.success('Categories list refreshed successfully')
+            })
+          }}
+          isRefreshing={isFetching}
+        />
 
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="pl-6 w-[80px]">Icon</TableHead>
-                <TableHead>Category Name</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Slug</TableHead>
-                <TableHead>Hierarchy</TableHead>
-                <TableHead>Sort Order</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="pr-6 text-right w-[120px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
+          <div className="relative w-full overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="w-[80px]">Icon</TableHead>
+                  <TableHead>Category Name</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Slug</TableHead>
+                  <TableHead>Hierarchy</TableHead>
+                  <TableHead>Sort Order</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right w-[120px]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
 
-            <TableBody>
-              {isLoading ? (
-                // Loading Skeletons
-                Array.from({ length: 5 }).map((_, idx) => (
-                  <TableRow key={idx}>
-                    <TableCell className="pl-6">
-                      <Skeleton className="h-8 w-8 rounded-md" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1.5">
-                        <Skeleton className="h-4 w-32" />
-                        <Skeleton className="h-3.5 w-24" />
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-4 w-48" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-4 w-24" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-5 w-20 rounded-full" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-4 w-8" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-5 w-14 rounded-full" />
-                    </TableCell>
-                    <TableCell className="pr-6">
-                      <div className="flex justify-end gap-2">
-                        <Skeleton className="h-8 w-8 rounded-md" />
-                        <Skeleton className="h-8 w-8 rounded-md" />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : isError ? (
-                <TableEmptyStateRow
-                  colSpan={8}
-                  variant="error"
-                  onAction={() => refetch()}
-                />
-              ) : categories.length === 0 ? (
-                debouncedSearch ? (
-                  <TableEmptyStateRow
-                    colSpan={8}
-                    variant="search"
-                    searchQuery={debouncedSearch}
-                    onClear={() => {
-                      setSearch('')
-                      setPage(1)
-                    }}
-                  />
-                ) : (
-                  <TableEmptyStateRow
-                    colSpan={8}
-                    variant="empty"
-                    title="No categories created yet"
-                    description="Create your first quiz category to organize your question bank."
-                    actionLabel="Create Category"
-                    actionIcon={Plus}
-                    onAction={() => {
-                      setActiveCategory(null)
-                      setDialogOpen(true)
-                    }}
-                  />
-                )
-              ) : (
-                // Data List
-                categories.map((cat) => (
-                  <TableRow key={cat.id}>
-                    {/* Icon Column */}
-                    <TableCell className="pl-6 py-3.5">
-                      <div className="size-8 rounded-md bg-muted/40 border border-border flex items-center justify-center overflow-hidden shrink-0">
-                        {cat.icon_url ? (
-                          <img src={cat.icon_url} alt={cat.name_en} className="size-5 object-contain" />
-                        ) : cat.parent_id ? (
-                          <Tag className="size-4 text-emerald-500" />
-                        ) : (
-                          <Folder className="size-4 text-blue-500 fill-blue-500/10" />
-                        )}
-                      </div>
-                    </TableCell>
-
-                    {/* Name Column */}
-                    <TableCell>
-                      <div className="font-semibold text-xs">
-                        {cat.name_en}
-                      </div>
-                      <div className="text-[10px] font-medium">
-                        {cat.name_kh}
-                      </div>
-                    </TableCell>
-
-                    {/* Description Column */}
-                    <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">
-                      {cat.description_en || <span className="">-</span>}
-                      {cat.description_kh && (
-                        <div className="text-[10px] font-medium truncate">
-                          {cat.description_kh}
+              <TableBody>
+                {isLoading ? (
+                  // Loading Skeletons
+                  Array.from({ length: 5 }).map((_, idx) => (
+                    <TableRow key={idx}>
+                      <TableCell className="pl-6">
+                        <Skeleton className="size-8 rounded-md" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1.5">
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-3.5 w-24" />
                         </div>
-                      )}
-                    </TableCell>
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-48" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-24" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-5 w-20 rounded-full" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-8" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-5 w-14 rounded-full" />
+                      </TableCell>
+                      <TableCell className="pr-6">
+                        <div className="flex justify-end gap-2">
+                          <Skeleton className="size-8 rounded-md" />
+                          <Skeleton className="size-8 rounded-md" />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : isError ? (
+                  <TableEmptyStateRow
+                    colSpan={8}
+                    variant="error"
+                    onAction={() => refetch()}
+                  />
+                ) : categories.length === 0 ? (
+                  debouncedSearch ? (
+                    <TableEmptyStateRow
+                      colSpan={8}
+                      variant="search"
+                      searchQuery={debouncedSearch}
+                      onClear={() => {
+                        setSearch('')
+                        setPage(1)
+                      }}
+                    />
+                  ) : (
+                    <TableEmptyStateRow
+                      colSpan={8}
+                      variant="empty"
+                      title="No categories created yet"
+                      description="Create your first quiz category to organize your question bank."
+                      actionLabel="Create Category"
+                      actionIcon={Plus}
+                      onAction={() => {
+                        setActiveCategory(null)
+                        setDialogOpen(true)
+                      }}
+                    />
+                  )
+                ) : (
+                  // Data List
+                  categories.map((cat) => (
+                    <TableRow key={cat.id}>
+                      {/* Icon Column */}
+                      <TableCell>
+                        <div className="size-8 rounded-md bg-muted/40 border border-border flex items-center justify-center overflow-hidden shrink-0">
+                          {cat.icon_url ? (
+                            <img src={cat.icon_url} alt={cat.name_en} className="size-5 object-contain" />
+                          ) : cat.parent_id ? (
+                            <Tag className="size-4 text-emerald-500" />
+                          ) : (
+                            <Folder className="size-4 text-blue-500 fill-blue-500/10" />
+                          )}
+                        </div>
+                      </TableCell>
 
-                    {/* Slug Column */}
-                    <TableCell className="text-xs font-mono">
-                      {cat.slug}
-                    </TableCell>
+                      {/* Name Column */}
+                      <TableCell>
+                        <div className="font-semibold text-xs">
+                          {cat.name_en}
+                        </div>
+                        <div className="text-[10px] font-medium text-muted-foreground">
+                          {cat.name_kh}
+                        </div>
+                      </TableCell>
 
-                    {/* Hierarchy Level Column */}
-                    <TableCell>
-                      {cat.parent ? (
-                        <Badge variant="outline" className="bg-muted/40 text-emerald-600 dark:text-emerald-400 border-emerald-500/10 text-[10px] px-2 py-0.5 rounded-sm font-medium">
-                          Subcategory of {cat.parent.name_en}
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary" className="bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border-blue-500/10 text-[10px] px-2 py-0.5 rounded-sm font-medium">
-                          Root Category
-                        </Badge>
-                      )}
-                    </TableCell>
+                      {/* Description Column */}
+                      <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">
+                        {cat.description_en || <span className="">-</span>}
+                        {cat.description_kh && (
+                          <div className="text-[10px] font-medium truncate text-muted-foreground">
+                            {cat.description_kh}
+                          </div>
+                        )}
+                      </TableCell>
 
-                    {/* Sort Order Column */}
-                    <TableCell className="text-xs font-medium">
-                      {cat.sort_order}
-                    </TableCell>
+                      {/* Slug Column */}
+                      <TableCell className="text-xs font-mono text-muted-foreground">
+                        {cat.slug}
+                      </TableCell>
 
-                    {/* Status Column */}
-                    <TableCell>
-                      {cat.is_active ? (
-                        <Badge variant="success">
-                          Active
-                        </Badge>
-                      ) : (
-                        <Badge variant="destructive">
-                          Inactive
-                        </Badge>
-                      )}
-                    </TableCell>
+                      {/* Hierarchy Level Column */}
+                      <TableCell>
+                        {cat.parent ? (
+                          <Badge variant="outline" className="bg-muted/40 text-emerald-600 dark:text-emerald-400 border-emerald-500/10 text-[10px] px-2 py-0.5 rounded-sm font-medium">
+                            Subcategory of {cat.parent.name_en}
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary" className="bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border-blue-500/10 text-[10px] px-2 py-0.5 rounded-sm font-medium">
+                            Root Category
+                          </Badge>
+                        )}
+                      </TableCell>
 
-                    {/* Actions Column */}
-                    <TableCell className="pr-6 text-right">
-                      <div className="flex justify-end gap-1">
-                        <ActionButton
-                          actionType="edit"
-                          tooltip="Edit Category"
-                          onClick={() => handleEdit(cat)}
-                        />
-                        <ActionButton
-                          actionType="delete"
-                          tooltip="Delete Category"
-                          onClick={() => handleDeleteTrigger(cat)}
-                        />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                      {/* Sort Order Column */}
+                      <TableCell className="text-xs font-medium">
+                        {cat.sort_order}
+                      </TableCell>
+
+                      {/* Status Column */}
+                      <TableCell>
+                        {cat.is_active ? (
+                          <Badge variant="success">
+                            Active
+                          </Badge>
+                        ) : (
+                          <Badge variant="destructive">
+                            Inactive
+                          </Badge>
+                        )}
+                      </TableCell>
+
+                      {/* Actions Column */}
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          <ActionButton
+                            actionType="edit"
+                            tooltip="Edit Category"
+                            onClick={() => handleEdit(cat)}
+                          />
+                          <ActionButton
+                            actionType="delete"
+                            tooltip="Delete Category"
+                            onClick={() => handleDeleteTrigger(cat)}
+                          />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
 
           {/* Pagination Footer */}
           {!isLoading && !isError && categories.length > 0 && (
-            <div className="flex items-center justify-between p-4 px-6 border-t">
-              <div className="text-xs">
-                Showing <span className="font-semibold">{((page - 1) * limit) + 1}</span> to{" "}
-                <span className="font-semibold">
-                  {Math.min(page * limit, totalElements)}
-                </span>{" "}
-                of <span className="font-semibold">{totalElements}</span> categories
-              </div>
-
-              <Pagination className="mx-0 w-auto">
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        if (page > 1) setPage(page - 1)
-                      }}
-                      className={page === 1 ? "pointer-events-none opacity-50" : undefined}
-                    />
-                  </PaginationItem>
-
-                  {Array.from({ length: totalPages }).map((_, idx) => {
-                    const pageNum = idx + 1
-                    if (pageNum === 1 || pageNum === totalPages || Math.abs(pageNum - page) <= 1) {
-                      return (
-                        <PaginationItem key={pageNum}>
-                          <PaginationLink
-                            href="#"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              setPage(pageNum)
-                            }}
-                            isActive={page === pageNum}
-                          >
-                            {pageNum}
-                          </PaginationLink>
-                        </PaginationItem>
-                      )
-                    }
-                    if (pageNum === 2 && page > 3) {
-                      return (
-                        <PaginationItem key="ellipsis-start">
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                      )
-                    }
-                    if (pageNum === totalPages - 1 && page < totalPages - 2) {
-                      return (
-                        <PaginationItem key="ellipsis-end">
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                      )
-                    }
-                    return null
-                  })}
-
-                  <PaginationItem>
-                    <PaginationNext
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        if (page < totalPages) setPage(page + 1)
-                      }}
-                      className={page === totalPages || totalPages === 0 ? "pointer-events-none opacity-50" : undefined}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
+            <DataTablePagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalElements={totalElements}
+              pageSize={limit}
+              onPageChange={setPage}
+              itemLabel="categories"
+            />
           )}
         </CardContent>
       </Card>

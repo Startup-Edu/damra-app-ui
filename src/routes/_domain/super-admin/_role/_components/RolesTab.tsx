@@ -11,31 +11,9 @@ import {
   TableHead,
   TableCell,
 } from '@/components/ui/table'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination'
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from '@/components/ui/alert-dialog'
-import {
-  RefreshCw,
-  Plus,
-  Loader2,
-} from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { ActionButton } from '@/components/ui/action-button'
-import { TableEmptyStateRow, SearchInput } from '@/components/ui/shared'
+import { TableEmptyStateRow, TableToolbar, DataTablePagination, ConfirmationModal } from '@/components/ui/shared'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { useRolesQuery, useDeleteRoleMutation } from '../_hooks/useRolesPermissions'
 import type { RoleItem } from '../_types/rolesPermissions.types'
@@ -99,59 +77,31 @@ export function RolesTab() {
   return (
     <div className="space-y-4">
       <Card className="py-0">
-        <div className="flex items-center gap-3 p-5 pb-0">
-          <SearchInput
-            placeholder="Search roles..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value)
-              setPage(1)
-            }}
-            onClear={() => {
-              setSearch('')
-              setPage(1)
-            }}
-            containerClassName="flex-1 max-w-md"
-            sizeVariant="default"
-          />
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => refetch()}
-              disabled={isLoading}
-              className="h-9 w-9"
-            >
-              {isLoading ? (
-                <Loader2 className="h-4.5 w-4.5 animate-spin" />
-              ) : (
-                <RefreshCw className="h-4.5 w-4.5" />
-              )}
+        <TableToolbar
+          searchPlaceholder="Search roles..."
+          searchValue={search}
+          onSearchChange={(val) => {
+            setSearch(val)
+            setPage(1)
+          }}
+          onRefresh={() => refetch()}
+          isRefreshing={isLoading}
+          actions={
+            <Button onClick={handleAdd}>
+              <Plus className="mr-1.5 size-4" /> Add Role
             </Button>
-            <Button onClick={handleAdd} className="h-10 text-xs">
-              <Plus className="mr-1.5 h-4 w-4" /> Add Role
-            </Button>
-          </div>
-        </div>
+          }
+        />
 
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
+          <div className="relative w-full overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="pl-6 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Role Name
-                  </TableHead>
-                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Created Date
-                  </TableHead>
-                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Status
-                  </TableHead>
-                  <TableHead className="pr-6 text-right text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Actions
-                  </TableHead>
+                  <TableHead>Role Name</TableHead>
+                  <TableHead>Created Date</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
 
@@ -170,9 +120,9 @@ export function RolesTab() {
                       </TableCell>
                       <TableCell className="pr-6">
                         <div className="flex justify-end gap-1.5">
-                          <Skeleton className="h-8 w-8 rounded-md" />
-                          <Skeleton className="h-8 w-8 rounded-md" />
-                          <Skeleton className="h-8 w-8 rounded-md" />
+                          <Skeleton className="size-8 rounded-md" />
+                          <Skeleton className="size-8 rounded-md" />
+                          <Skeleton className="size-8 rounded-md" />
                         </div>
                       </TableCell>
                     </TableRow>
@@ -211,7 +161,7 @@ export function RolesTab() {
                 ) : (
                   roles.map((role) => (
                     <TableRow key={role.id}>
-                      <TableCell className="pl-6 py-3.5">
+                      <TableCell>
                         <span className="font-bold text-foreground tracking-wide text-xs">
                           {role.name}
                         </span>
@@ -230,7 +180,7 @@ export function RolesTab() {
                           </Badge>
                         )}
                       </TableCell>
-                      <TableCell className="pr-6 text-right">
+                      <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
                           <ActionButton
                             actionType="key"
@@ -257,77 +207,14 @@ export function RolesTab() {
           </div>
 
           {!isLoading && !isError && roles.length > 0 && (
-            <div className="flex items-center justify-between p-4 px-6 border-t bg-muted/30">
-              <div className="text-xs text-muted-foreground">
-                Showing <span className="font-semibold text-foreground">{((page - 1) * limit) + 1}</span> to{" "}
-                <span className="font-semibold text-foreground">
-                  {Math.min(page * limit, totalElements)}
-                </span>{" "}
-                of <span className="font-semibold text-foreground">{totalElements}</span> roles
-              </div>
-
-              <Pagination className="mx-0 w-auto">
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        if (page > 1) setPage(page - 1)
-                      }}
-                      className={page === 1 ? "pointer-events-none opacity-50 h-8 text-[11px]" : "h-8 text-[11px]"}
-                    />
-                  </PaginationItem>
-
-                  {Array.from({ length: totalPages }).map((_, idx) => {
-                    const pageNum = idx + 1
-                    if (pageNum === 1 || pageNum === totalPages || Math.abs(pageNum - page) <= 1) {
-                      return (
-                        <PaginationItem key={pageNum}>
-                          <PaginationLink
-                            href="#"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              setPage(pageNum)
-                            }}
-                            isActive={page === pageNum}
-                            className="h-8 w-8 text-[11px]"
-                          >
-                            {pageNum}
-                          </PaginationLink>
-                        </PaginationItem>
-                      )
-                    }
-                    if (pageNum === 2 && page > 3) {
-                      return (
-                        <PaginationItem key="ellipsis-start">
-                          <span className="px-2 text-muted-foreground text-xs">...</span>
-                        </PaginationItem>
-                      )
-                    }
-                    if (pageNum === totalPages - 1 && page < totalPages - 2) {
-                      return (
-                        <PaginationItem key="ellipsis-end">
-                          <span className="px-2 text-muted-foreground text-xs">...</span>
-                        </PaginationItem>
-                      )
-                    }
-                    return null
-                  })}
-
-                  <PaginationItem>
-                    <PaginationNext
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        if (page < totalPages) setPage(page + 1)
-                      }}
-                      className={page === totalPages || totalPages === 0 ? "pointer-events-none opacity-50 h-8 text-[11px]" : "h-8 text-[11px]"}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
+            <DataTablePagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalElements={totalElements}
+              pageSize={limit}
+              onPageChange={setPage}
+              itemLabel="roles"
+            />
           )}
         </CardContent>
       </Card>
@@ -343,31 +230,21 @@ export function RolesTab() {
         />
       )}
 
-      <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
-        <AlertDialogContent className="max-w-md p-6">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-base font-bold">Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription className="text-xs text-muted-foreground">
-              This will soft-delete the role <span className="font-semibold text-foreground">"{roleToDelete?.name}"</span>. 
-              Users currently assigned to this role might experience authentication issues.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="mt-4">
-            <AlertDialogCancel disabled={deleteMutation.isPending} className="h-9 text-xs">Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(e) => {
-                e.preventDefault()
-                handleDeleteConfirm()
-              }}
-              disabled={deleteMutation.isPending}
-              className="h-9 text-xs bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {deleteMutation.isPending && <Loader2 className="mr-2 size-3.5 animate-spin" />}
-              Delete Role
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmationModal
+        open={deleteAlertOpen}
+        onOpenChange={setDeleteAlertOpen}
+        title="Delete Role"
+        description={
+          <>
+            This will soft-delete the role <span className="font-semibold text-foreground">"{roleToDelete?.name}"</span>. 
+            Users currently assigned to this role might experience authentication issues.
+          </>
+        }
+        confirmText="Delete Role"
+        variant="destructive"
+        isPending={deleteMutation.isPending}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   )
 }

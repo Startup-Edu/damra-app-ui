@@ -69,17 +69,17 @@ function CheckHealthPage() {
               </div>
               
               {status === "success" && (
-                <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/25">
+                <Badge variant="success">
                   Online
                 </Badge>
               )}
               {status === "error" && (
-                <Badge variant="destructive" className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/25">
+                <Badge variant="destructive">
                   Offline
                 </Badge>
               )}
               {status === "idle" && (
-                <Badge className="bg-muted text-muted-foreground border border-border">
+                <Badge variant="outline">
                   Unchecked
                 </Badge>
               )}
@@ -98,7 +98,7 @@ function CheckHealthPage() {
 
               {status === "loading" && (
                 <div className="flex flex-col items-center justify-center py-6 text-center space-y-3">
-                  <Loader2 className="size-8 text-emerald-500 dark:text-emerald-400 animate-spin" />
+                  <Loader2 className="size-8 text-primary animate-spin" />
                   <p className="text-xs text-muted-foreground animate-pulse">Contacting backend services...</p>
                 </div>
               )}
@@ -121,7 +121,7 @@ function CheckHealthPage() {
 
               {status === "error" && error && (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2.5 text-rose-600 dark:text-rose-400">
+                  <div className="flex items-center gap-2.5 text-destructive">
                     <AlertTriangle className="size-5 shrink-0" />
                     <span className="font-semibold text-sm">Connection Error</span>
                   </div>
@@ -139,9 +139,9 @@ function CheckHealthPage() {
             <Button 
               onClick={checkHealth}
               disabled={status === "loading"}
-              className="w-full relative overflow-hidden bg-primary hover:bg-primary/90 text-white rounded-lg !h-12 text-base font-semibold transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none group"
+              className="w-full relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground h-11 text-base font-semibold group"
             >
-              <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+              <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
               
               <span className="relative flex items-center justify-center gap-2">
                 {status === "loading" ? (
@@ -155,13 +155,6 @@ function CheckHealthPage() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Global styles for the button shimmer effect */}
-      <style>{`
-        @keyframes shimmer {
-          100% { transform: translateX(100%); }
-        }
-      `}</style>
     </div>
   )
 }

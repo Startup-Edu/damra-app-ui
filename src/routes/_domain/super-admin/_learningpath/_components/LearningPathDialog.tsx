@@ -190,8 +190,8 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
 
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
           <div className="space-y-1.5">
-            <Label htmlFor="path-title-en">
-              English Title <span className="text-rose-500">*</span>
+            <Label htmlFor="path-title-en" className="text-xs">
+              English Title <span className="text-destructive">*</span>
             </Label>
             <Input
               id="path-title-en"
@@ -199,13 +199,12 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
               value={titleEn}
               onChange={(e) => setTitleEn(e.target.value)}
               disabled={isLoading}
-              className="h-9.5 text-xs"
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="path-title-kh">
-              Khmer Title <span className="text-rose-500">*</span>
+            <Label htmlFor="path-title-kh" className="text-xs">
+              Khmer Title <span className="text-destructive">*</span>
             </Label>
             <Input
               id="path-title-kh"
@@ -213,14 +212,13 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
               value={titleKh}
               onChange={(e) => setTitleKh(e.target.value)}
               disabled={isLoading}
-              className="h-9.5 text-xs"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="path-grade">
-                Target Grade Level <span className="text-rose-500">*</span>
+              <Label htmlFor="path-grade" className="text-xs">
+                Target Grade Level <span className="text-destructive">*</span>
               </Label>
               <SearchableSelect
                 options={gradeSelectOptions}
@@ -238,8 +236,8 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="path-category">
-                Aligned Category <span className="text-rose-500">*</span>
+              <Label htmlFor="path-category" className="text-xs">
+                Aligned Category <span className="text-destructive">*</span>
               </Label>
               <SearchableSelect
                 options={categorySelectOptions}
@@ -256,7 +254,7 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
 
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="path-sequence">Sequence Order</Label>
+              <Label htmlFor="path-sequence" className="text-xs">Sequence Order</Label>
               <Input
                 id="path-sequence"
                 type="number"
@@ -264,12 +262,11 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
                 value={sequence}
                 onChange={(e) => setSequence(Number(e.target.value))}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="path-xp">XP Reward</Label>
+              <Label htmlFor="path-xp" className="text-xs">XP Reward</Label>
               <Input
                 id="path-xp"
                 type="number"
@@ -277,12 +274,11 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
                 value={xpReward}
                 onChange={(e) => setXpReward(Number(e.target.value))}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="path-pass">Pass Score (%)</Label>
+              <Label htmlFor="path-pass" className="text-xs">Pass Score (%)</Label>
               <Input
                 id="path-pass"
                 type="number"
@@ -291,13 +287,12 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
                 value={passScorePercentage}
                 onChange={(e) => setPassScorePercentage(Number(e.target.value))}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-3 mt-2">
-            <div className="flex items-center justify-between p-2.5 rounded-lg bg-muted border">
+            <div className="flex items-center justify-between p-2.5 rounded-lg bg-muted/40 border border-border">
               <div className="space-y-0.5">
                 <Label htmlFor="path-skip" className="text-xs font-semibold">Allow Skip</Label>
                 <p className="text-[10px] text-muted-foreground">Skip prereqs</p>
@@ -310,7 +305,7 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
               />
             </div>
 
-            <div className="flex items-center justify-between p-2.5 rounded-lg bg-muted border">
+            <div className="flex items-center justify-between p-2.5 rounded-lg bg-muted/40 border border-border">
               <div className="space-y-0.5">
                 <Label htmlFor="path-status" className="text-xs font-semibold">Active (Admin)</Label>
                 <p className="text-[10px] text-muted-foreground">Admin status</p>
@@ -323,7 +318,7 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
               />
             </div>
 
-            <div className="flex items-center justify-between p-2.5 rounded-lg bg-muted border">
+            <div className="flex items-center justify-between p-2.5 rounded-lg bg-muted/40 border border-border">
               <div className="space-y-0.5">
                 <Label htmlFor="path-published" className="text-xs font-semibold">Published</Label>
                 <p className="text-[10px] text-muted-foreground">Mobile feed</p>
@@ -338,24 +333,23 @@ export function LearningPathDialog({ open, onOpenChange, learningPath }: Learnin
           </div>
 
           {validationError && (
-            <div className="flex items-start gap-2 p-3 rounded-lg border border-rose-500/10 bg-rose-500/5 text-rose-500">
-              <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2 p-3 rounded-lg border border-destructive/20 bg-destructive/10 text-destructive">
+              <AlertTriangle className="size-4 shrink-0 mt-0.5" />
               <p className="text-xs font-medium leading-tight">{validationError}</p>
             </div>
           )}
 
-          <DialogFooter className="pt-3 border-t">
+          <DialogFooter className="pt-3 border-t border-border">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
-              className="text-xs"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading} className="text-xs">
-              {isLoading && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 size-3.5 animate-spin" />}
               {isEditing ? 'Save Changes' : 'Create Path'}
             </Button>
           </DialogFooter>

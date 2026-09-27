@@ -24,13 +24,13 @@ function RolesPermissionsPage() {
 
       {/* Tabs Container */}
       <Tabs value={tab} onValueChange={(v) => setTab(v as 'roles' | 'permissions')} className="w-full">
-        <div className="border-b border-border pb-px mb-4">
-          <TabsList variant="line" className="h-9 gap-4">
-            <TabsTrigger value="roles" className="px-1.5 pb-2 pt-1 h-9 rounded-none text-xs font-semibold">
-              <ShieldCheck className="mr-1.5 h-3.5 w-3.5" /> Roles Management
+        <div className="border-b border-border mb-4">
+          <TabsList variant="line" className="h-10 gap-6">
+            <TabsTrigger value="roles" className="h-10 px-1 rounded-none text-xs font-medium data-active:font-semibold">
+              <ShieldCheck className="mr-1.5 size-4" /> Roles Management
             </TabsTrigger>
-            <TabsTrigger value="permissions" className="px-1.5 pb-2 pt-1 h-9 rounded-none text-xs font-semibold">
-              <ShieldCheck className="mr-1.5 h-3.5 w-3.5" /> Permissions Registry
+            <TabsTrigger value="permissions" className="h-10 px-1 rounded-none text-xs font-medium data-active:font-semibold">
+              <ShieldCheck className="mr-1.5 size-4" /> Permissions Registry
             </TabsTrigger>
           </TabsList>
         </div>

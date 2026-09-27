@@ -170,13 +170,12 @@ export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogP
                 value={nameEn}
                 onChange={(e) => setNameEn(e.target.value)}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="category-name-kh" className="text-[11px] font-semibold">
-                Khmer Name <span className="text-rose-500">*</span>
+                Khmer Name <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="category-name-kh"
@@ -184,7 +183,6 @@ export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogP
                 value={nameKh}
                 onChange={(e) => setNameKh(e.target.value)}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
           </div>
@@ -200,7 +198,6 @@ export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogP
                 value={descriptionEn}
                 onChange={(e) => setDescriptionEn(e.target.value)}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
 
@@ -214,7 +211,6 @@ export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogP
                 value={descriptionKh}
                 onChange={(e) => setDescriptionKh(e.target.value)}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
           </div>
@@ -230,9 +226,8 @@ export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogP
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
-              <p className="text-[9px]">Must be unique, lowercase, URL-friendly.</p>
+              <p className="text-[9px] text-muted-foreground">Must be unique, lowercase, URL-friendly.</p>
             </div>
 
             <div className="space-y-1.5">
@@ -245,7 +240,6 @@ export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogP
                 value={iconUrl}
                 onChange={(e) => setIconUrl(e.target.value)}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
           </div>
@@ -265,7 +259,7 @@ export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogP
                 emptyMessage={rootsLoading ? 'Loading root categories...' : 'No parent categories found.'}
                 disabled={isLoading}
                 clearable={true}
-                triggerClassName="w-full h-9.5 text-xs"
+                triggerClassName="w-full"
                 contentClassName="w-[var(--radix-popover-trigger-width)] min-w-[240px]"
               />
               <p className="text-[9px] text-muted-foreground">Maximum of 2 hierarchy levels allowed.</p>
@@ -283,17 +277,16 @@ export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogP
                 value={sortOrder}
                 onChange={(e) => setSortOrder(Number(e.target.value))}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-3 bg-muted rounded-lg border mt-2">
+          <div className="flex items-center justify-between p-3 bg-muted/40 rounded-lg border border-border mt-2">
             <div className="space-y-0.5">
               <Label htmlFor="category-status" className="text-[11px] font-semibold">
                 Active Status
               </Label>
-              <p className="text-[10px]">
+              <p className="text-[10px] text-muted-foreground">
                 Inactive categories will be hidden from mobile clients.
               </p>
             </div>
@@ -306,24 +299,23 @@ export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogP
           </div>
 
           {validationError && (
-            <div className="flex items-start gap-2 p-3 rounded-lg border border-rose-500/10 bg-rose-500/5 text-rose-500">
-              <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2 p-3 rounded-lg border border-destructive/20 bg-destructive/10 text-destructive">
+              <AlertTriangle className="size-4 shrink-0 mt-0.5" />
               <p className="text-xs font-medium leading-tight">{validationError}</p>
             </div>
           )}
 
-          <DialogFooter className="pt-3 border-t">
+          <DialogFooter className="pt-3 border-t border-border">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
-              className="!h-9 text-xs"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading} className="!h-9 text-xs">
-              {isLoading && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 size-3.5 animate-spin" />}
               {isEditing ? 'Save Changes' : 'Create Category'}
             </Button>
           </DialogFooter>

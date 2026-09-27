@@ -13,21 +13,10 @@ import {
   TableHead,
   TableCell,
 } from '@/components/ui/table'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationEllipsis,
-} from '@/components/ui/pagination'
-import { SearchableSelect, TableEmptyStateRow, SearchInput } from '@/components/ui/shared'
+import { SearchableSelect, TableEmptyStateRow, TableToolbar, DataTablePagination } from '@/components/ui/shared'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import {
-  RefreshCw,
   Plus,
-  Loader2,
   Coins,
 } from 'lucide-react'
 import { ActionButton } from '@/components/ui/action-button'
@@ -127,303 +116,221 @@ function QuizPackagesPage() {
         title="Quiz Packages"
         description="Manage standalone practice quiz packages, coin pricing, and category filters."
       >
-        <Button onClick={handleAdd} className="text-xs !h-9">
-          <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Package
+        <Button onClick={handleAdd}>
+          <Plus className="mr-1.5 size-4" /> Add Package
         </Button>
       </PageHeader>
 
       {/* Main Content Card */}
       <Card className="py-0">
         {/* Toolbar */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-5 pb-0">
-          <div className="flex flex-1 items-center gap-3 max-w-2xl">
-            <SearchInput
-              placeholder="Search packages by title..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value)
-                setPage(1)
-              }}
-              onClear={() => {
-                setSearch('')
-                setPage(1)
-              }}
-              containerClassName="flex-1"
-              sizeVariant="default"
-            />
-
-            {/* Category Filter */}
+        <TableToolbar
+          searchPlaceholder="Search packages by title..."
+          searchValue={search}
+          onSearchChange={(val) => {
+            setSearch(val)
+            setPage(1)
+          }}
+          onRefresh={() => {
+            refetch().then(() => {
+              toast.success('Quiz packages list refreshed successfully')
+            })
+          }}
+          isRefreshing={isFetching}
+          filters={
             <SearchableSelect
               options={categoryOptions}
               value={selectedCategoryId}
               onChange={(val) => {
-                setSelectedCategoryId(val)
+                setSelectedCategoryId(val || 'all')
                 setPage(1)
               }}
               placeholder="All Categories"
               searchPlaceholder="Search category..."
-              className="w-[200px]"
+              triggerClassName="w-[200px]"
             />
-          </div>
-
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => {
-              refetch().then(() => {
-                toast.success('Quiz packages list refreshed successfully')
-              })
-            }}
-            disabled={isFetching}
-            className="h-9.5 w-9.5 shrink-0"
-          >
-            {isFetching ? (
-              <Loader2 className="h-4.5 w-4.5 animate-spin" />
-            ) : (
-              <RefreshCw className="h-4.5 w-4.5" />
-            )}
-          </Button>
-        </div>
+          }
+        />
 
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="pl-6">Title</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Access Status</TableHead>
-                <TableHead>Questions / Session</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="pr-6 text-right w-[120px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
+          <div className="relative w-full overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead>Title</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Access Status</TableHead>
+                  <TableHead>Questions / Session</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right w-[120px]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
 
-            <TableBody>
-              {isLoading ? (
-                Array.from({ length: 5 }).map((_, idx) => (
-                  <TableRow key={idx}>
-                    <TableCell className="pl-6">
-                      <div className="space-y-1.5">
-                        <Skeleton className="h-4 w-36" />
-                        <Skeleton className="h-3.5 w-24" />
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-4 w-24" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-5 w-16 rounded-full" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-4 w-8" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-5 w-14 rounded-full" />
-                    </TableCell>
-                    <TableCell className="pr-6">
-                      <div className="flex justify-end gap-2">
-                        <Skeleton className="h-8 w-8 rounded-md" />
-                        <Skeleton className="h-8 w-8 rounded-md" />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : isError ? (
-                <TableEmptyStateRow
-                  colSpan={6}
-                  variant="error"
-                  onAction={() => refetch()}
-                />
-              ) : packages.length === 0 ? (
-                debouncedSearch ? (
-                  <TableEmptyStateRow
-                    colSpan={6}
-                    variant="search"
-                    searchQuery={debouncedSearch}
-                    onClear={() => {
-                      setSearch('')
-                      setPage(1)
-                    }}
-                  />
-                ) : selectedCategoryId !== 'all' ? (
-                  <TableEmptyStateRow
-                    colSpan={6}
-                    variant="filter"
-                    title="No quiz packages found in this category"
-                    description="No quiz packages match the selected category. Try selecting a different category or reset your filter."
-                    onClear={() => {
-                      setSelectedCategoryId('all')
-                      setPage(1)
-                    }}
-                  />
-                ) : (
-                  <TableEmptyStateRow
-                    colSpan={6}
-                    variant="empty"
-                    title="No quiz packages created yet"
-                    description="Get started by creating your first quiz package."
-                    actionLabel="Create Quiz Package"
-                    actionIcon={Plus}
-                    onAction={() => {
-                      setActiveQuizpack(null)
-                      setDialogOpen(true)
-                    }}
-                  />
-                )
-              ) : (
-                packages.map((pkg) => (
-                  <TableRow key={pkg.id}>
-                    {/* Title & Description */}
-                    <TableCell className="pl-6 py-3.5">
-                      <div className="font-semibold text-xs">
-                        {pkg.title}
-                      </div>
-                      {pkg.description && (
-                        <div className="text-[10px] max-w-[220px] truncate">
-                          {pkg.description}
+              <TableBody>
+                {isLoading ? (
+                  Array.from({ length: 5 }).map((_, idx) => (
+                    <TableRow key={idx}>
+                      <TableCell className="pl-6">
+                        <div className="space-y-1.5">
+                          <Skeleton className="h-4 w-36" />
+                          <Skeleton className="h-3.5 w-24" />
                         </div>
-                      )}
-                    </TableCell>
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-24" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-5 w-16 rounded-full" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-8" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-5 w-14 rounded-full" />
+                      </TableCell>
+                      <TableCell className="pr-6">
+                        <div className="flex justify-end gap-2">
+                          <Skeleton className="size-8 rounded-md" />
+                          <Skeleton className="size-8 rounded-md" />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : isError ? (
+                  <TableEmptyStateRow
+                    colSpan={6}
+                    variant="error"
+                    onAction={() => refetch()}
+                  />
+                ) : packages.length === 0 ? (
+                  debouncedSearch ? (
+                    <TableEmptyStateRow
+                      colSpan={6}
+                      variant="search"
+                      searchQuery={debouncedSearch}
+                      onClear={() => {
+                        setSearch('')
+                        setPage(1)
+                      }}
+                    />
+                  ) : selectedCategoryId !== 'all' ? (
+                    <TableEmptyStateRow
+                      colSpan={6}
+                      variant="filter"
+                      title="No quiz packages found in this category"
+                      description="No quiz packages match the selected category. Try selecting a different category or reset your filter."
+                      onClear={() => {
+                        setSelectedCategoryId('all')
+                        setPage(1)
+                      }}
+                    />
+                  ) : (
+                    <TableEmptyStateRow
+                      colSpan={6}
+                      variant="empty"
+                      title="No quiz packages created yet"
+                      description="Get started by creating your first quiz package."
+                      actionLabel="Create Quiz Package"
+                      actionIcon={Plus}
+                      onAction={() => {
+                        setActiveQuizpack(null)
+                        setDialogOpen(true)
+                      }}
+                    />
+                  )
+                ) : (
+                  packages.map((pkg) => (
+                    <TableRow key={pkg.id}>
+                      {/* Title & Description */}
+                      <TableCell>
+                        <div className="font-semibold text-xs">
+                          {pkg.title}
+                        </div>
+                        {pkg.description && (
+                          <div className="text-[10px] text-muted-foreground max-w-[220px] truncate">
+                            {pkg.description}
+                          </div>
+                        )}
+                      </TableCell>
 
-                    {/* Category Column */}
-                    <TableCell className="text-xs font-medium">
-                      {pkg.category ? (
-                        <span>{pkg.category.name_en}</span>
-                      ) : (
-                        <span>-</span>
-                      )}
-                    </TableCell>
+                      {/* Category Column */}
+                      <TableCell className="text-xs font-medium">
+                        {pkg.category ? (
+                          <span>{pkg.category.name_en}</span>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
 
-                    {/* Access Status & Price */}
-                    <TableCell>
-                      {pkg.is_free ? (
-                        <Badge variant="success" className="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border-emerald-500/10">
-                          Free Access
-                        </Badge>
-                      ) : (
-                        <Badge variant="warning" className="flex items-center gap-1 w-fit bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 border-amber-500/10 font-bold">
-                          <Coins className="h-3 w-3 shrink-0" />
-                          {pkg.price_coins} Coins
-                        </Badge>
-                      )}
-                    </TableCell>
+                      {/* Access Status & Price */}
+                      <TableCell>
+                        {pkg.is_free ? (
+                          <Badge variant="success" className="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border-emerald-500/10">
+                            Free Access
+                          </Badge>
+                        ) : (
+                          <Badge variant="warning" className="flex items-center gap-1 w-fit bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 border-amber-500/10 font-bold">
+                            <Coins className="size-3 shrink-0" />
+                            {pkg.price_coins} Coins
+                          </Badge>
+                        )}
+                      </TableCell>
 
-                    {/* Questions per Session */}
-                    <TableCell className="text-xs font-medium">
-                      {pkg.questions_per_session !== null ? pkg.questions_per_session : 'Default (10)'}
-                    </TableCell>
+                      {/* Questions per Session */}
+                      <TableCell className="text-xs font-medium">
+                        {pkg.questions_per_session !== null ? pkg.questions_per_session : 'Default (10)'}
+                      </TableCell>
 
-                    {/* Active Status Column */}
-                    <TableCell>
-                      {pkg.is_active ? (
-                        <Badge variant="success">
-                          Active
-                        </Badge>
-                      ) : (
-                        <Badge variant="destructive">
-                          Inactive
-                        </Badge>
-                      )}
-                    </TableCell>
+                      {/* Active Status Column */}
+                      <TableCell>
+                        {pkg.is_active ? (
+                          <Badge variant="success">
+                            Active
+                          </Badge>
+                        ) : (
+                          <Badge variant="destructive">
+                            Inactive
+                          </Badge>
+                        )}
+                      </TableCell>
 
-                    {/* Actions Column */}
-                    <TableCell className="pr-6 text-right">
-                      <div className="flex justify-end gap-1">
-                        <ActionButton
-                          actionType="view"
-                          tooltip="Manage Questions"
-                          onClick={() => handleManageQuestions(pkg)}
-                        />
-                        <ActionButton
-                          actionType="edit"
-                          tooltip="Edit Package"
-                          onClick={() => handleEdit(pkg)}
-                        />
-                        <ActionButton
-                          actionType="delete"
-                          tooltip="Delete Package"
-                          onClick={() => handleDeleteTrigger(pkg)}
-                        />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                      {/* Actions Column */}
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          <ActionButton
+                            actionType="view"
+                            tooltip="Manage Questions"
+                            onClick={() => handleManageQuestions(pkg)}
+                          />
+                          <ActionButton
+                            actionType="edit"
+                            tooltip="Edit Package"
+                            onClick={() => handleEdit(pkg)}
+                          />
+                          <ActionButton
+                            actionType="delete"
+                            tooltip="Delete Package"
+                            onClick={() => handleDeleteTrigger(pkg)}
+                          />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
 
           {/* Pagination Footer */}
           {!isLoading && !isError && packages.length > 0 && (
-            <div className="flex items-center justify-between p-4 px-6 border-t ">
-              <div className="text-xs">
-                Showing <span className="font-semibold">{((page - 1) * limit) + 1}</span> to{" "}
-                <span className="font-semibold">
-                  {Math.min(page * limit, totalElements)}
-                </span>{" "}
-                of <span className="font-semibold">{totalElements}</span> packages
-              </div>
-
-              <Pagination className="mx-0 w-auto">
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        if (page > 1) setPage(page - 1)
-                      }}
-                      className={page === 1 ? "pointer-events-none opacity-50" : undefined}
-                    />
-                  </PaginationItem>
-
-                  {Array.from({ length: totalPages }).map((_, idx) => {
-                    const pageNum = idx + 1
-                    if (pageNum === 1 || pageNum === totalPages || Math.abs(pageNum - page) <= 1) {
-                      return (
-                        <PaginationItem key={pageNum}>
-                          <PaginationLink
-                            href="#"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              setPage(pageNum)
-                            }}
-                            isActive={page === pageNum}
-                          >
-                            {pageNum}
-                          </PaginationLink>
-                        </PaginationItem>
-                      )
-                    }
-                    if (pageNum === 2 && page > 3) {
-                      return (
-                        <PaginationItem key="ellipsis-start">
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                      )
-                    }
-                    if (pageNum === totalPages - 1 && page < totalPages - 2) {
-                      return (
-                        <PaginationItem key="ellipsis-end">
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                      )
-                    }
-                    return null
-                  })}
-
-                  <PaginationItem>
-                    <PaginationNext
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        if (page < totalPages) setPage(page + 1)
-                      }}
-                      className={page === totalPages || totalPages === 0 ? "pointer-events-none opacity-50" : undefined}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
+            <DataTablePagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalElements={totalElements}
+              pageSize={limit}
+              onPageChange={setPage}
+              itemLabel="packages"
+            />
           )}
         </CardContent>
       </Card>

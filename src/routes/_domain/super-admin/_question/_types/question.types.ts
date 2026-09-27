@@ -7,7 +7,7 @@ export type DifficultyEnum = 'EASY' | 'MEDIUM' | 'HARD'
 export interface QuestionItem {
   id: string
   category_id: string
-  grade_id: string
+  grade_id: string | null
   question_type: QuestionTypeEnum
   difficulty_level: DifficultyEnum
   scenario_en: string | null
@@ -47,7 +47,7 @@ export interface ListQuestionsResponse {
 
 export interface CreateQuestionDTO {
   categoryId: string
-  gradeId: string
+  gradeId?: string | null
   questionType: QuestionTypeEnum
   difficulty?: DifficultyEnum
   scenarioEn?: string | null
@@ -66,7 +66,7 @@ export interface CreateQuestionDTO {
 
 export interface UpdateQuestionDTO {
   categoryId?: string
-  gradeId?: string
+  gradeId?: string | null
   questionType?: QuestionTypeEnum
   difficulty?: DifficultyEnum
   scenarioEn?: string | null

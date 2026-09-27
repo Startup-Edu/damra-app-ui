@@ -14,23 +14,10 @@ import {
   TableHead,
   TableCell,
 } from '@/components/ui/table'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationEllipsis,
-} from '@/components/ui/pagination'
 import { DeleteModal } from '@/components/ui/delete-modal'
-import { TableEmptyStateRow, SearchInput } from '@/components/ui/shared'
+import { TableEmptyStateRow, TableToolbar, DataTablePagination } from '@/components/ui/shared'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
-import {
-  RefreshCw,
-  Plus,
-  Loader2,
-} from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { ActionButton } from '@/components/ui/action-button'
 import { useUsersQuery, useDeleteUserMutation } from './_user/_hooks/useUsers'
 import type { UserItem } from './_user/_types/users.types'
@@ -98,8 +85,8 @@ function UsersManagementPage() {
         description="Manage system access, user roles, authentication status, and details."
       >
         {/* Add User button */}
-        <Button onClick={handleAdd} className="text-xs !h-9">
-          <Plus className="mr-1.5 h-3.5 w-3.5" /> Add User
+        <Button onClick={handleAdd}>
+          <Plus className="mr-1.5 size-4" /> Add User
         </Button>
       </PageHeader>
 
@@ -107,50 +94,31 @@ function UsersManagementPage() {
       <Card className="py-0">
         
         {/* Toolbar */}
-        <div className="flex items-center gap-3 p-5 pb-0">
-          <SearchInput
-            placeholder="Search users by name or email..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value)
-              setPage(1)
-            }}
-            onClear={() => {
-              setSearch('')
-              setPage(1)
-            }}
-            containerClassName="flex-1 max-w-md"
-            sizeVariant="lg"
-          />
-          
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => {
-              refetch().then(() => {
-                toast.success('User list refreshed successfully')
-              })
-            }}
-            disabled={isFetching}
-            className="h-10 w-10"
-          >
-            {isFetching ? (
-              <Loader2 className="h-4.5 w-4.5 animate-spin" />
-            ) : (
-              <RefreshCw className="h-4.5 w-4.5" />
-            )}
-          </Button>
-        </div>
+        <TableToolbar
+          searchPlaceholder="Search users by name or email..."
+          searchValue={search}
+          onSearchChange={(val) => {
+            setSearch(val)
+            setPage(1)
+          }}
+          onRefresh={() => {
+            refetch().then(() => {
+              toast.success('User list refreshed successfully')
+            })
+          }}
+          isRefreshing={isFetching}
+        />
 
         <CardContent className="p-0">
-          <Table>
+          <div className="relative w-full overflow-x-auto">
+            <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="pl-6">User</TableHead>
+                  <TableHead>User</TableHead>
                   <TableHead>Email Address</TableHead>
                   <TableHead>Roles</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="pr-6 text-right">Actions</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               
@@ -161,7 +129,7 @@ function UsersManagementPage() {
                     <TableRow key={idx}>
                       <TableCell className="pl-6">
                         <div className="flex items-center gap-3">
-                          <Skeleton className="h-9 w-9 rounded-full" />
+                          <Skeleton className="size-9 rounded-full" />
                           <Skeleton className="h-4 w-28" />
                         </div>
                       </TableCell>
@@ -176,8 +144,8 @@ function UsersManagementPage() {
                       </TableCell>
                       <TableCell className="pr-6">
                         <div className="flex justify-end gap-2">
-                          <Skeleton className="h-8 w-8 rounded-md" />
-                          <Skeleton className="h-8 w-8 rounded-md" />
+                          <Skeleton className="size-8 rounded-md" />
+                          <Skeleton className="size-8 rounded-md" />
                         </div>
                       </TableCell>
                     </TableRow>
@@ -215,7 +183,7 @@ function UsersManagementPage() {
                   users.map((user) => (
                     <TableRow key={user.id}>
                       {/* User Column with Avatar */}
-                      <TableCell className="pl-6 py-3.5">
+                      <TableCell>
                         <div className="flex items-center gap-3">
                           <Avatar name={user.name} />
                           <div className="font-semibold text-foreground text-xs">
@@ -259,7 +227,7 @@ function UsersManagementPage() {
                       </TableCell>
                       
                       {/* Actions Column */}
-                      <TableCell className="pr-6 text-right">
+                      <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
                           <ActionButton
                             actionType="edit"
@@ -279,78 +247,18 @@ function UsersManagementPage() {
                 )}
               </TableBody>
             </Table>
+          </div>
+
           {/* Pagination Footer */}
           {!isLoading && !isError && users.length > 0 && (
-            <div className="flex items-center justify-between p-4 px-6 border-t bg-muted/20">
-              <div className="text-xs text-muted-foreground">
-                Showing <span className="font-semibold text-foreground">{((page - 1) * limit) + 1}</span> to{" "}
-                <span className="font-semibold text-foreground">
-                  {Math.min(page * limit, totalElements)}
-                </span>{" "}
-                of <span className="font-semibold text-foreground">{totalElements}</span> users
-              </div>
-              
-              <Pagination className="mx-0 w-auto">
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        if (page > 1) setPage(page - 1)
-                      }}
-                      className={page === 1 ? "pointer-events-none opacity-50" : undefined}
-                    />
-                  </PaginationItem>
-                  
-                  {Array.from({ length: totalPages }).map((_, idx) => {
-                    const pageNum = idx + 1
-                    if (pageNum === 1 || pageNum === totalPages || Math.abs(pageNum - page) <= 1) {
-                      return (
-                        <PaginationItem key={pageNum}>
-                          <PaginationLink
-                            href="#"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              setPage(pageNum)
-                            }}
-                            isActive={page === pageNum}
-                          >
-                            {pageNum}
-                          </PaginationLink>
-                        </PaginationItem>
-                      )
-                    }
-                    if (pageNum === 2 && page > 3) {
-                      return (
-                        <PaginationItem key="ellipsis-start">
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                      )
-                    }
-                    if (pageNum === totalPages - 1 && page < totalPages - 2) {
-                      return (
-                        <PaginationItem key="ellipsis-end">
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                      )
-                    }
-                    return null
-                  })}
-
-                  <PaginationItem>
-                    <PaginationNext
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        if (page < totalPages) setPage(page + 1)
-                      }}
-                      className={page === totalPages || totalPages === 0 ? "pointer-events-none opacity-50" : undefined}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
+            <DataTablePagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalElements={totalElements}
+              pageSize={limit}
+              onPageChange={setPage}
+              itemLabel="users"
+            />
           )}
         </CardContent>
       </Card>

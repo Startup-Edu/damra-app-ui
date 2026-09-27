@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useAuthStore } from '@/store/useAuthStore'
 import { routeTree } from './routeTree.gen'
 import { ThemeProvider } from '@/components/theme-provider' 
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from '@/components/ui/sonner' // Import your new Toaster
 
 const queryClient = new QueryClient({
@@ -34,9 +35,11 @@ export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="theme">
-        <RouterProvider router={router} />
-        {/* Mount Toaster globally here */}
-        <Toaster position='top-center' /> 
+        <TooltipProvider>
+          <RouterProvider router={router} />
+          {/* Mount Toaster globally here */}
+          <Toaster position='top-center' /> 
+        </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
   )

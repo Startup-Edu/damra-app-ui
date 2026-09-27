@@ -173,7 +173,7 @@ export function SearchableSelect({
           aria-expanded={open}
           disabled={disabled}
           className={cn(
-            "w-[220px] justify-between h-9.5! px-3 text-xs font-normal border border-input bg-input/20 transition-colors outline-none hover:bg-input/30 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30 data-[state=open]:border-primary data-[state=open]:ring-2 data-[state=open]:ring-primary/30 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30 dark:hover:bg-input/50",
+            "w-[220px] justify-between h-9 px-3 text-xs font-normal border border-input bg-input/20 transition-[border-color,box-shadow,background-color] duration-160 ease-[var(--ease-out)] outline-none hover:bg-input/30 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30 data-[state=open]:border-primary data-[state=open]:ring-2 data-[state=open]:ring-primary/30 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30 dark:hover:bg-input/50",
             !selectedOption && "text-muted-foreground",
             triggerClassName,
             className

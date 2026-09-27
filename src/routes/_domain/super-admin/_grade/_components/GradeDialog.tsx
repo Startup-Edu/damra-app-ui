@@ -125,8 +125,8 @@ export function GradeDialog({ open, onOpenChange, grade }: GradeDialogProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="grade-name-en" className="font-semibold">
-                English Label <span className="text-rose-500">*</span>
+              <Label htmlFor="grade-name-en" className="font-semibold text-xs">
+                English Label <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="grade-name-en"
@@ -134,13 +134,12 @@ export function GradeDialog({ open, onOpenChange, grade }: GradeDialogProps) {
                 value={nameEn}
                 onChange={(e) => setNameEn(e.target.value)}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="grade-name-kh" className="font-semibold">
-                Khmer Label <span className="text-rose-500">*</span>
+              <Label htmlFor="grade-name-kh" className="font-semibold text-xs">
+                Khmer Label <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="grade-name-kh"
@@ -148,15 +147,14 @@ export function GradeDialog({ open, onOpenChange, grade }: GradeDialogProps) {
                 value={nameKh}
                 onChange={(e) => setNameKh(e.target.value)}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="grade-number">
-                Grade Number <span className="text-rose-500">*</span>
+              <Label htmlFor="grade-number" className="text-xs">
+                Grade Number <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="grade-number"
@@ -167,12 +165,11 @@ export function GradeDialog({ open, onOpenChange, grade }: GradeDialogProps) {
                 value={gradeNumber}
                 onChange={(e) => setGradeNumber(e.target.value ? Number(e.target.value) : '')}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="grade-sort">
+              <Label htmlFor="grade-sort" className="text-xs">
                 Sort Order
               </Label>
               <Input
@@ -183,17 +180,16 @@ export function GradeDialog({ open, onOpenChange, grade }: GradeDialogProps) {
                 value={sortOrder}
                 onChange={(e) => setSortOrder(Number(e.target.value))}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted border mt-2">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border mt-2">
             <div className="space-y-0.5">
-              <Label htmlFor="grade-status" className="font-semibold">
+              <Label htmlFor="grade-status" className="font-semibold text-xs">
                 Active Status
               </Label>
-              <p className="text-[10px]">
+              <p className="text-[10px] text-muted-foreground">
                 Inactive grades will be hidden from mobile target selection.
               </p>
             </div>
@@ -206,24 +202,23 @@ export function GradeDialog({ open, onOpenChange, grade }: GradeDialogProps) {
           </div>
 
           {validationError && (
-            <div className="flex items-start gap-2 p-3 rounded-lg border border-rose-500/10 bg-rose-500/5 text-rose-500">
-              <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2 p-3 rounded-lg border border-destructive/20 bg-destructive/10 text-destructive">
+              <AlertTriangle className="size-4 shrink-0 mt-0.5" />
               <p className="text-xs font-medium leading-tight">{validationError}</p>
             </div>
           )}
 
-          <DialogFooter className="pt-3 border-t">
+          <DialogFooter className="pt-3 border-t border-border">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
-              className="!h-9 text-xs"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading} className="!h-9 text-xs">
-              {isLoading && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 size-3.5 animate-spin" />}
               {isEditing ? 'Save Changes' : 'Create Grade'}
             </Button>
           </DialogFooter>

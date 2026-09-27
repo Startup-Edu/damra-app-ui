@@ -131,8 +131,8 @@ export function QuestiontypeDialog({ open, onOpenChange, questiontype }: Questio
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="qtype-code">
-              Type Code (Identifier) <span className="text-rose-500">*</span>
+            <Label htmlFor="qtype-code" className="text-xs">
+              Type Code (Identifier) <span className="text-destructive">*</span>
             </Label>
             <Input
               id="qtype-code"
@@ -140,15 +140,15 @@ export function QuestiontypeDialog({ open, onOpenChange, questiontype }: Questio
               value={code}
               onChange={(e) => setCode(e.target.value)}
               disabled={isLoading || isEditing}
-              className="h-9.5 text-xs font-mono uppercase"
+              className="font-mono uppercase"
             />
             <p className="text-[11px] text-muted-foreground">Unique uppercase code key used in JSON schemas.</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="qtype-name-en">
-                English Name <span className="text-rose-500">*</span>
+              <Label htmlFor="qtype-name-en" className="text-xs">
+                English Name <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="qtype-name-en"
@@ -156,13 +156,12 @@ export function QuestiontypeDialog({ open, onOpenChange, questiontype }: Questio
                 value={nameEn}
                 onChange={(e) => setNameEn(e.target.value)}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="qtype-name-kh">
-                Khmer Name <span className="text-rose-500">*</span>
+              <Label htmlFor="qtype-name-kh" className="text-xs">
+                Khmer Name <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="qtype-name-kh"
@@ -170,14 +169,13 @@ export function QuestiontypeDialog({ open, onOpenChange, questiontype }: Questio
                 value={nameKh}
                 onChange={(e) => setNameKh(e.target.value)}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="qtype-desc-en">
+              <Label htmlFor="qtype-desc-en" className="text-xs">
                 English Description
               </Label>
               <Input
@@ -186,12 +184,11 @@ export function QuestiontypeDialog({ open, onOpenChange, questiontype }: Questio
                 value={descriptionEn}
                 onChange={(e) => setDescriptionEn(e.target.value)}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="qtype-desc-kh">
+              <Label htmlFor="qtype-desc-kh" className="text-xs">
                 Khmer Description
               </Label>
               <Input
@@ -200,14 +197,13 @@ export function QuestiontypeDialog({ open, onOpenChange, questiontype }: Questio
                 value={descriptionKh}
                 onChange={(e) => setDescriptionKh(e.target.value)}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="qtype-icon">
+              <Label htmlFor="qtype-icon" className="text-xs">
                 Icon URL
               </Label>
               <Input
@@ -216,12 +212,11 @@ export function QuestiontypeDialog({ open, onOpenChange, questiontype }: Questio
                 value={iconUrl}
                 onChange={(e) => setIconUrl(e.target.value)}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="qtype-sort">
+              <Label htmlFor="qtype-sort" className="text-xs">
                 Sort Order
               </Label>
               <Input
@@ -232,14 +227,13 @@ export function QuestiontypeDialog({ open, onOpenChange, questiontype }: Questio
                 value={sortOrder}
                 onChange={(e) => setSortOrder(Number(e.target.value))}
                 disabled={isLoading}
-                className="h-9.5 text-xs"
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-lg border bg-muted mt-2">
+          <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/40 mt-2">
             <div className="space-y-0.5">
-              <Label htmlFor="qtype-status">
+              <Label htmlFor="qtype-status" className="text-xs">
                 Active Status
               </Label>
               <p className="text-[11px] text-muted-foreground">
@@ -255,24 +249,23 @@ export function QuestiontypeDialog({ open, onOpenChange, questiontype }: Questio
           </div>
 
           {validationError && (
-            <div className="flex items-start gap-2 p-3 rounded-lg border border-rose-500/10 bg-rose-500/5 text-rose-500">
-              <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2 p-3 rounded-lg border border-destructive/20 bg-destructive/10 text-destructive">
+              <AlertTriangle className="size-4 shrink-0 mt-0.5" />
               <p className="text-xs font-medium leading-tight">{validationError}</p>
             </div>
           )}
 
-          <DialogFooter className="pt-3 border-t">
+          <DialogFooter className="pt-3 border-t border-border">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
-              className="!h-9 text-xs"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading} className="!h-9 text-xs">
-              {isLoading && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 size-3.5 animate-spin" />}
               {isEditing ? 'Save Changes' : 'Create Type'}
             </Button>
           </DialogFooter>

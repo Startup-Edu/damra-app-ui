@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useTheme } from '@/components/theme-provider'
+import { Button } from '@/components/ui/button'
 import { Map, Swords, Coins, Check, ChevronRight, ShieldCheck, BarChart3, Sun, Moon } from 'lucide-react'
 
 // Define the root route
@@ -8,44 +9,44 @@ export const Route = createFileRoute('/')({
 })
 
 function LandingPage() {
-  const { theme, setTheme } = useTheme();
-  const isDark = theme === 'dark';
-  const toggleTheme = () => setTheme(isDark ? 'light' : 'dark');
+  const { theme, setTheme } = useTheme()
+  const isDark = theme === 'dark'
+  const toggleTheme = () => setTheme(isDark ? 'light' : 'dark')
 
   return (
-    <div className="relative bg-background text-foreground transition-colors duration-300 font-sans min-h-screen flex flex-col selection:bg-amber-500/30">
+    <div className="relative bg-background text-foreground transition-colors duration-300 font-sans min-h-screen flex flex-col selection:bg-primary/20">
       
       {/* Subtle Grid Background (Spans full screen) */}
-      <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+      <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
 
       {/* FULL WIDTH NAVIGATION */}
       <nav className="sticky top-0 z-50 w-full bg-background/90 backdrop-blur-md border-b border-border transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center gap-2 text-xl font-bold tracking-tight text-amber-600 dark:text-amber-600">
+            <div className="flex items-center gap-2 text-xl font-bold tracking-tight text-primary">
               Damra App
             </div>
             <div className="hidden md:flex space-x-8 text-sm font-medium text-muted-foreground">
-              <a href="#paths" className="hover:text-amber-600 dark:hover:text-amber-400 transition">Learning Paths</a>
-              <a href="#battles" className="hover:text-amber-600 dark:hover:text-amber-400 transition">Arena</a>
-              <a href="#schools" className="hover:text-amber-600 dark:hover:text-amber-400 transition">For Schools</a>
+              <a href="#paths" className="hover:text-primary transition-colors">Learning Paths</a>
+              <a href="#battles" className="hover:text-primary transition-colors">Arena</a>
+              <a href="#schools" className="hover:text-primary transition-colors">For Schools</a>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4 text-sm font-medium">
               
               {/* Dark/Light Mode Toggle */}
               <button 
                 onClick={toggleTheme}
-                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                aria-label="Toggle theme (Press D)"
-                title="Toggle theme (Press 'd')"
+                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all active:scale-[0.95]"
+                aria-label="Toggle theme"
+                title="Toggle theme"
               >
                 {isDark ? <Sun className="size-5" /> : <Moon className="size-5" />}
               </button>
 
-              <Link to="/auth/login" className="hidden hover:bg-muted rounded-lg md:block px-4 py-2 text-muted-foreground hover:text-foreground transition">
+              <Link to="/auth/login" className="hidden hover:bg-muted rounded-lg md:block px-4 py-2 text-muted-foreground hover:text-foreground transition-colors">
                 Log In
               </Link>
-              <Link to="/auth/register" className="bg-primary text-primary-foreground hover:bg-primary/90 py-2 px-4 rounded-lg shadow-sm transition-all duration-200">
+              <Link to="/auth/register" className="bg-primary text-primary-foreground hover:bg-primary/90 py-2 px-4 rounded-lg shadow-xs transition-all active:scale-[0.97]">
                 Sign Up
               </Link>
             </div>
@@ -54,7 +55,6 @@ function LandingPage() {
       </nav>
 
       {/* BORDERED BODY WRAPPER */}
-      {/* flex-1 ensures the body grows to push the footer down if content is short */}
       <main className="flex-1 relative z-10 max-w-7xl mx-auto w-full border-x border-border shadow-[0_0_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_0_40px_-15px_rgba(0,0,0,0.2)]">
         
         {/* HERO SECTION */}
@@ -62,13 +62,13 @@ function LandingPage() {
           <div className="text-center">
             
             {/* Announcement Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 mb-8 text-sm font-medium rounded-full bg-amber-100/50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-400 border border-amber-200/50 dark:border-amber-500/20 backdrop-blur-sm">
-              <span className="flex h-2 w-2 rounded-full bg-amber-500"></span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 mb-8 text-sm font-medium rounded-full bg-primary/10 text-primary border border-primary/20 backdrop-blur-xs">
+              <span className="flex h-2 w-2 rounded-full bg-primary" />
               Damra App 1.0 is on development mode
             </div>
 
             <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight mb-6 text-foreground">
-              Learn like a <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-500 dark:from-amber-400 dark:to-amber-600">Genius.</span><br />
+              Learn like a <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70">Genius.</span><br />
               Compete like a <span className="text-muted-foreground">Champion.</span>
             </h1>
             
@@ -77,21 +77,24 @@ function LandingPage() {
             </p>
             
             <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-              <button className="flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white text-base font-semibold py-3 px-6 rounded-lg shadow-sm transition-all">
-                Start Your Journey <ChevronRight className="size-4" />
-              </button>
-              <button className="bg-card text-card-foreground border border-border hover:bg-accent hover:text-accent-foreground text-base font-semibold py-3 px-6 rounded-lg transition-all">
-                Enter the Arena
-              </button>
+              <Button asChild size="lg" className="h-12 px-6 text-base font-semibold">
+                <Link to="/auth/login" className="flex items-center gap-2">
+                  Start Your Journey <ChevronRight className="size-4" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="h-12 px-6 text-base font-semibold">
+                <a href="#paths">
+                  Explore Platform
+                </a>
+              </Button>
             </div>
           </div>
         </section>
 
-        {/* TAILWIND STYLE HORIZONTAL DIVIDER */}
+        {/* HORIZONTAL DIVIDER */}
         <div className="relative flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
-          <div className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
-          {/* Glowing accent in the center */}
-          <div className="absolute h-[1px] w-1/4 bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-50 blur-[1px]"></div>
+          <div className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+          <div className="absolute h-[1px] w-1/4 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 blur-[1px]" />
         </div>
 
         {/* FEATURES GRID */}
@@ -105,7 +108,7 @@ function LandingPage() {
             {/* Feature 1 */}
             <div className="bg-card/80 backdrop-blur-sm border border-border p-8 rounded-2xl transition-all group">
               <div className="size-12 bg-muted border border-border rounded-xl flex items-center justify-center mb-6">
-                <Map className="size-6 text-foreground group-hover:text-amber-500 transition-colors" />
+                <Map className="size-6 text-foreground group-hover:text-primary transition-colors" />
               </div>
               <h3 className="text-lg font-semibold mb-2 text-foreground">Interactive Paths</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
@@ -116,7 +119,7 @@ function LandingPage() {
             {/* Feature 2 */}
             <div className="bg-card/80 backdrop-blur-sm border border-border p-8 rounded-2xl transition-all group">
               <div className="size-12 bg-muted border border-border rounded-xl flex items-center justify-center mb-6">
-                <Swords className="size-6 text-foreground group-hover:text-amber-500 transition-colors" />
+                <Swords className="size-6 text-foreground group-hover:text-primary transition-colors" />
               </div>
               <h3 className="text-lg font-semibold mb-2 text-foreground">Multiplayer Battles</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
@@ -127,7 +130,7 @@ function LandingPage() {
             {/* Feature 3 */}
             <div className="bg-card/80 backdrop-blur-sm border border-border p-8 rounded-2xl transition-all group">
               <div className="size-12 bg-muted border border-border rounded-xl flex items-center justify-center mb-6">
-                <Coins className="size-6 text-foreground group-hover:text-amber-500 transition-colors" />
+                <Coins className="size-6 text-foreground group-hover:text-primary transition-colors" />
               </div>
               <h3 className="text-lg font-semibold mb-2 text-foreground">Rich Economy</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">

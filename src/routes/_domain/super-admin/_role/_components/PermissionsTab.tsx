@@ -11,31 +11,9 @@ import {
   TableHead,
   TableCell,
 } from '@/components/ui/table'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination'
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from '@/components/ui/alert-dialog'
-import {
-  RefreshCw,
-  Plus,
-  Loader2,
-} from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { ActionButton } from '@/components/ui/action-button'
-import { TableEmptyStateRow, SearchInput } from '@/components/ui/shared'
+import { TableEmptyStateRow, TableToolbar, DataTablePagination, ConfirmationModal } from '@/components/ui/shared'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { usePermissionsQuery, useDeletePermissionMutation } from '../_hooks/useRolesPermissions'
 import type { PermissionItem } from '../_types/rolesPermissions.types'
@@ -94,62 +72,32 @@ export function PermissionsTab({ active = true }: PermissionsTabProps) {
   return (
     <div className="space-y-4">
       <Card className="py-0">
-        <div className="flex items-center gap-3 p-5 pb-4">
-          <SearchInput
-            placeholder="Search permissions..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value)
-              setPage(1)
-            }}
-            onClear={() => {
-              setSearch('')
-              setPage(1)
-            }}
-            containerClassName="flex-1 max-w-md"
-            sizeVariant="default"
-          />
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => refetch()}
-              disabled={isLoading}
-              className="h-9 w-9"
-            >
-              {isLoading ? (
-                <Loader2 className="h-4.5 w-4.5 animate-spin" />
-              ) : (
-                <RefreshCw className="h-4.5 w-4.5" />
-              )}
+        <TableToolbar
+          searchPlaceholder="Search permissions..."
+          searchValue={search}
+          onSearchChange={(val) => {
+            setSearch(val)
+            setPage(1)
+          }}
+          onRefresh={() => refetch()}
+          isRefreshing={isLoading}
+          actions={
+            <Button onClick={handleAdd}>
+              <Plus className="mr-1.5 size-4" /> Add Permission
             </Button>
-            <Button onClick={handleAdd} className="h-10 text-xs">
-              <Plus className="mr-1.5 h-4 w-4" /> Add Permission
-            </Button>
-          </div>
-        </div>
+          }
+        />
 
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
+          <div className="relative w-full overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="pl-6 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Resource
-                  </TableHead>
-                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Action
-                  </TableHead>
-                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Full Name / Key
-                  </TableHead>
-                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Status
-                  </TableHead>
-                  <TableHead className="pr-6 text-right text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Actions
-                  </TableHead>
+                  <TableHead>Resource</TableHead>
+                  <TableHead>Action</TableHead>
+                  <TableHead>Full Name / Key</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
 
@@ -171,8 +119,8 @@ export function PermissionsTab({ active = true }: PermissionsTabProps) {
                       </TableCell>
                       <TableCell className="pr-6">
                         <div className="flex justify-end gap-1.5">
-                          <Skeleton className="h-8 w-8 rounded-md" />
-                          <Skeleton className="h-8 w-8 rounded-md" />
+                          <Skeleton className="size-8 rounded-md" />
+                          <Skeleton className="size-8 rounded-md" />
                         </div>
                       </TableCell>
                     </TableRow>
@@ -211,13 +159,13 @@ export function PermissionsTab({ active = true }: PermissionsTabProps) {
                 ) : (
                   permissions.map((permission) => (
                     <TableRow key={permission.id}>
-                      <TableCell className="pl-6 py-3 text-foreground capitalize font-medium text-xs">
+                      <TableCell className="text-foreground capitalize font-medium text-xs">
                         {permission.module || permission.resource || (permission.name?.includes(':') ? permission.name.split(':')[1] : permission.name || '-')}
                       </TableCell>
                       <TableCell className="text-muted-foreground capitalize text-xs">
                         {permission.action || (permission.name?.includes(':') ? permission.name.split(':')[0] : '-')}
                       </TableCell>
-                      <TableCell className="py-3">
+                      <TableCell>
                         <Badge variant="outline" className="font-mono text-[9px] bg-muted/50 border-border">
                           {permission.name}
                         </Badge>
@@ -233,7 +181,7 @@ export function PermissionsTab({ active = true }: PermissionsTabProps) {
                           </Badge>
                         )}
                       </TableCell>
-                      <TableCell className="pr-6 text-right">
+                      <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
                           <ActionButton
                             actionType="edit"
@@ -255,108 +203,35 @@ export function PermissionsTab({ active = true }: PermissionsTabProps) {
           </div>
 
           {!isLoading && !isError && permissions.length > 0 && (
-            <div className="flex items-center justify-between p-4 px-6 border-t bg-muted/30">
-              <div className="text-xs text-muted-foreground">
-                Showing <span className="font-semibold text-foreground">{((page - 1) * limit) + 1}</span> to{" "}
-                <span className="font-semibold text-foreground">
-                  {Math.min(page * limit, totalElements)}
-                </span>{" "}
-                of <span className="font-semibold text-foreground">{totalElements}</span> permissions
-              </div>
-
-              <Pagination className="mx-0 w-auto">
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        if (page > 1) setPage(page - 1)
-                      }}
-                      className={page === 1 ? "pointer-events-none opacity-50 h-8 text-[11px]" : "h-8 text-[11px]"}
-                    />
-                  </PaginationItem>
-
-                  {Array.from({ length: totalPages }).map((_, idx) => {
-                    const pageNum = idx + 1
-                    if (pageNum === 1 || pageNum === totalPages || Math.abs(pageNum - page) <= 1) {
-                      return (
-                        <PaginationItem key={pageNum}>
-                          <PaginationLink
-                            href="#"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              setPage(pageNum)
-                            }}
-                            isActive={page === pageNum}
-                            className="h-8 w-8 text-[11px]"
-                          >
-                            {pageNum}
-                          </PaginationLink>
-                        </PaginationItem>
-                      )
-                    }
-                    if (pageNum === 2 && page > 3) {
-                      return (
-                        <PaginationItem key="ellipsis-start">
-                          <span className="px-2 text-muted-foreground text-xs">...</span>
-                        </PaginationItem>
-                      )
-                    }
-                    if (pageNum === totalPages - 1 && page < totalPages - 2) {
-                      return (
-                        <PaginationItem key="ellipsis-end">
-                          <span className="px-2 text-muted-foreground text-xs">...</span>
-                        </PaginationItem>
-                      )
-                    }
-                    return null
-                  })}
-
-                  <PaginationItem>
-                    <PaginationNext
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        if (page < totalPages) setPage(page + 1)
-                      }}
-                      className={page === totalPages || totalPages === 0 ? "pointer-events-none opacity-50 h-8 text-[11px]" : "h-8 text-[11px]"}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
+            <DataTablePagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalElements={totalElements}
+              pageSize={limit}
+              onPageChange={setPage}
+              itemLabel="permissions"
+            />
           )}
         </CardContent>
       </Card>
 
       <PermissionDialog open={dialogOpen} onOpenChange={setDialogOpen} permission={activePermission} />
 
-      <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
-        <AlertDialogContent className="max-w-md p-6">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-base font-bold">Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription className="text-xs text-muted-foreground">
-              This will permanently delete the permission <span className="font-semibold text-foreground">"{permissionToDelete?.name}"</span>. 
-              This operation cannot be undone and roles using this permission will lose access.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="mt-4">
-            <AlertDialogCancel disabled={deleteMutation.isPending} className="h-9 text-xs">Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(e) => {
-                e.preventDefault()
-                handleDeleteConfirm()
-              }}
-              disabled={deleteMutation.isPending}
-              className="h-9 text-xs bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {deleteMutation.isPending && <Loader2 className="mr-2 size-3.5 animate-spin" />}
-              Delete Permission
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmationModal
+        open={deleteAlertOpen}
+        onOpenChange={setDeleteAlertOpen}
+        title="Delete Permission"
+        description={
+          <>
+            This will permanently delete the permission <span className="font-semibold text-foreground">"{permissionToDelete?.name}"</span>. 
+            This operation cannot be undone and roles using this permission will lose access.
+          </>
+        }
+        confirmText="Delete Permission"
+        variant="destructive"
+        isPending={deleteMutation.isPending}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   )
 }

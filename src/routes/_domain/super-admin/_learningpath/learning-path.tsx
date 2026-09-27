@@ -13,22 +13,9 @@ import {
   TableHead,
   TableCell,
 } from '@/components/ui/table'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationEllipsis,
-} from '@/components/ui/pagination'
-import {
-  RefreshCw,
-  Plus,
-  Loader2,
-} from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { DeleteModal } from '@/components/ui/delete-modal'
-import { SearchableSelect, TableEmptyStateRow, SearchInput } from '@/components/ui/shared'
+import { SearchableSelect, TableEmptyStateRow, TableToolbar, DataTablePagination } from '@/components/ui/shared'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { useLearningPathsQuery, useDeleteLearningPathMutation } from './_hooks/useLearningPath'
 import { useCategoriesQuery } from '../_category/_hooks/useCategory'
@@ -145,91 +132,70 @@ function LearningPathPage() {
         title="Learning Path"
         description="Manage user-journey roadmaps, path nodes, and category/grade alignments."
       >
-        <Button onClick={handleAdd} className="text-xs !h-9">
+        <Button onClick={handleAdd} size="sm">
           <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Learning Path
         </Button>
       </PageHeader>
 
       {/* Main Content Card */}
-      <Card className="py-0">
+      <Card className="py-0 gap-0">
         {/* Toolbar */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-5 pb-0">
-          <div className="flex flex-1 items-center gap-3 max-w-3xl">
-            <SearchInput
-              placeholder="Search learning paths by English or Khmer title..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value)
-                setPage(1)
-              }}
-              onClear={() => {
-                setSearch('')
-                setPage(1)
-              }}
-              containerClassName="flex-1"
-              sizeVariant="default"
-            />
-
-            {/* Category Filter */}
-            <SearchableSelect
-              options={categoryFilterOptions}
-              value={selectedCategoryId}
-              onChange={(val) => {
-                setSelectedCategoryId(val || 'all')
-                setPage(1)
-              }}
-              sortable="asc"
-              placeholder="All Categories"
-              searchPlaceholder="Search category..."
-              triggerClassName="w-[180px]"
-            />
-
-            {/* Grade Filter */}
-            <SearchableSelect
-              options={gradeFilterOptions}
-              value={selectedGradeId}
-              onChange={(val) => {
-                setSelectedGradeId(val || 'all')
-                setPage(1)
-              }}
-              sortable="asc"
-              placeholder="All Grades"
-              searchPlaceholder="Search grade..."
-              triggerClassName="w-[150px]"
-            />
-          </div>
-
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => {
-              refetch().then(() => {
-                toast.success('Learning paths list refreshed successfully')
-              })
-            }}
-            disabled={isFetching}
-            className="h-9.5 w-9.5 shrink-0"
-          >
-            {isFetching ? (
-              <Loader2 className="h-4.5 w-4.5 animate-spin" />
-            ) : (
-              <RefreshCw className="h-4.5 w-4.5" />
-            )}
-          </Button>
-        </div>
+        <TableToolbar
+          searchPlaceholder="Search learning paths by English or Khmer title..."
+          searchValue={search}
+          onSearchChange={(val) => {
+            setSearch(val)
+            setPage(1)
+          }}
+          filters={
+            <>
+              <SearchableSelect
+                options={categoryFilterOptions}
+                value={selectedCategoryId}
+                onChange={(val) => {
+                  setSelectedCategoryId(val || 'all')
+                  setPage(1)
+                }}
+                sortable="asc"
+                placeholder="All Categories"
+                searchPlaceholder="Search category..."
+                triggerClassName="w-[180px]"
+              />
+              <SearchableSelect
+                options={gradeFilterOptions}
+                value={selectedGradeId}
+                onChange={(val) => {
+                  setSelectedGradeId(val || 'all')
+                  setPage(1)
+                }}
+                sortable="asc"
+                placeholder="All Grades"
+                searchPlaceholder="Search grade..."
+                triggerClassName="w-[150px]"
+              />
+            </>
+          }
+          onRefresh={() => {
+            refetch().then(() => {
+              toast.success('Learning paths list refreshed successfully')
+            })
+          }}
+          isRefreshing={isFetching}
+        />
 
         <CardContent className="p-0">
-          <Table>
+          <div className="relative w-full overflow-x-auto">
+            <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="pl-6 w-[90px]">Sequence</TableHead>
+                <TableHead className="w-[90px]">Sequence</TableHead>
                 <TableHead>Learning Path Title</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Grade</TableHead>
                 <TableHead>XP & Pass Rules</TableHead>
                 <TableHead>Quiz Packages</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="pr-6 text-right w-[140px]">Actions</TableHead>
+                <TableHead className="text-right w-[140px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -324,7 +290,7 @@ function LearningPathPage() {
                   return (
                     <TableRow key={l.id}>
                       {/* Sequence */}
-                      <TableCell className="pl-6 py-3.5 font-bold">
+                      <TableCell className="font-bold">
                         #{l.sequence_order ?? l.sequenceOrder ?? l.sequence ?? 1}
                       </TableCell>
 
@@ -407,7 +373,7 @@ function LearningPathPage() {
                       </TableCell>
 
                       {/* Actions Column */}
-                      <TableCell className="pr-6 text-right">
+                      <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
                           <ActionButton
                             actionType="info"
@@ -432,81 +398,20 @@ function LearningPathPage() {
               )}
             </TableBody>
           </Table>
+        </div>
 
-          {/* Pagination Footer */}
-          {!isLoading && !isError && learningPaths.length > 0 && (
-            <div className="flex items-center justify-between p-4 px-6 border-t">
-              <div className="text-xs">
-                Showing <span className="font-semibold">{((page - 1) * limit) + 1}</span> to{" "}
-                <span className="font-semibold">
-                  {Math.min(page * limit, totalElements)}
-                </span>{" "}
-                of <span className="font-semibold">{totalElements}</span> learning paths
-              </div>
-
-              <Pagination className="mx-0 w-auto">
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        if (page > 1) setPage(page - 1)
-                      }}
-                      className={page === 1 ? "pointer-events-none opacity-50" : undefined}
-                    />
-                  </PaginationItem>
-
-                  {Array.from({ length: totalPages }).map((_, idx) => {
-                    const pageNum = idx + 1
-                    if (pageNum === 1 || pageNum === totalPages || Math.abs(pageNum - page) <= 1) {
-                      return (
-                        <PaginationItem key={pageNum}>
-                          <PaginationLink
-                            href="#"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              setPage(pageNum)
-                            }}
-                            isActive={page === pageNum}
-                          >
-                            {pageNum}
-                          </PaginationLink>
-                        </PaginationItem>
-                      )
-                    }
-                    if (pageNum === 2 && page > 3) {
-                      return (
-                        <PaginationItem key="ellipsis-start">
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                      )
-                    }
-                    if (pageNum === totalPages - 1 && page < totalPages - 2) {
-                      return (
-                        <PaginationItem key="ellipsis-end">
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                      )
-                    }
-                    return null
-                  })}
-
-                  <PaginationItem>
-                    <PaginationNext
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        if (page < totalPages) setPage(page + 1)
-                      }}
-                      className={page === totalPages || totalPages === 0 ? "pointer-events-none opacity-50" : undefined}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          )}
-        </CardContent>
+        {/* Pagination Footer */}
+        {!isLoading && !isError && learningPaths.length > 0 && (
+          <DataTablePagination
+            currentPage={page}
+            totalPages={totalPages}
+            totalItems={totalElements}
+            pageSize={limit}
+            itemName="learning paths"
+            onPageChange={setPage}
+          />
+        )}
+      </CardContent>
       </Card>
 
       {/* Learning Path Create/Edit Dialog Form */}

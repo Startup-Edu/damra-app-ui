@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Edit, Trash2, Eye, Settings, Key, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 
 export type ActionType = "edit" | "delete" | "view" | "setting" | "key" | "info"
@@ -72,8 +72,9 @@ export function ActionButton({
       variant={variant}
       size={size}
       disabled={disabled}
+      aria-label={typeof tooltipText === "string" && tooltipText ? tooltipText : actionType}
       className={cn(
-        "h-8 w-8 transition-all duration-200 hover:scale-105 active:scale-95",
+        "h-8 w-8 transition-[transform,background-color,color] duration-160 ease-[var(--ease-out)] active:scale-[0.97]",
         config?.className,
         className
       )}
@@ -88,18 +89,16 @@ export function ActionButton({
   }
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          {buttonElement}
-        </TooltipTrigger>
-        <TooltipContent
-          side={tooltipSide}
-          className="text-[10px] py-1 px-2 font-medium"
-        >
-          {tooltipText}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        {buttonElement}
+      </TooltipTrigger>
+      <TooltipContent
+        side={tooltipSide}
+        className="text-[10px] py-1 px-2 font-medium"
+      >
+        {tooltipText}
+      </TooltipContent>
+    </Tooltip>
   )
 }
