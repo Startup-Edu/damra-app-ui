@@ -48,6 +48,6 @@ export const superAdminQuestionService = {
   },
 
   bulkImportQuestions: async (data: BulkImportQuestionsDTO) => {
-    return apiClient.post<BulkImportQuestionsResponse>('/admin/questions/bulk-import', data)
+    return apiClient.post<BulkImportQuestionsResponse>('/admin/questions/import', data)
   },
 }

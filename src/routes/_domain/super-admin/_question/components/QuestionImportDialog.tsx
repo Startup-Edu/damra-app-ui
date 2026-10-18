@@ -47,7 +47,7 @@ export function QuestionImportDialog({
   const [presetDifficulty, setPresetDifficulty] = useState<DifficultyEnum>('EASY')
   const [presetXpValue, setPresetXpValue] = useState<number>(10)
   const [presetTimeLimit, setPresetTimeLimit] = useState<string>('')
-  const [overrideExisting, setOverrideExisting] = useState<boolean>(false)
+  const [overrideExisting, setOverrideExisting] = useState<boolean>(true)
 
   // Result Metrics
   const [totalSubmitted, setTotalSubmitted] = useState<number>(0)
@@ -79,7 +79,7 @@ export function QuestionImportDialog({
     setPresetDifficulty('EASY')
     setPresetXpValue(10)
     setPresetTimeLimit('')
-    setOverrideExisting(false)
+    setOverrideExisting(true)
     setTotalSubmitted(0)
     setImportedCount(0)
     setSkippedCount(0)

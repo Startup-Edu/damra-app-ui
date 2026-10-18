@@ -82,15 +82,28 @@ export const parseAndValidateImportPayload = (
 
     // 3. Grade & Category Resolution
     const rawGrade = item.grade_id || item.gradeId || ''
-    const gradeId = overrideExisting ? (presetGradeId || rawGrade) : (rawGrade || presetGradeId)
-    if (!gradeId) {
-      errors.push('Grade ID missing (Select a target Grade in presets or provide grade_id)')
-    }
-
     const rawCat = item.category_id || item.categoryId || ''
-    const categoryId = overrideExisting ? (presetCategoryId || rawCat) : (rawCat || presetCategoryId)
-    if (!categoryId) {
-      errors.push('Category ID missing (Select a target Category in presets or provide category_id)')
+
+    let gradeId = ''
+    let categoryId = ''
+
+    if (presetGradeId) {
+      // When a grade is selected on the form, use the selected grade and category,
+      // not the grade_id and category_id from the JSON file.
+      gradeId = presetGradeId
+      categoryId = presetCategoryId
+      if (!categoryId) {
+        errors.push('Target Category is required (Select a Category from the dropdown for the chosen Grade)')
+      }
+    } else {
+      gradeId = overrideExisting ? (presetGradeId || rawGrade) : (rawGrade || presetGradeId)
+      categoryId = overrideExisting ? (presetCategoryId || rawCat) : (rawCat || presetCategoryId)
+      if (!gradeId) {
+        errors.push('Grade ID missing (Select a target Grade in presets or provide grade_id)')
+      }
+      if (!categoryId) {
+        errors.push('Category ID missing (Select a target Category in presets or provide category_id)')
+      }
     }
 
     // 4. Difficulty & XP Presets
@@ -160,7 +173,7 @@ export const parseAndValidateImportPayload = (
     }
 
     const processedPayload: CreateQuestionDTO = {
-      gradeId,
+      gradeId: gradeId || null,
       categoryId,
       questionType: type,
       difficulty: diff,
@@ -169,7 +182,7 @@ export const parseAndValidateImportPayload = (
       questionTextEn: qEn,
       questionTextKh: qKh,
       explanationEn: item.explanation_en || item.explanationEn || null,
-      explanationKh: item.explanationKh || item.explanationKh || null,
+      explanationKh: item.explanation_kh || item.explanationKh || null,
       imageUrl: item.image_url || item.imageUrl || null,
       xpValue: Number(xp),
       timeLimitSeconds: timer ? Number(timer) : null,
