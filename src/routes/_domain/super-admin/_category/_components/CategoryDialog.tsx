@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { SearchableSelect } from '@/components/ui/shared'
+import { ImageUpload } from '@/components/ui/image-upload'
 import {
   useCreateCategoryMutation,
   useUpdateCategoryMutation,
@@ -146,20 +147,23 @@ export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto custom-scrollbar">
-        <DialogHeader className="space-y-1.5 border-b pb-3">
-          <DialogTitle className="text-lg font-bold">
+      <DialogContent className="sm:max-w-[540px] p-0 gap-0 max-h-[90vh] flex flex-col overflow-hidden">
+        {/* Fixed Header */}
+        <DialogHeader className="px-6 py-4 border-b border-border bg-background shrink-0 space-y-1">
+          <DialogTitle className="text-base font-bold">
             {isEditing ? 'Modify Category' : 'Create New Category'}
           </DialogTitle>
-          <DialogDescription className="text-xs">
+          <DialogDescription className="text-xs text-muted-foreground">
             {isEditing
               ? 'Update the category details, hierarchy associations, and status.'
               : 'Add a new category to organize quizzes, levels, and content.'}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+          {/* Scrollable Form Body */}
+          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 custom-scrollbar">
+            <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="category-name-en" className="text-[11px] font-semibold">
                 English Name <span className="text-rose-500">*</span>
@@ -217,35 +221,6 @@ export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogP
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="category-slug" className="text-[11px] font-semibold">
-                Custom Slug
-              </Label>
-              <Input
-                id="category-slug"
-                placeholder="Auto-generated if empty"
-                value={slug}
-                onChange={(e) => setSlug(e.target.value)}
-                disabled={isLoading}
-              />
-              <p className="text-[9px] text-muted-foreground">Must be unique, lowercase, URL-friendly.</p>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="category-icon" className="text-[11px] font-semibold">
-                Icon URL
-              </Label>
-              <Input
-                id="category-icon"
-                placeholder="https://example.com/icon.svg"
-                value={iconUrl}
-                onChange={(e) => setIconUrl(e.target.value)}
-                disabled={isLoading}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
               <Label htmlFor="category-parent" className="text-[11px] font-semibold">
                 Parent Category (Hierarchy)
               </Label>
@@ -281,6 +256,37 @@ export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogP
             </div>
           </div>
 
+          <div className="space-y-1.5">
+            <Label htmlFor="category-slug" className="text-[11px] font-semibold">
+              Custom Slug
+            </Label>
+            <Input
+              id="category-slug"
+              placeholder="Auto-generated if empty (e.g. science-tech)"
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              disabled={isLoading}
+            />
+            <p className="text-[9px] text-muted-foreground">Must be unique, lowercase, URL-friendly.</p>
+          </div>
+
+          {/* Category Icon with Browser Compression */}
+          <ImageUpload
+            label="Category Icon"
+            description="Upload icon (PNG, JPG, WebP, SVG). Automatically compressed in browser before upload."
+            value={iconUrl}
+            onChange={(url) => setIconUrl(url || '')}
+            disabled={isLoading}
+            aspectRatio="square"
+            maxSizeMB={5}
+            compression={{
+              maxWidth: 400,
+              maxHeight: 400,
+              quality: 0.85,
+              format: 'image/webp',
+            }}
+          />
+
           <div className="flex items-center justify-between p-3 bg-muted/40 rounded-lg border border-border mt-2">
             <div className="space-y-0.5">
               <Label htmlFor="category-status" className="text-[11px] font-semibold">
@@ -304,8 +310,10 @@ export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogP
               <p className="text-xs font-medium leading-tight">{validationError}</p>
             </div>
           )}
+          </div>
 
-          <DialogFooter className="pt-3 border-t border-border">
+          {/* Fixed Footer */}
+          <DialogFooter className="px-6 py-3 border-t border-border bg-muted/20 shrink-0 flex items-center justify-end gap-2">
             <Button
               type="button"
               variant="outline"

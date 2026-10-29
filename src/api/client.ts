@@ -41,6 +41,41 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   return data
 }
 
+async function uploadRequest<T>(path: string, formData: FormData, options: RequestOptions = {}): Promise<T> {
+  const { params, headers, ...restOptions } = options
+
+  let url = `${BASE_URL}${path}`
+  if (params) {
+    const searchParams = new URLSearchParams(params)
+    url += `?${searchParams.toString()}`
+  }
+
+  const response = await fetch(url, {
+    credentials: 'include',
+    method: 'POST',
+    headers: {
+      ...headers,
+    },
+    body: formData,
+    ...restOptions,
+  })
+
+  const data = await response.json()
+  if (!response.ok) {
+    const errorDetailMsg =
+      (Array.isArray(data.error) && data.error[0]?.message) ||
+      data.error?.details?.[0]?.message ||
+      data.details?.[0]?.message ||
+      data.message ||
+      `Request failed with status ${response.status}`
+    const error = new Error(errorDetailMsg)
+    ;(error as any).data = data
+    throw error
+  }
+
+  return data
+}
+
 export const apiClient = {
   get: <T>(path: string, options?: RequestOptions) => 
     request<T>(path, { ...options, method: 'GET' }),
@@ -52,4 +87,6 @@ export const apiClient = {
     request<T>(path, { ...options, method: 'PATCH', body: body ? JSON.stringify(body) : undefined }),
   delete: <T>(path: string, options?: RequestOptions) => 
     request<T>(path, { ...options, method: 'DELETE' }),
+  upload: <T>(path: string, formData: FormData, options?: RequestOptions) =>
+    uploadRequest<T>(path, formData, options),
 }

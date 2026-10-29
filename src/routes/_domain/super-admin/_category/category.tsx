@@ -31,6 +31,35 @@ export const Route = createFileRoute('/_domain/super-admin/_category/category')(
   component: CategoriesPage,
 })
 
+function CategoryIconCell({
+  iconUrl,
+  name,
+  isSub,
+}: {
+  iconUrl?: string | null
+  name: string
+  isSub?: boolean
+}) {
+  const [hasError, setHasError] = useState(false)
+
+  if (iconUrl && !hasError) {
+    return (
+      <img
+        src={iconUrl}
+        alt={name}
+        className="size-5 object-contain"
+        onError={() => setHasError(true)}
+      />
+    )
+  }
+
+  return isSub ? (
+    <Tag className="size-4 text-emerald-500" />
+  ) : (
+    <Folder className="size-4 text-blue-500 fill-blue-500/10" />
+  )
+}
+
 function CategoriesPage() {
   const [page, setPage] = useState(1)
   const [limit] = useState(10)
@@ -199,13 +228,11 @@ function CategoriesPage() {
                       {/* Icon Column */}
                       <TableCell>
                         <div className="size-8 rounded-md bg-muted/40 border border-border flex items-center justify-center overflow-hidden shrink-0">
-                          {cat.icon_url ? (
-                            <img src={cat.icon_url} alt={cat.name_en} className="size-5 object-contain" />
-                          ) : cat.parent_id ? (
-                            <Tag className="size-4 text-emerald-500" />
-                          ) : (
-                            <Folder className="size-4 text-blue-500 fill-blue-500/10" />
-                          )}
+                          <CategoryIconCell
+                            iconUrl={cat.icon_url}
+                            name={cat.name_en}
+                            isSub={Boolean(cat.parent_id)}
+                          />
                         </div>
                       </TableCell>
 

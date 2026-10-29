@@ -22,9 +22,14 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         '/api': {
-          target: env.VITE_API_TARGET,
+          target: env.VITE_API_TARGET || 'http://localhost:3000',
           changeOrigin: true,
-          secure: true,
+          secure: false,
+        },
+        '/uploads': {
+          target: env.VITE_API_TARGET || 'http://localhost:3000',
+          changeOrigin: true,
+          secure: false,
         },
       },
     },
