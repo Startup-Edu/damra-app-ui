@@ -4,12 +4,10 @@ import {
   Image as ImageIcon,
   Trash2,
   RefreshCw,
-  CheckCircle2,
   AlertCircle,
   ExternalLink,
   Link as LinkIcon,
   Eye,
-  X,
   FileImage,
   Sparkles,
 } from 'lucide-react'
@@ -416,6 +414,7 @@ export function ImageUpload({
         <div
           className={cn(
             'relative group rounded-xl border-2 border-dashed transition-all duration-200 overflow-hidden p-4 cursor-pointer',
+            ratioClass,
             dragActive
               ? 'border-primary bg-primary/5 ring-4 ring-primary/10 scale-[1.01]'
               : 'border-border/80 hover:border-primary/50 bg-muted/20 hover:bg-muted/30',

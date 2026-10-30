@@ -21,6 +21,7 @@ import { Route as DomainAuthResetPasswordRouteImport } from './routes/_domain/au
 import { Route as DomainAuthRegisterRouteImport } from './routes/_domain/auth/register'
 import { Route as DomainAuthLoginRouteImport } from './routes/_domain/auth/login'
 import { Route as DomainAuthForgetPasswordRouteImport } from './routes/_domain/auth/forget-password'
+import { Route as DomainSuperAdminStudentVerificationStudentVerificationRouteImport } from './routes/_domain/super-admin/_student-verification/student-verification'
 import { Route as DomainSuperAdminQuizpackQuizepackRouteImport } from './routes/_domain/super-admin/_quizpack/quizepack'
 import { Route as DomainSuperAdminQuestiontypeQuestiontypeRouteImport } from './routes/_domain/super-admin/_questiontype/questiontype'
 import { Route as DomainSuperAdminQuestionQuestionRouteImport } from './routes/_domain/super-admin/_question/question'
@@ -92,6 +93,12 @@ const DomainAuthForgetPasswordRoute =
     path: '/forget-password',
     getParentRoute: () => DomainAuthRoute,
   } as any)
+const DomainSuperAdminStudentVerificationStudentVerificationRoute =
+  DomainSuperAdminStudentVerificationStudentVerificationRouteImport.update({
+    id: '/_student-verification/student-verification',
+    path: '/student-verification',
+    getParentRoute: () => DomainSuperAdminRoute,
+  } as any)
 const DomainSuperAdminQuizpackQuizepackRoute =
   DomainSuperAdminQuizpackQuizepackRouteImport.update({
     id: '/_quizpack/quizepack',
@@ -148,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/super-admin/question': typeof DomainSuperAdminQuestionQuestionRoute
   '/super-admin/questiontype': typeof DomainSuperAdminQuestiontypeQuestiontypeRoute
   '/super-admin/quizepack': typeof DomainSuperAdminQuizpackQuizepackRoute
+  '/super-admin/student-verification': typeof DomainSuperAdminStudentVerificationStudentVerificationRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -167,6 +175,7 @@ export interface FileRoutesByTo {
   '/super-admin/question': typeof DomainSuperAdminQuestionQuestionRoute
   '/super-admin/questiontype': typeof DomainSuperAdminQuestiontypeQuestiontypeRoute
   '/super-admin/quizepack': typeof DomainSuperAdminQuizpackQuizepackRoute
+  '/super-admin/student-verification': typeof DomainSuperAdminStudentVerificationStudentVerificationRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -188,6 +197,7 @@ export interface FileRoutesById {
   '/_domain/super-admin/_question/question': typeof DomainSuperAdminQuestionQuestionRoute
   '/_domain/super-admin/_questiontype/questiontype': typeof DomainSuperAdminQuestiontypeQuestiontypeRoute
   '/_domain/super-admin/_quizpack/quizepack': typeof DomainSuperAdminQuizpackQuizepackRoute
+  '/_domain/super-admin/_student-verification/student-verification': typeof DomainSuperAdminStudentVerificationStudentVerificationRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -210,6 +220,7 @@ export interface FileRouteTypes {
     | '/super-admin/question'
     | '/super-admin/questiontype'
     | '/super-admin/quizepack'
+    | '/super-admin/student-verification'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -229,6 +240,7 @@ export interface FileRouteTypes {
     | '/super-admin/question'
     | '/super-admin/questiontype'
     | '/super-admin/quizepack'
+    | '/super-admin/student-verification'
   id:
     | '__root__'
     | '/'
@@ -249,6 +261,7 @@ export interface FileRouteTypes {
     | '/_domain/super-admin/_question/question'
     | '/_domain/super-admin/_questiontype/questiontype'
     | '/_domain/super-admin/_quizpack/quizepack'
+    | '/_domain/super-admin/_student-verification/student-verification'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -343,6 +356,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DomainAuthForgetPasswordRouteImport
       parentRoute: typeof DomainAuthRoute
     }
+    '/_domain/super-admin/_student-verification/student-verification': {
+      id: '/_domain/super-admin/_student-verification/student-verification'
+      path: '/student-verification'
+      fullPath: '/super-admin/student-verification'
+      preLoaderRoute: typeof DomainSuperAdminStudentVerificationStudentVerificationRouteImport
+      parentRoute: typeof DomainSuperAdminRoute
+    }
     '/_domain/super-admin/_quizpack/quizepack': {
       id: '/_domain/super-admin/_quizpack/quizepack'
       path: '/quizepack'
@@ -418,6 +438,7 @@ interface DomainSuperAdminRouteChildren {
   DomainSuperAdminQuestionQuestionRoute: typeof DomainSuperAdminQuestionQuestionRoute
   DomainSuperAdminQuestiontypeQuestiontypeRoute: typeof DomainSuperAdminQuestiontypeQuestiontypeRoute
   DomainSuperAdminQuizpackQuizepackRoute: typeof DomainSuperAdminQuizpackQuizepackRoute
+  DomainSuperAdminStudentVerificationStudentVerificationRoute: typeof DomainSuperAdminStudentVerificationStudentVerificationRoute
 }
 
 const DomainSuperAdminRouteChildren: DomainSuperAdminRouteChildren = {
@@ -435,6 +456,8 @@ const DomainSuperAdminRouteChildren: DomainSuperAdminRouteChildren = {
     DomainSuperAdminQuestiontypeQuestiontypeRoute,
   DomainSuperAdminQuizpackQuizepackRoute:
     DomainSuperAdminQuizpackQuizepackRoute,
+  DomainSuperAdminStudentVerificationStudentVerificationRoute:
+    DomainSuperAdminStudentVerificationStudentVerificationRoute,
 }
 
 const DomainSuperAdminRouteWithChildren =

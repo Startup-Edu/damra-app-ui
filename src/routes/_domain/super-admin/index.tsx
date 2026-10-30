@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -13,10 +13,12 @@ import {
   RefreshCw,
   AlertCircle,
   Clock,
+  GraduationCap,
 } from 'lucide-react'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useDashboardStatsQuery } from './_dashboard/_hooks/useDashboard'
 import { StatCard } from './_dashboard/_components/StatCard'
+import { VerificationStatCard } from './_dashboard/_components/VerificationStatCard'
 import { UserRatioCard } from './_dashboard/_components/UserRatioCard'
 import { QuickActionsCard } from './_dashboard/_components/QuickActionsCard'
 
@@ -52,6 +54,12 @@ function DashboardPage() {
   const categoriesData = stats?.categories || { total: 0, active: 0, inactive: 0 }
   const quizPackagesData = stats?.quiz_packages || { total: 0, active: 0, inactive: 0 }
   const learningPathsData = stats?.learning_paths || { total: 0, active: 0, inactive: 0 }
+  const studentVerificationsData = stats?.student_verifications || {
+    total: 0,
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+  }
 
   return (
     <div className="flex flex-col gap-6 text-foreground pb-8">
@@ -93,6 +101,36 @@ function DashboardPage() {
         </CardHeader>
       </Card>
 
+      {/* Pending Student Verifications Alert Banner */}
+      {!isLoading && studentVerificationsData.pending > 0 && (
+        <Alert className="border-amber-500/40 bg-amber-500/10 text-amber-950 dark:text-amber-100 flex items-center justify-between gap-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className="size-9 rounded-lg bg-amber-500/20 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
+              <GraduationCap className="size-5" />
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <AlertTitle className="text-sm font-semibold tracking-tight text-amber-950 dark:text-amber-100 mb-0">
+                {studentVerificationsData.pending} Student Verification{studentVerificationsData.pending > 1 ? 's' : ''} Awaiting Review
+              </AlertTitle>
+              <AlertDescription className="text-xs text-amber-800 dark:text-amber-300">
+                Action required: Student ID cards have been uploaded and need verification before exam access.
+              </AlertDescription>
+            </div>
+          </div>
+          <AlertAction>
+            <Button
+              size="sm"
+              className="bg-amber-600 hover:bg-amber-700 text-white font-medium shrink-0 h-8"
+              asChild
+            >
+              <Link to="/super-admin/student-verification">
+                Review Queue
+              </Link>
+            </Button>
+          </AlertAction>
+        </Alert>
+      )}
+
       {/* Error Callout using shadcn Alert */}
       {isError && (
         <Alert variant="destructive">
@@ -113,7 +151,7 @@ function DashboardPage() {
         </Alert>
       )}
 
-      {/* 4 Core Platform Metric Cards */}
+      {/* 5 Core Platform Metric Cards */}
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold tracking-tight uppercase text-muted-foreground">
@@ -124,7 +162,7 @@ function DashboardPage() {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5">
           {/* Total Users */}
           <StatCard
             title="Total Users"
@@ -134,6 +172,15 @@ function DashboardPage() {
             icon={Users}
             href="/super-admin/users-management"
             linkText="Manage Users"
+            isLoading={isLoading}
+          />
+
+          {/* Student Verifications */}
+          <VerificationStatCard
+            total={studentVerificationsData.total}
+            pending={studentVerificationsData.pending}
+            approved={studentVerificationsData.approved}
+            rejected={studentVerificationsData.rejected}
             isLoading={isLoading}
           />
 

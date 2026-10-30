@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { LayoutDashboard, Users, GraduationCap, Shield, ShieldCheck, X, PanelsTopLeft, FolderTree, Layers, BookOpen, FileQuestion, HelpCircle, type LucideIcon } from 'lucide-react'
+import { LayoutDashboard, Users, GraduationCap, Shield, ShieldCheck, X, PanelsTopLeft, FolderTree, Layers, BookOpen, FileQuestion, HelpCircle, UserCheck, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLayoutStore } from '@/store/useLayoutStore'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -36,6 +36,7 @@ const navigationGroups: NavGroup[] = [
     groupName: 'Authentication',
     items: [
       { name: 'Users Management', href: '/super-admin/users-management', icon: Users },
+      { name: 'Student Verifications', href: '/super-admin/student-verification', icon: UserCheck },
       { name: 'Roles & Permission', href: '/super-admin/roles-permissions', icon: ShieldCheck },
     ]
   },

@@ -8,9 +8,16 @@ import {
   ShieldCheck,
   Activity,
   ArrowRight,
+  UserCheck,
 } from 'lucide-react'
 
 const actions = [
+  {
+    title: 'Student Verifications',
+    description: 'Review student ID submissions & grade approvals',
+    href: '/super-admin/student-verification',
+    icon: UserCheck,
+  },
   {
     title: 'Category Setup',
     description: 'Organize subjects, levels & taxonomies',
